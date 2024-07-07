@@ -74,7 +74,7 @@ public class TeleOpBase extends CommandOpMode {
 
     public void initAllianceRelated(RobotEx.Alliance alliance) {
         robot = new IntoTheDeepRobot(hardwareMap, RobotConstants, telemetry, driverOp, toolOp,
-                RobotEx.OpModeType.TELEOP,  alliance, "external_imu",
+                RobotEx.OpModeType.TELEOP, alliance, "external_imu",
                 false, pose, runtime);
     }
 
