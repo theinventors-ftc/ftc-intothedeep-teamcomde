@@ -9,24 +9,103 @@ import java.util.HashMap;
 public class ArmSubsystem extends SubsystemBase {
     private final ServoImplEx armLeft, armRight, wrist;
 
-    enum ArmState {
-        UP,
-        DOWN
+    // ------------------------------------------ States ---------------------------------------- //
+    public enum ArmState {
+        INTAKE,
+        PARK,
+        HIGH,
+        PERP
     }
-    enum WristState {
-        UP,
-        DOWN
+    public enum WristState {
+        INTAKE,
+        PARK,
+        HIGH,
+        PERP
     }
     private ArmState armState;
     private WristState wristState;
 
-    HashMap<ArmState, Double> arm_positions = new HashMap<ArmState, Double>() {{
-        put(ArmState.UP, 0.0);
-        put(ArmState.DOWN, 0.5);
+    HashMap<ArmState, Double> arm_positionsL = new HashMap<ArmState, Double>() {{
+        put(ArmState.INTAKE, 0.2);
+        put(ArmState.PARK, 0.5);
+        put(ArmState.HIGH, 0.8);
+        put(ArmState.PERP, 0.9);
     }};
+
+    HashMap<ArmState, Double> arm_positionsR = new HashMap<ArmState, Double>() {{
+        put(ArmState.INTAKE, 0.8);
+        put(ArmState.PARK, 0.5);
+        put(ArmState.HIGH, 0.2);
+        put(ArmState.PERP, 0.1);
+    }};
+
+    HashMap<WristState, Double> wrist_positions = new HashMap<WristState, Double>() {{
+        put(WristState.INTAKE, 0.2);
+        put(WristState.PARK, 0.2);
+        put(WristState.HIGH, 0.7);
+        put(WristState.PERP, 0.7);
+    }};
+
     public ArmSubsystem(HardwareMap hm) {
         armLeft = hm.get(ServoImplEx.class, "arm_left");
         armRight = hm.get(ServoImplEx.class, "arm_right");
         wrist = hm.get(ServoImplEx.class, "wrist");
+
+        arm_goPark();
+        wrist_goPark();
+    }
+
+    // ---------------------------------------- Actuators --------------------------------------- //
+
+    void setArmState(ArmState state) {
+        armState = state;
+        armLeft.setPosition((double)arm_positionsL.get(state));
+        armRight.setPosition(1.0-(double)arm_positionsR.get(state));
+    }
+
+    void arm_goIntake() {
+        setArmState(ArmState.INTAKE);
+    }
+
+    void arm_goPark() {
+        setArmState(ArmState.PARK);
+    }
+
+    void arm_goHigh() {
+        setArmState(ArmState.HIGH);
+    }
+
+    void arm_goPerp() {
+        setArmState(ArmState.PERP);
+    }
+
+    void setWristState(WristState state) {
+        wristState = state;
+        wrist.setPosition((double)wrist_positions.get(state));
+    }
+
+    void wrist_goIntake() {
+        setWristState(WristState.INTAKE);
+    }
+
+    void wrist_goPark() {
+        setWristState(WristState.PARK);
+    }
+
+    void wrist_goHigh() {
+        setWristState(WristState.HIGH);
+    }
+
+    void wrist_goPerp() {
+        setWristState(WristState.PERP);
+    }
+
+    // ------------------------------------- State Getters -------------------------------------- //
+    public ArmState getArmState() {
+        return armState;
+    }
+
+    public WristState getWristState() {
+        return wristState;
     }
 }

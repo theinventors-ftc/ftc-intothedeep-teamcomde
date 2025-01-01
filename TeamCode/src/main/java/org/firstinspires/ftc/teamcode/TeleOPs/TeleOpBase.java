@@ -60,7 +60,7 @@ public class TeleOpBase extends CommandOpMode {
         RobotConstants.VELO_KD = 0;
 
         RobotConstants.TICKS_PER_REV = 537;
-        RobotConstants.MAX_RPM = 312;
+        RobotConstants.MAX_RPM = 435;
 
         RobotConstants.DEFAULT_SPEED_PERC = 0.5;
         RobotConstants.SLOW_SPEED_PERC = 0.3;

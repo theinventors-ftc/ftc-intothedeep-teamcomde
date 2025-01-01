@@ -10,12 +10,12 @@ public class ClawSubsystem extends SubsystemBase {
     private final ServoImplEx clawServo, clawRotServo;
 
     // --------------------------------------- Claw States -------------------------------------- //
-    enum ClawState {
+    public enum ClawState {
         OPEN,
         JUST_OPENED,
         CLOSED
     }
-    enum ClawRotState {
+    public enum ClawRotState {
         NORMAL,
         FLIPPED,
     }
@@ -38,10 +38,10 @@ public class ClawSubsystem extends SubsystemBase {
         clawRotServo = hm.get(ServoImplEx.class, "claw_rot");
 
         goNormal();
-        grab();
+        justOpen();
     }
 
-    // ------------------------------------------ Claw ------------------------------------------ //
+    // ---------------------------------------- Actuators --------------------------------------- //
     public void grab() {
         this.state = ClawState.CLOSED;
         clawServo.setPosition((double)claw_positions.get(ClawState.CLOSED));
@@ -57,7 +57,6 @@ public class ClawSubsystem extends SubsystemBase {
         clawServo.setPosition((double)claw_positions.get(ClawState.OPEN));
     }
 
-    //--------------------------------------- Claw Rotation --------------------------------------//
     public void goNormal() {
         this.rotState = ClawRotState.NORMAL;
         clawRotServo.setPosition((double)claw_rot_positions.get(ClawRotState.NORMAL));
