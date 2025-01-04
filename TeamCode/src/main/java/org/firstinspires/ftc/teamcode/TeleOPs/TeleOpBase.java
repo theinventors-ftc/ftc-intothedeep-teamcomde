@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.IntoTheDeepRobot;
 import org.firstinspires.ftc.teamcode.PoseStorage;
+import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.RobotEx;
 import org.inventors.ftc.robotbase.drive.DriveConstants;
 import org.inventors.ftc.robotbase.hardware.GamepadExEx;
@@ -21,11 +22,16 @@ public class TeleOpBase extends CommandOpMode {
     private ElapsedTime runtime;
     private IntoTheDeepRobot robot;
 
+    private RobotMap robotMap;
+
     @Override
     public void initialize() {
         driverOp = new GamepadExEx(gamepad1);
         toolOp = new GamepadExEx(gamepad2);
 
+        robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2);
+
+        // ----------------------------------- Robot Constants ---------------------------------- //
         RobotConstants = new DriveConstants();
 
         RobotConstants.frontLeftInverted = true;
@@ -66,12 +72,12 @@ public class TeleOpBase extends CommandOpMode {
         RobotConstants.SLOW_SPEED_PERC = 0.3;
         RobotConstants.FAST_SPEED_PERC = 1;
 
+        // ---------------------------- Transfer Pose from Autonomous --------------------------- //
         pose = PoseStorage.currentPose;
     }
 
     public void initAllianceRelated(RobotEx.Alliance alliance) {
-        robot = new IntoTheDeepRobot(hardwareMap, RobotConstants, telemetry, driverOp, toolOp,
-                RobotEx.OpModeType.TELEOP, alliance, "external_imu",
+        robot = new IntoTheDeepRobot(robotMap, RobotConstants, RobotEx.OpModeType.TELEOP, alliance,
                 false, pose);
     }
 

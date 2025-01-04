@@ -4,6 +4,8 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+import org.firstinspires.ftc.teamcode.RobotMap;
+
 import java.util.HashMap;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -46,10 +48,10 @@ public class ArmSubsystem extends SubsystemBase {
         put(WristState.PERP, 0.7);
     }};
 
-    public ArmSubsystem(HardwareMap hm) {
-        armLeft = hm.get(ServoImplEx.class, "arm_left");
-        armRight = hm.get(ServoImplEx.class, "arm_right");
-        wrist = hm.get(ServoImplEx.class, "wrist");
+    public ArmSubsystem(RobotMap robotMap) {
+        armLeft = robotMap.getArmLeftServo();
+        armRight = robotMap.getArmRightServo();
+        wrist = robotMap.getArmWristServo();
 
         arm_goPark();
         wrist_goPark();
