@@ -4,6 +4,8 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+import org.firstinspires.ftc.teamcode.RobotMap;
+
 import java.util.HashMap;
 
 public class ClawSubsystem extends SubsystemBase {
@@ -33,9 +35,9 @@ public class ClawSubsystem extends SubsystemBase {
         put(ClawRotState.FLIPPED, 0.9);
     }}; // TODO: Find the correct positions
 
-    public ClawSubsystem(HardwareMap hm) {
-        clawServo = hm.get(ServoImplEx.class, "claw");
-        clawRotServo = hm.get(ServoImplEx.class, "claw_rot");
+    public ClawSubsystem(RobotMap robotMap) {
+        clawServo = robotMap.getClawServo();
+        clawRotServo = robotMap.getClawRotServo();
 
         goNormal();
         justOpen();

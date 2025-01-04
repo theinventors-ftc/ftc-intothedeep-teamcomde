@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.RobotMap;
 
 import java.util.HashMap;
 
@@ -62,22 +63,21 @@ public class IntakeSubsystem extends SubsystemBase {
     private COLOR color;
 
     // ------------------------------------------------------------------------------------------ //
-    public IntakeSubsystem(HardwareMap hm, Telemetry telemetry) {
-        this.telemetry = telemetry;
+    public IntakeSubsystem(RobotMap robotMap) {
+        this.telemetry = robotMap.getTelemetry();
 
-        raiseServoL = hm.get(ServoImplEx.class, "intake_raise_left");
-        raiseServoR = hm.get(ServoImplEx.class, "intake_raise_right");
+        raiseServoL = robotMap.getIntakeRaiseServoL();
+        raiseServoR = robotMap.getIntakeRaiseServoR();
         raise();
 
-        leftIntake = hm.get(CRServoImplEx.class, "intake_left_wheel");
-        rightIntake = hm.get(CRServoImplEx.class, "intake_right_wheel");
+        leftIntake = robotMap.getLeftIntakeServo();
+        rightIntake = robotMap.getRightIntakeServo();
         stop();
 
-        colorSensor = hm.get(NormalizedColorSensor.class, "color");
-        colorSensor.setGain(100);
+        colorSensor = robotMap.getColorSensor();
         color = COLOR.NONE;
 
-        limitSwitch = hm.get(DigitalChannel.class, "switch");
+        limitSwitch = robotMap.getLimitSwitch();
     }
 
     // ---------------------------------------- Actuators --------------------------------------- //
