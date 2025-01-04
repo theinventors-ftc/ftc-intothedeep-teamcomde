@@ -78,7 +78,7 @@ public class TeleOpBase extends CommandOpMode {
 
     public void initAllianceRelated(RobotEx.Alliance alliance) {
         robot = new IntoTheDeepRobot(robotMap, RobotConstants, RobotEx.OpModeType.TELEOP, alliance,
-                false, pose);
+                false, pose, telemetry);
     }
 
     @Override

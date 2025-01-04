@@ -1,16 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.inventors.ftc.robotbase.RobotMapInterface;
 import org.inventors.ftc.robotbase.hardware.Battery;
+import org.inventors.ftc.robotbase.hardware.ColorSensor;
 import org.inventors.ftc.robotbase.hardware.GamepadExEx;
 import org.inventors.ftc.robotbase.hardware.MotorExEx;
 import org.openftc.easyopencv.OpenCvWebcam;
@@ -34,7 +35,8 @@ public class RobotMap implements RobotMapInterface {
     // ----------------------------------------- Intake ----------------------------------------- //
     private ServoImplEx intakeRaiseServoL, intakeRaiseServoR;
     private CRServoImplEx leftIntakeServo, rightIntakeServo;
-    private NormalizedColorSensor colorSensor;
+//    private NormalizedColorSensor colorSensor;
+    private ColorSensor colorSensor;
     private DigitalChannel limitSwitch;
 
     // ----------------------------------------- Slider ----------------------------------------- //
@@ -42,12 +44,13 @@ public class RobotMap implements RobotMapInterface {
     // ----------------------------------------- Extendo ---------------------------------------- //
 
     // ----------------------------------------- Couplers --------------------------------------- //
+    private ServoImplEx coupler_servo;
 
     public RobotMap(HardwareMap hm, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2) {
-        frontLeft = new MotorExEx(hm, "front_left");
-        frontRight = new MotorExEx(hm, "front_right");
-        rearLeft = new MotorExEx(hm, "rear_left");
-        rearRight = new MotorExEx(hm, "rear_right");
+        frontLeft = new MotorExEx(hm, "front_left", Motor.GoBILDA.RPM_435);
+        frontRight = new MotorExEx(hm, "front_right", Motor.GoBILDA.RPM_435);
+        rearLeft = new MotorExEx(hm, "rear_left", Motor.GoBILDA.RPM_435);
+        rearRight = new MotorExEx(hm, "rear_right", Motor.GoBILDA.RPM_435);
         this.telemetry = telemetry;
 
 //        int cameraMonitorViewId = hm.appContext.getResources()
@@ -63,25 +66,28 @@ public class RobotMap implements RobotMapInterface {
 
         //// ----------------------------------- Mechanisms ----------------------------------- ////
         // ---------------------------------------- Claw ---------------------------------------- //
-        clawServo = hm.get(ServoImplEx.class, "claw");
-        clawRotServo = hm.get(ServoImplEx.class, "claw_rot");
+//        clawServo = hm.get(ServoImplEx.class, "claw");
+//        clawRotServo = hm.get(ServoImplEx.class, "claw_rot");
+//
+//        // ---------------------------------------- Arm ----------------------------------------- //
+//        armLeftServo = hm.get(ServoImplEx.class, "arm_left");
+//        armRightServo = hm.get(ServoImplEx.class, "arm_right");
+//        armWristServo = hm.get(ServoImplEx.class, "wrist");
+//
+//        // --------------------------------------- Intake --------------------------------------- //
+//        intakeRaiseServoL = hm.get(ServoImplEx.class, "intake_raise_left");
+//        intakeRaiseServoR = hm.get(ServoImplEx.class, "intake_raise_right");
+//
+//        leftIntakeServo = hm.get(CRServoImplEx.class, "intake_left_wheel");
+//        rightIntakeServo = hm.get(CRServoImplEx.class, "intake_right_wheel");
+//
+//        colorSensor = new ColorSensor(hm, "color");
+//        colorSensor.setGain(100);
+//
+//        limitSwitch = hm.get(DigitalChannel.class, "switch");
 
-        // ---------------------------------------- Arm ----------------------------------------- //
-        armLeftServo = hm.get(ServoImplEx.class, "arm_left");
-        armRightServo = hm.get(ServoImplEx.class, "arm_right");
-        armWristServo = hm.get(ServoImplEx.class, "wrist");
-
-        // --------------------------------------- Intake --------------------------------------- //
-        intakeRaiseServoL = hm.get(ServoImplEx.class, "intake_raise_left");
-        intakeRaiseServoR = hm.get(ServoImplEx.class, "intake_raise_right");
-
-        leftIntakeServo = hm.get(CRServoImplEx.class, "intake_left_wheel");
-        rightIntakeServo = hm.get(CRServoImplEx.class, "intake_right_wheel");
-
-        colorSensor = hm.get(NormalizedColorSensor.class, "color");
-        colorSensor.setGain(100);
-
-        limitSwitch = hm.get(DigitalChannel.class, "switch");
+        // --------------------------------------- Couplers ------------------------------------- //
+        coupler_servo = hm.get(ServoImplEx.class, "coupler");
     }
 
     // ------------------------------------ Drivetrain Motors ----------------------------------- //
@@ -179,11 +185,16 @@ public class RobotMap implements RobotMapInterface {
         return rightIntakeServo;
     }
 
-    public NormalizedColorSensor getColorSensor() {
+    public ColorSensor getColorSensor() {
         return colorSensor;
     }
 
     public DigitalChannel getLimitSwitch() {
         return limitSwitch;
+    }
+
+    // ----------------------------------------- Couplers --------------------------------------- //
+    public ServoImplEx getCouplerServo() {
+        return coupler_servo;
     }
 }

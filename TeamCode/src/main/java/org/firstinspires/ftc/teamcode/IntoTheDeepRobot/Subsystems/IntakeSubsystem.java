@@ -10,13 +10,14 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RobotMap;
+import org.inventors.ftc.robotbase.hardware.ColorSensor;
 
 import java.util.HashMap;
 
 public class IntakeSubsystem extends SubsystemBase {
     private ServoImplEx raiseServoL, raiseServoR;
     private CRServoImplEx rightIntake, leftIntake;
-    private NormalizedColorSensor colorSensor;
+    private ColorSensor colorSensor;
     private DigitalChannel limitSwitch;
     private Telemetry telemetry;
 
@@ -133,8 +134,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public COLOR getSampleColor() {
-        NormalizedRGBA raw_colors = colorSensor.getNormalizedColors();
-        double[] colors = {Math.floor(raw_colors.red*100), Math.floor(raw_colors.green*100), Math.floor(raw_colors.blue*100), Math.floor(raw_colors.alpha*100)};
+        double[] colors = colorSensor.getNormalizedColors();
 
         telemetry.addData("Red: ", colors[0]);
         telemetry.addData("Green: ", colors[1]);
