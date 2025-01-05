@@ -35,7 +35,6 @@ public class RobotMap implements RobotMapInterface {
     // ----------------------------------------- Intake ----------------------------------------- //
     private ServoImplEx intakeRaiseServoL, intakeRaiseServoR;
     private CRServoImplEx leftIntakeServo, rightIntakeServo;
-//    private NormalizedColorSensor colorSensor;
     private ColorSensor colorSensor;
     private DigitalChannel limitSwitch;
 
@@ -66,25 +65,25 @@ public class RobotMap implements RobotMapInterface {
 
         //// ----------------------------------- Mechanisms ----------------------------------- ////
         // ---------------------------------------- Claw ---------------------------------------- //
-//        clawServo = hm.get(ServoImplEx.class, "claw");
-//        clawRotServo = hm.get(ServoImplEx.class, "claw_rot");
-//
-//        // ---------------------------------------- Arm ----------------------------------------- //
-//        armLeftServo = hm.get(ServoImplEx.class, "arm_left");
-//        armRightServo = hm.get(ServoImplEx.class, "arm_right");
-//        armWristServo = hm.get(ServoImplEx.class, "wrist");
-//
-//        // --------------------------------------- Intake --------------------------------------- //
-//        intakeRaiseServoL = hm.get(ServoImplEx.class, "intake_raise_left");
-//        intakeRaiseServoR = hm.get(ServoImplEx.class, "intake_raise_right");
-//
-//        leftIntakeServo = hm.get(CRServoImplEx.class, "intake_left_wheel");
-//        rightIntakeServo = hm.get(CRServoImplEx.class, "intake_right_wheel");
-//
-//        colorSensor = new ColorSensor(hm, "color");
-//        colorSensor.setGain(100);
-//
-//        limitSwitch = hm.get(DigitalChannel.class, "switch");
+        clawServo = hm.get(ServoImplEx.class, "claw");
+        clawRotServo = hm.get(ServoImplEx.class, "claw_rot");
+
+        // ---------------------------------------- Arm ----------------------------------------- //
+        armLeftServo = hm.get(ServoImplEx.class, "arm_left");
+        armRightServo = hm.get(ServoImplEx.class, "arm_right");
+        armWristServo = hm.get(ServoImplEx.class, "wrist");
+
+        // --------------------------------------- Intake --------------------------------------- //
+        intakeRaiseServoL = hm.get(ServoImplEx.class, "intake_raise_left");
+        intakeRaiseServoR = hm.get(ServoImplEx.class, "intake_raise_right");
+
+        leftIntakeServo = hm.get(CRServoImplEx.class, "intake_left_wheel");
+        rightIntakeServo = hm.get(CRServoImplEx.class, "intake_right_wheel");
+
+        colorSensor = new ColorSensor(hm, "color");
+        colorSensor.setGain(100);
+
+        limitSwitch = hm.get(DigitalChannel.class, "switch");
 
         // --------------------------------------- Couplers ------------------------------------- //
         coupler_servo = hm.get(ServoImplEx.class, "coupler");

@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.IntoTheDeepRobot;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ArmSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.CouplersSubsystem;
@@ -21,8 +20,8 @@ public class IntoTheDeepRobot extends RobotEx {
 
     public IntoTheDeepRobot(RobotMap robotMap, DriveConstants RobotConstants,
                             OpModeType opModeType, Alliance alliance, boolean init_camera,
-                            Pose2d startingPose, Telemetry telemetry) {
-        super(robotMap, RobotConstants, opModeType, alliance, init_camera, startingPose, telemetry);
+                            Pose2d startingPose) {
+        super(robotMap, RobotConstants, opModeType, alliance, init_camera, startingPose);
         this.robotMap = robotMap;
         this.initMechanismsTeleOp();
     }

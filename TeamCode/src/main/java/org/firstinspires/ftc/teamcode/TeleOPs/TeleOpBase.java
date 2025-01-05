@@ -48,6 +48,8 @@ public class TeleOpBase extends CommandOpMode {
         RobotConstants.MAX_ANG_VEL = Math.toRadians(360);
         RobotConstants.MAX_ANG_ACCEL = Math.toRadians(360);
 
+        RobotConstants.RUN_USING_ENCODER = false;
+
         RobotConstants.frontLeftFeedForward[0] = 0;
         RobotConstants.frontLeftFeedForward[1] = 1;
         RobotConstants.frontLeftFeedForward[2] = 0;
@@ -78,7 +80,7 @@ public class TeleOpBase extends CommandOpMode {
 
     public void initAllianceRelated(RobotEx.Alliance alliance) {
         robot = new IntoTheDeepRobot(robotMap, RobotConstants, RobotEx.OpModeType.TELEOP, alliance,
-                false, pose, telemetry);
+                false, pose);
     }
 
     @Override
