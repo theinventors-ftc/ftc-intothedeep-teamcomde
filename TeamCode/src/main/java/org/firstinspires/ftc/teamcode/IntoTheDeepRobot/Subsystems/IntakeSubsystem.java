@@ -18,7 +18,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private ServoImplEx raiseServoL, raiseServoR;
     private CRServoImplEx rightIntake, leftIntake;
     private ColorSensor colorSensor;
-    private DigitalChannel limitSwitch;
+    private DigitalChannel limitSwitch, raiseLimitSwitch;
     private Telemetry telemetry;
 
     // ------------------------------------------ States ---------------------------------------- //
@@ -78,7 +78,8 @@ public class IntakeSubsystem extends SubsystemBase {
         colorSensor = robotMap.getColorSensor();
         color = COLOR.NONE;
 
-        limitSwitch = robotMap.getLimitSwitch();
+        limitSwitch = robotMap.getSampleLimitSwitch();
+        raiseLimitSwitch = robotMap.getRaiseLimitSwitch();
     }
 
     // ---------------------------------------- Actuators --------------------------------------- //

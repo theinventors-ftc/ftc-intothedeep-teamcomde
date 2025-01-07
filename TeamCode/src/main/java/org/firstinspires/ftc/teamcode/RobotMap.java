@@ -36,9 +36,10 @@ public class RobotMap implements RobotMapInterface {
     private ServoImplEx intakeRaiseServoL, intakeRaiseServoR;
     private CRServoImplEx leftIntakeServo, rightIntakeServo;
     private ColorSensor colorSensor;
-    private DigitalChannel limitSwitch;
+    private DigitalChannel sampleLimitSwitch, raiseLimitSwitch;
 
     // ----------------------------------------- Slider ----------------------------------------- //
+    private MotorExEx sliderMotor;
 
     // ----------------------------------------- Extendo ---------------------------------------- //
 
@@ -80,10 +81,14 @@ public class RobotMap implements RobotMapInterface {
         leftIntakeServo = hm.get(CRServoImplEx.class, "intake_left_wheel");
         rightIntakeServo = hm.get(CRServoImplEx.class, "intake_right_wheel");
 
-        colorSensor = new ColorSensor(hm, "color");
+        colorSensor = new ColorSensor(hm, "intake_color");
         colorSensor.setGain(100);
 
-        limitSwitch = hm.get(DigitalChannel.class, "switch");
+        sampleLimitSwitch = hm.get(DigitalChannel.class, "sample_switch");
+        raiseLimitSwitch = hm.get(DigitalChannel.class, "raise_switch");
+
+        // ---------------------------------------- Slider -------------------------------------- //
+        sliderMotor = new MotorExEx(hm, "slider", Motor.GoBILDA.RPM_435);
 
         // --------------------------------------- Couplers ------------------------------------- //
         coupler_servo = hm.get(ServoImplEx.class, "coupler");
@@ -188,8 +193,17 @@ public class RobotMap implements RobotMapInterface {
         return colorSensor;
     }
 
-    public DigitalChannel getLimitSwitch() {
-        return limitSwitch;
+    public DigitalChannel getSampleLimitSwitch() {
+        return sampleLimitSwitch;
+    }
+
+    public DigitalChannel getRaiseLimitSwitch() {
+        return raiseLimitSwitch;
+    }
+
+    // ----------------------------------------- Slider ----------------------------------------- //
+    public MotorExEx getSliderMotor() {
+        return sliderMotor;
     }
 
     // ----------------------------------------- Couplers --------------------------------------- //

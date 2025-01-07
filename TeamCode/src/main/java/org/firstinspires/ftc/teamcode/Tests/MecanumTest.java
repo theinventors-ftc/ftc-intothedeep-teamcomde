@@ -1,12 +1,13 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 
-@TeleOp
-public class MecanumTeleOp extends LinearOpMode {
+@TeleOp(name = "Mecanum TeleOp", group = "Tests")
+public class MecanumTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         // Declare our motors
@@ -15,6 +16,8 @@ public class MecanumTeleOp extends LinearOpMode {
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("rear_left");
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("front_right");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("rear_right");
+        ServoImplEx coupler_servo = hardwareMap.get(ServoImplEx.class, "coupler");
+        coupler_servo.setPosition(0.65);
 
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
