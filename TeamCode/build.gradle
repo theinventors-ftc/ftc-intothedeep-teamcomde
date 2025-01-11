@@ -31,7 +31,9 @@ repositories {
 dependencies {
     implementation project(':FtcRobotController')
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22" // Malaka Ayto lynei problima trion imeron gamo tin thia toy
+
+    implementation 'com.acmerobotics.dashboard:dashboard:0.4.16'
 
     implementation 'org.ftclib.ftclib:core:2.1.1'
 
