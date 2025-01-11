@@ -58,7 +58,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(10, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(4, 0, 0);
 
-    public static double LATERAL_MULTIPLIER = 1.1538461538461538461538461538462;
+    public static double LATERAL_MULTIPLIER = 1.1464206615067540924657099022576;
 
     public static volatile double LIVE_TARGET_VELOCITY = 0.0;
 
@@ -102,10 +102,10 @@ public class SampleMecanumDrive extends MecanumDrive {
             DriveConstants.LOGO_FACING_DIR, DriveConstants.USB_FACING_DIR));
         imu.initialize(parameters);
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "frontLeft");
-        leftRear = hardwareMap.get(DcMotorEx.class, "rearLeft");
-        rightRear = hardwareMap.get(DcMotorEx.class, "rearRight");
-        rightFront = hardwareMap.get(DcMotorEx.class, "frontRight");
+        leftFront = hardwareMap.get(DcMotorEx.class, "front_left");
+        leftRear = hardwareMap.get(DcMotorEx.class, "rear_left");
+        rightRear = hardwareMap.get(DcMotorEx.class, "rear_right");
+        rightFront = hardwareMap.get(DcMotorEx.class, "front_right");
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
@@ -311,7 +311,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     public Double getExternalHeadingVelocity() {
-        return (double) imu.getRobotAngularVelocity(AngleUnit.RADIANS).xRotationRate;
+        return (double) imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate;
     }
 
     public static TrajectoryVelocityConstraint getVelocityConstraint(double maxVel, double maxAngularVel, double trackWidth) {
