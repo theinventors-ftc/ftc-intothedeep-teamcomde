@@ -34,12 +34,12 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private RaiseState state;
 
-    private HashMap<RaiseState, Double> raise_positionsL = new HashMap<RaiseState, Double>() {{
+    private final HashMap<RaiseState, Double> raise_positionsL = new HashMap<RaiseState, Double>() {{
         put(RaiseState.RAISED, 0.2);
         put(RaiseState.LOWERED, 0.5);
     }};
 
-    private HashMap<RaiseState, Double> raise_positionsR = new HashMap<RaiseState, Double>() {{
+    private final HashMap<RaiseState, Double> raise_positionsR = new HashMap<RaiseState, Double>() {{
         put(RaiseState.RAISED, 0.8);
         put(RaiseState.LOWERED, 0.5);
     }};
