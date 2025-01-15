@@ -24,16 +24,16 @@ public class ClawSubsystem extends SubsystemBase {
     private ClawState state;
     private ClawRotState rotState;
 
-    private HashMap<ClawState, Double> claw_positions = new HashMap<ClawState, Double>() {{
-        put(ClawState.CLOSED, 0.2);
-        put(ClawState.JUST_OPENED, 0.5);
-        put(ClawState.OPEN, 0.8);
-    }}; // TODO: Find the correct positions
+    private final HashMap<ClawState, Double> claw_positions = new HashMap<ClawState, Double>() {{
+        put(ClawState.CLOSED, 0.8);
+        put(ClawState.JUST_OPENED, 0.65);
+        put(ClawState.OPEN, 0.5);
+    }};
 
-    private HashMap<ClawRotState, Double> claw_rot_positions = new HashMap<ClawRotState, Double>() {{
-        put(ClawRotState.NORMAL, 0.1);
-        put(ClawRotState.FLIPPED, 0.9);
-    }}; // TODO: Find the correct positions
+    private final HashMap<ClawRotState, Double> claw_rot_positions = new HashMap<ClawRotState, Double>() {{
+        put(ClawRotState.NORMAL, 0.06);
+        put(ClawRotState.FLIPPED, 0.4);
+    }};
 
     public ClawSubsystem(RobotMap robotMap) {
         clawServo = robotMap.getClawServo();
