@@ -21,14 +21,14 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 public class DriveConstants {
 
     public static RevHubOrientationOnRobot.LogoFacingDirection LOGO_FACING_DIR =
-        RevHubOrientationOnRobot.LogoFacingDirection.UP;
+        RevHubOrientationOnRobot.LogoFacingDirection.DOWN;
     public static RevHubOrientationOnRobot.UsbFacingDirection USB_FACING_DIR =
         RevHubOrientationOnRobot.UsbFacingDirection.LEFT;
 
     /*
      * These are motor constants that should be listed online for your motors.
      */
-    public static final double TICKS_PER_REV = 384.5;
+    public static final double TICKS_PER_REV = 4096;
     public static final double MAX_RPM = 435;
 
     /*

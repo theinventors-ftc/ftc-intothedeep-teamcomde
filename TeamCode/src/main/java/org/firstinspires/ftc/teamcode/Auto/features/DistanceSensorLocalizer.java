@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Auto.Features;
+package org.firstinspires.ftc.teamcode.Auto.features;
 
 import static java.lang.Math.acos;
 import static java.lang.Math.cos;

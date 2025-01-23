@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.Auto.opMode;
 
-import static org.firstinspires.ftc.teamcode.Auto.Features.BuilderFunctions.Tile;
-import static org.firstinspires.ftc.teamcode.Auto.Features.BuilderFunctions.robotX;
-import static org.firstinspires.ftc.teamcode.Auto.Features.BuilderFunctions.robotY;
-import static org.firstinspires.ftc.teamcode.Auto.Features.BuilderFunctions.tipPoseTransfer;
-import static org.firstinspires.ftc.teamcode.Auto.Features.DistanceSensorLocalizer.calculateReal2dLocation;
-import static org.firstinspires.ftc.teamcode.Auto.Features.DistanceSensorLocalizer.calculateRealYLocation;
+import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.Tile;
+import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robotX;
+import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robotY;
+import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.tipPoseTransfer;
+import static org.firstinspires.ftc.teamcode.Auto.features.DistanceSensorLocalizer.calculateReal2dLocation;
+import static org.firstinspires.ftc.teamcode.Auto.features.DistanceSensorLocalizer.calculateRealYLocation;
 import static org.firstinspires.ftc.teamcode.Auto.opMode.OpCommon.fixedPose2d;
 import static org.firstinspires.ftc.teamcode.Auto.opMode.OpCommon.init_mechanisms;
 
@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.Auto.trajectorysequence.TrajectorySequence
 
 import java.util.function.DoubleSupplier;
 
-@Autonomous(name = "Autonomous Right Red")
+@Autonomous(name = "Autonomous Right Red Speciments")
 public class Red_Right_Speciments extends CommandOpMode {
 
     private SampleMecanumDrive drive;

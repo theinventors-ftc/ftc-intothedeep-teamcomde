@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -39,9 +40,10 @@ public class RobotMap implements RobotMapInterface {
     private DigitalChannel sampleLimitSwitch, raiseLimitSwitch;
 
     // ----------------------------------------- Slider ----------------------------------------- //
-    private MotorExEx sliderMotor;
+    private MotorExEx sliderMotor, sliderFollow;
 
     // ----------------------------------------- Extendo ---------------------------------------- //
+    private MotorExEx extendoMotor;
 
     // ----------------------------------------- Couplers --------------------------------------- //
     private ServoImplEx coupler_servo;
@@ -53,10 +55,6 @@ public class RobotMap implements RobotMapInterface {
         rearRight = new MotorExEx(hm, "rear_right", Motor.GoBILDA.RPM_435);
         this.telemetry = telemetry;
 
-//        int cameraMonitorViewId = hm.appContext.getResources()
-//                .getIdentifier("cameraMonitorViewId", "id", hm.appContext.getPackageName());
-//        webcam = OpenCvCameraFactory.getInstance().createWebcam(hm.get(WebcamName.class,
-//                "webcam"), cameraMonitorViewId);
         imu = hm.get(IMU.class, "external_imu");
 
         driverOp = new GamepadExEx(gamepad1);
@@ -72,7 +70,9 @@ public class RobotMap implements RobotMapInterface {
         // ---------------------------------------- Arm ----------------------------------------- //
         armLeftServo = hm.get(ServoImplEx.class, "arm_left");
         armRightServo = hm.get(ServoImplEx.class, "arm_right");
-        armWristServo = hm.get(ServoImplEx.class, "wrist");
+        armLeftServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        armRightServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        armWristServo = hm.get(ServoImplEx.class, "wrist_tilt");
 
         // --------------------------------------- Intake --------------------------------------- //
         intakeRaiseServoL = hm.get(ServoImplEx.class, "intake_raise_left");
@@ -84,11 +84,15 @@ public class RobotMap implements RobotMapInterface {
         colorSensor = new ColorSensor(hm, "intake_color");
         colorSensor.setGain(100);
 
-        sampleLimitSwitch = hm.get(DigitalChannel.class, "sample_switch");
-        raiseLimitSwitch = hm.get(DigitalChannel.class, "raise_switch");
+        sampleLimitSwitch = hm.get(DigitalChannel.class, "intake_sample_switch");
+//        raiseLimitSwitch = hm.get(DigitalChannel.class, "raise_switch");
 
         // ---------------------------------------- Slider -------------------------------------- //
-        sliderMotor = new MotorExEx(hm, "slider", Motor.GoBILDA.RPM_435);
+        sliderMotor = new MotorExEx(hm, "slider", Motor.GoBILDA.RPM_312);
+        sliderFollow = new MotorExEx(hm, "slider2", Motor.GoBILDA.RPM_312);
+
+        // ---------------------------------------- Extendo ------------------------------------- //
+        extendoMotor = new MotorExEx(hm, "extendo", Motor.GoBILDA.RPM_435);
 
         // --------------------------------------- Couplers ------------------------------------- //
         coupler_servo = hm.get(ServoImplEx.class, "coupler");
@@ -204,6 +208,15 @@ public class RobotMap implements RobotMapInterface {
     // ----------------------------------------- Slider ----------------------------------------- //
     public MotorExEx getSliderMotor() {
         return sliderMotor;
+    }
+
+    public MotorExEx getSliderFollow() {
+        return sliderFollow;
+    }
+
+    // ----------------------------------------- Extendo ---------------------------------------- //
+    public MotorExEx getExtendoMotor() {
+        return extendoMotor;
     }
 
     // ----------------------------------------- Couplers --------------------------------------- //
