@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -9,6 +10,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+import org.firstinspires.ftc.ftccommon.internal.manualcontrol.parameters.ImuParameters;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.inventors.ftc.robotbase.RobotMapInterface;
 import org.inventors.ftc.robotbase.hardware.Battery;
@@ -40,9 +42,10 @@ public class RobotMap implements RobotMapInterface {
     private DigitalChannel sampleLimitSwitch, raiseLimitSwitch;
 
     // ----------------------------------------- Slider ----------------------------------------- //
-    private MotorExEx sliderMotor;
+    private MotorExEx sliderMotor, sliderFollow;
 
     // ----------------------------------------- Extendo ---------------------------------------- //
+    private MotorExEx extendoMotor;
 
     // ----------------------------------------- Couplers --------------------------------------- //
     private ServoImplEx coupler_servo;
@@ -52,13 +55,21 @@ public class RobotMap implements RobotMapInterface {
         frontRight = new MotorExEx(hm, "front_right", Motor.GoBILDA.RPM_435);
         rearLeft = new MotorExEx(hm, "rear_left", Motor.GoBILDA.RPM_435);
         rearRight = new MotorExEx(hm, "rear_right", Motor.GoBILDA.RPM_435);
+        frontLeft.setRunMode(Motor.RunMode.RawPower);
+        frontRight.setRunMode(Motor.RunMode.RawPower);
+        rearLeft.setRunMode(Motor.RunMode.RawPower);
+        rearRight.setRunMode(Motor.RunMode.RawPower);
+
         this.telemetry = telemetry;
 
-//        int cameraMonitorViewId = hm.appContext.getResources()
-//                .getIdentifier("cameraMonitorViewId", "id", hm.appContext.getPackageName());
-//        webcam = OpenCvCameraFactory.getInstance().createWebcam(hm.get(WebcamName.class,
-//                "webcam"), cameraMonitorViewId);
         imu = hm.get(IMU.class, "external_imu");
+        IMU.Parameters imuParameters = new IMU.Parameters(
+                new RevHubOrientationOnRobot(
+                        RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
+                        RevHubOrientationOnRobot.UsbFacingDirection.LEFT
+                )
+        );
+        imu.initialize(imuParameters);
 
         driverOp = new GamepadExEx(gamepad1);
         toolOp = new GamepadExEx(gamepad2);
@@ -78,20 +89,24 @@ public class RobotMap implements RobotMapInterface {
         armWristServo = hm.get(ServoImplEx.class, "wrist_tilt");
 
         // --------------------------------------- Intake --------------------------------------- //
-//        intakeRaiseServoL = hm.get(ServoImplEx.class, "intake_raise_left");
-//        intakeRaiseServoR = hm.get(ServoImplEx.class, "intake_raise_right");
-//
-//        leftIntakeServo = hm.get(CRServoImplEx.class, "intake_left_wheel");
-//        rightIntakeServo = hm.get(CRServoImplEx.class, "intake_right_wheel");
-//
-//        colorSensor = new ColorSensor(hm, "intake_color");
-//        colorSensor.setGain(100);
-//
-//        sampleLimitSwitch = hm.get(DigitalChannel.class, "sample_switch");
+        intakeRaiseServoL = hm.get(ServoImplEx.class, "intake_raise_left");
+        intakeRaiseServoR = hm.get(ServoImplEx.class, "intake_raise_right");
+
+        leftIntakeServo = hm.get(CRServoImplEx.class, "intake_left_wheel");
+        rightIntakeServo = hm.get(CRServoImplEx.class, "intake_right_wheel");
+
+        colorSensor = new ColorSensor(hm, "intake_color");
+        colorSensor.setGain(100);
+
+        sampleLimitSwitch = hm.get(DigitalChannel.class, "intake_sample_switch");
 //        raiseLimitSwitch = hm.get(DigitalChannel.class, "raise_switch");
 
         // ---------------------------------------- Slider -------------------------------------- //
-        sliderMotor = new MotorExEx(hm, "slider", Motor.GoBILDA.RPM_435);
+        sliderMotor = new MotorExEx(hm, "slider", Motor.GoBILDA.RPM_312);
+        sliderFollow = new MotorExEx(hm, "slider2", Motor.GoBILDA.RPM_312);
+
+        // ---------------------------------------- Extendo ------------------------------------- //
+        extendoMotor = new MotorExEx(hm, "extendo", Motor.GoBILDA.RPM_435);
 
         // --------------------------------------- Couplers ------------------------------------- //
         coupler_servo = hm.get(ServoImplEx.class, "coupler");
@@ -207,6 +222,15 @@ public class RobotMap implements RobotMapInterface {
     // ----------------------------------------- Slider ----------------------------------------- //
     public MotorExEx getSliderMotor() {
         return sliderMotor;
+    }
+
+    public MotorExEx getSliderFollow() {
+        return sliderFollow;
+    }
+
+    // ----------------------------------------- Extendo ---------------------------------------- //
+    public MotorExEx getExtendoMotor() {
+        return extendoMotor;
     }
 
     // ----------------------------------------- Couplers --------------------------------------- //

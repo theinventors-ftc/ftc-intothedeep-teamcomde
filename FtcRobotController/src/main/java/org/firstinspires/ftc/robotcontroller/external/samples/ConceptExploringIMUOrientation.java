@@ -85,7 +85,7 @@ public class ConceptExploringIMUOrientation extends LinearOpMode {
     boolean orientationIsValid = true;
 
     @Override public void runOpMode() throws InterruptedException {
-        imu = hardwareMap.get(IMU.class, "imu");
+        imu = hardwareMap.get(IMU.class, "external_imu");
         logoFacingDirectionPosition = 0; // Up
         usbFacingDirectionPosition = 2; // Forward
 
