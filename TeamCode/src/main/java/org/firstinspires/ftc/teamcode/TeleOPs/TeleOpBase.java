@@ -70,8 +70,8 @@ public class TeleOpBase extends CommandOpMode {
         RobotConstants.TICKS_PER_REV = 537;
         RobotConstants.MAX_RPM = 435;
 
-        RobotConstants.DEFAULT_SPEED_PERC = 0.5;
-        RobotConstants.SLOW_SPEED_PERC = 0.3;
+        RobotConstants.DEFAULT_SPEED_PERC = 0.65;
+        RobotConstants.SLOW_SPEED_PERC = 0.2;
         RobotConstants.FAST_SPEED_PERC = 1;
 
         // ---------------------------- Transfer Pose from Autonomous --------------------------- //

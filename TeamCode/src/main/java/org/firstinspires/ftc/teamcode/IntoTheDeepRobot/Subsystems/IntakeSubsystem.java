@@ -22,7 +22,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private Telemetry telemetry;
 
     // ------------------------------------------ States ---------------------------------------- //
-    // Intake Contstant
+    // Intake Constant
     private static double intaking_power = 0.9;
     private static double brake_power = 0.4;
 
@@ -32,16 +32,16 @@ public class IntakeSubsystem extends SubsystemBase {
         LOWERED
     }
 
-    private RaiseState state;
+    private RaiseState raiseState;
 
     private final HashMap<RaiseState, Double> raise_positionsL = new HashMap<RaiseState, Double>() {{
-        put(RaiseState.RAISED, 0.2);
-        put(RaiseState.LOWERED, 0.5);
+        put(RaiseState.RAISED, 0.07);
+        put(RaiseState.LOWERED, 0.24);
     }};
 
     private final HashMap<RaiseState, Double> raise_positionsR = new HashMap<RaiseState, Double>() {{
-        put(RaiseState.RAISED, 0.8);
-        put(RaiseState.LOWERED, 0.5);
+        put(RaiseState.RAISED, 0.07);
+        put(RaiseState.LOWERED, 0.24);
     }};
 
     // Intake States
@@ -85,13 +85,13 @@ public class IntakeSubsystem extends SubsystemBase {
     // ---------------------------------------- Actuators --------------------------------------- //
     // Raise
     public void raise() {
-        state = RaiseState.RAISED;
+        raiseState = RaiseState.RAISED;
         raiseServoL.setPosition((double)raise_positionsL.get(RaiseState.RAISED));
         raiseServoR.setPosition((double)raise_positionsR.get(RaiseState.RAISED));
     }
 
     public void lower() {
-        state = RaiseState.LOWERED;
+        raiseState = RaiseState.LOWERED;
         raiseServoL.setPosition((double)raise_positionsL.get(RaiseState.LOWERED));
         raiseServoR.setPosition((double)raise_positionsR.get(RaiseState.LOWERED));
     }
@@ -99,20 +99,20 @@ public class IntakeSubsystem extends SubsystemBase {
     // Intake
     public void run() {
         intakeState = IntakeState.INTAKE;
-        rightIntake.setPower(-intaking_power);
-        leftIntake.setPower(intaking_power);
-    }
-
-    public void reverse() {
-        intakeState = IntakeState.REVERSE;
         rightIntake.setPower(intaking_power);
         leftIntake.setPower(-intaking_power);
     }
 
+    public void reverse() {
+        intakeState = IntakeState.REVERSE;
+        rightIntake.setPower(-intaking_power);
+        leftIntake.setPower(intaking_power);
+    }
+
     public void brake_reverse() {
         intakeState = IntakeState.INTAKE;
-        rightIntake.setPower(brake_power);
-        leftIntake.setPower(-brake_power);
+        rightIntake.setPower(-brake_power);
+        leftIntake.setPower(brake_power);
     }
 
     public void stop() {
@@ -130,8 +130,11 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     // ----------------------------------------- Getters ---------------------------------------- //
-    public RaiseState getState() {
-        return state;
+    public RaiseState getRaiseState() {
+        return raiseState;
+    }
+    public IntakeState getIntakeState() {
+        return intakeState;
     }
 
     public COLOR getSampleColor() {
