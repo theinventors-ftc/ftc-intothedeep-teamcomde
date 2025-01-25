@@ -43,6 +43,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public enum Level {
         INTAKE,
+        SPECIMEN_DISLOCATE,
         PARK,
         PARK2,
         LOW_BASKET,
@@ -58,17 +59,16 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     HashMap<Level, Integer> levelMap = new HashMap<Level, Integer>() {{
         put(Level.INTAKE, 0);
+        put(Level.SPECIMEN_DISLOCATE, 150);
         put(Level.PARK, 250);
         put(Level.PARK2, 500);
         put(Level.LOW_BASKET, 740);
         put(Level.HIGH_BASKET, 2245);
         put(Level.LOW_CHAMBER, 0);
         put(Level.HIGH_CHAMBER, 565);
-        put(Level.HANGING_AIM, 0);
+        put(Level.HANGING_AIM, 1000);
         put(Level.HANGING, 0);
     }};
-
-    private Telemetry dash_tele;
 
     public static int target_height = 0;
     private int springs_off = 34;
@@ -94,8 +94,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         timer = new Timing.Timer(600, TimeUnit.MILLISECONDS);
 
-        dash_tele = FtcDashboard.getInstance().getTelemetry();
-
         this.telemetry = telemetry;
 
         setLevel(Level.INTAKE);
@@ -104,7 +102,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     private void set(double power) {
         power *= MAX_ELEVATOR_POWER;
         double ffPower = ff.calculate(power);
-        telemetry.addData("ffPower", ffPower);
         elevatorMotor.set(ffPower);
         elevatorMotorFollow.set(ffPower);
     }
@@ -130,7 +127,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             target_height = getHeight();
             level = Level.MANUAL;
         } else { // Auto
-            set(pid.calculate(getHeight()));
+            set(pid.calculate(getHeight())); // TODO: TUNE FOR NEW MOTORS/RATIO
         }
     }
 
