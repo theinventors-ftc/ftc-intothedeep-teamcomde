@@ -16,36 +16,69 @@ public class ArmSubsystem extends SubsystemBase {
         INTAKE,
         PARK,
         HIGH,
-        PERP
+        PERP,
+        SPECIMENT_INTAKE,
+        INTAKE_B_ABOVE,
+        INTAKE_B,
+        BASKET_OUTTAKE,
+        SPECIMENT_OUTTAKE_HIGH,
+        SPECIMENT_OUTTAKE_LOW,
+        HUMAN_PLAYER
     }
     public enum WristState {
         INTAKE,
         PARK,
         HIGH,
-        PERP
+        PERP,
+        SPECIMENT_INTAKE,
+        INTAKE_B_ABOVE,
+        INTAKE_B,
+        BASKET_OUTTAKE,
+        SPECIMENT_OUTTAKE_HIGH,
+        SPECIMENT_OUTTAKE_LOW,
+        HUMAN_PLAYER
     }
     private ArmState armState;
     private WristState wristState;
 
-    HashMap<ArmState, Double> arm_positionsL = new HashMap<ArmState, Double>() {{
-        put(ArmState.INTAKE, 0.2);
-        put(ArmState.PARK, 0.5);
-        put(ArmState.HIGH, 0.8);
-        put(ArmState.PERP, 0.9);
+    private final HashMap<ArmState, Double> arm_positionsL = new HashMap<ArmState, Double>() {{
+        put(ArmState.INTAKE, 0.075);
+        put(ArmState.PARK, 0.17);
+        put(ArmState.HIGH, 0.45);
+        put(ArmState.PERP, 0.75);
+        put(ArmState.SPECIMENT_INTAKE, 0.77);
+        put(ArmState.INTAKE_B_ABOVE, 0.88);
+        put(ArmState.INTAKE_B, 0.91);
+        put(ArmState.BASKET_OUTTAKE, 0.46);
+        put(ArmState.SPECIMENT_OUTTAKE_HIGH, 0.71);
+        put(ArmState.SPECIMENT_OUTTAKE_LOW, 0.86);
+        put(ArmState.HUMAN_PLAYER, 0.88);
     }};
 
-    HashMap<ArmState, Double> arm_positionsR = new HashMap<ArmState, Double>() {{
-        put(ArmState.INTAKE, 0.8);
-        put(ArmState.PARK, 0.5);
-        put(ArmState.HIGH, 0.2);
-        put(ArmState.PERP, 0.1);
-    }};
+//    private final HashMap<ArmState, Double> arm_positionsR = new HashMap<ArmState, Double>() {{
+//        put(ArmState.INTAKE, 0.075);
+//        put(ArmState.PARK, 0.17);
+//        put(ArmState.HIGH, 0.45);
+//        put(ArmState.PERP, 0.75);
+//        put(ArmState.INTAKE_B_ABOVE, 0.88);
+//        put(ArmState.INTAKE_B, 0.91);
+//        put(ArmState.BASKET_OUTTAKE, 0.46);
+//        put(ArmState.SPECIMENT_OUTTAKE, 0.7);
+//        put(ArmState.SPECIMENT_LOW_OUTTAKE, 0.84);
+//    }};
 
-    HashMap<WristState, Double> wrist_positions = new HashMap<WristState, Double>() {{
-        put(WristState.INTAKE, 0.2);
-        put(WristState.PARK, 0.2);
-        put(WristState.HIGH, 0.7);
-        put(WristState.PERP, 0.7);
+    private final HashMap<WristState, Double> wrist_positions = new HashMap<WristState, Double>() {{
+        put(WristState.INTAKE, 0.23);
+        put(WristState.PARK, 0.09);
+        put(WristState.HIGH, 0.52);
+        put(WristState.PERP, 0.48);
+        put(WristState.SPECIMENT_INTAKE, 0.47);
+        put(WristState.INTAKE_B_ABOVE, 0.70);
+        put(WristState.INTAKE_B, 0.67);
+        put(WristState.BASKET_OUTTAKE, 0.78);
+        put(WristState.SPECIMENT_OUTTAKE_HIGH, 0.17);
+        put(WristState.SPECIMENT_OUTTAKE_LOW, 0.0);
+        put(WristState.HUMAN_PLAYER, 0.69);
     }};
 
     public ArmSubsystem(RobotMap robotMap) {
@@ -53,53 +86,20 @@ public class ArmSubsystem extends SubsystemBase {
         armRight = robotMap.getArmRightServo();
         wrist = robotMap.getArmWristServo();
 
-        arm_goPark();
-        wrist_goPark();
-    }
-
-    // ---------------------------------------- Actuators --------------------------------------- //
-
-    void setArmState(ArmState state) {
-        armState = state;
-        armLeft.setPosition((double)arm_positionsL.get(state));
-        armRight.setPosition(1.0-(double)arm_positionsR.get(state));
-    }
-
-    void arm_goIntake() {
-        setArmState(ArmState.INTAKE);
-    }
-
-    void arm_goPark() {
         setArmState(ArmState.PARK);
-    }
-
-    void arm_goHigh() {
-        setArmState(ArmState.HIGH);
-    }
-
-    void arm_goPerp() {
-        setArmState(ArmState.PERP);
-    }
-
-    void setWristState(WristState state) {
-        wristState = state;
-        wrist.setPosition((double)wrist_positions.get(state));
-    }
-
-    void wrist_goIntake() {
-        setWristState(WristState.INTAKE);
-    }
-
-    void wrist_goPark() {
         setWristState(WristState.PARK);
     }
 
-    void wrist_goHigh() {
-        setWristState(WristState.HIGH);
+    // ---------------------------------------- Actuators --------------------------------------- //
+    public void setArmState(ArmState state) {
+        armState = state;
+        armLeft.setPosition((double)arm_positionsL.get(state));
+        armRight.setPosition((double)arm_positionsL.get(state));
     }
 
-    void wrist_goPerp() {
-        setWristState(WristState.PERP);
+    public void setWristState(WristState state) {
+        wristState = state;
+        wrist.setPosition((double)wrist_positions.get(state));
     }
 
     // ------------------------------------- State Getters -------------------------------------- //

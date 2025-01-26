@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -9,6 +11,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+import org.firstinspires.ftc.ftccommon.internal.manualcontrol.parameters.ImuParameters;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.inventors.ftc.robotbase.RobotMapInterface;
 import org.inventors.ftc.robotbase.hardware.Battery;
@@ -48,14 +51,29 @@ public class RobotMap implements RobotMapInterface {
     // ----------------------------------------- Couplers --------------------------------------- //
     private ServoImplEx coupler_servo;
 
+    // -------------------------------------- Distance Sensors ---------------------------------- //
+    private AnalogInput rear_dist, left_dist, right_dist;
+
     public RobotMap(HardwareMap hm, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2) {
         frontLeft = new MotorExEx(hm, "front_left", Motor.GoBILDA.RPM_435);
         frontRight = new MotorExEx(hm, "front_right", Motor.GoBILDA.RPM_435);
         rearLeft = new MotorExEx(hm, "rear_left", Motor.GoBILDA.RPM_435);
         rearRight = new MotorExEx(hm, "rear_right", Motor.GoBILDA.RPM_435);
+        frontLeft.setRunMode(Motor.RunMode.RawPower);
+        frontRight.setRunMode(Motor.RunMode.RawPower);
+        rearLeft.setRunMode(Motor.RunMode.RawPower);
+        rearRight.setRunMode(Motor.RunMode.RawPower);
+
         this.telemetry = telemetry;
 
         imu = hm.get(IMU.class, "external_imu");
+        IMU.Parameters imuParameters = new IMU.Parameters(
+                new RevHubOrientationOnRobot(
+                        RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD,
+                        RevHubOrientationOnRobot.UsbFacingDirection.DOWN
+                )
+        );
+        imu.initialize(imuParameters);
 
         driverOp = new GamepadExEx(gamepad1);
         toolOp = new GamepadExEx(gamepad2);
@@ -96,6 +114,11 @@ public class RobotMap implements RobotMapInterface {
 
         // --------------------------------------- Couplers ------------------------------------- //
         coupler_servo = hm.get(ServoImplEx.class, "coupler");
+
+        // ------------------------------------ Distance Sensors -------------------------------- //
+        rear_dist = hm.get(AnalogInput.class, "rear_dist");
+        left_dist = hm.get(AnalogInput.class, "left_dist");
+        right_dist = hm.get(AnalogInput.class, "right_dist");
     }
 
     // ------------------------------------ Drivetrain Motors ----------------------------------- //
@@ -222,5 +245,18 @@ public class RobotMap implements RobotMapInterface {
     // ----------------------------------------- Couplers --------------------------------------- //
     public ServoImplEx getCouplerServo() {
         return coupler_servo;
+    }
+
+    // -------------------------------------- Distance Sensors ---------------------------------- //
+    public AnalogInput getRearDist() {
+        return rear_dist;
+    }
+
+    public AnalogInput getLeftDist() {
+        return left_dist;
+    }
+
+    public AnalogInput getRightDist() {
+        return right_dist;
     }
 }
