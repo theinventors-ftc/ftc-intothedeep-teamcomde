@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -50,6 +51,9 @@ public class RobotMap implements RobotMapInterface {
     // ----------------------------------------- Couplers --------------------------------------- //
     private ServoImplEx coupler_servo;
 
+    // -------------------------------------- Distance Sensors ---------------------------------- //
+    private AnalogInput rear_dist, left_dist, right_dist;
+
     public RobotMap(HardwareMap hm, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2) {
         frontLeft = new MotorExEx(hm, "front_left", Motor.GoBILDA.RPM_435);
         frontRight = new MotorExEx(hm, "front_right", Motor.GoBILDA.RPM_435);
@@ -65,8 +69,8 @@ public class RobotMap implements RobotMapInterface {
         imu = hm.get(IMU.class, "external_imu");
         IMU.Parameters imuParameters = new IMU.Parameters(
                 new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
-                        RevHubOrientationOnRobot.UsbFacingDirection.LEFT
+                        RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD,
+                        RevHubOrientationOnRobot.UsbFacingDirection.DOWN
                 )
         );
         imu.initialize(imuParameters);
@@ -110,6 +114,11 @@ public class RobotMap implements RobotMapInterface {
 
         // --------------------------------------- Couplers ------------------------------------- //
         coupler_servo = hm.get(ServoImplEx.class, "coupler");
+
+        // ------------------------------------ Distance Sensors -------------------------------- //
+        rear_dist = hm.get(AnalogInput.class, "rear_dist");
+        left_dist = hm.get(AnalogInput.class, "left_dist");
+        right_dist = hm.get(AnalogInput.class, "right_dist");
     }
 
     // ------------------------------------ Drivetrain Motors ----------------------------------- //
@@ -236,5 +245,18 @@ public class RobotMap implements RobotMapInterface {
     // ----------------------------------------- Couplers --------------------------------------- //
     public ServoImplEx getCouplerServo() {
         return coupler_servo;
+    }
+
+    // -------------------------------------- Distance Sensors ---------------------------------- //
+    public AnalogInput getRearDist() {
+        return rear_dist;
+    }
+
+    public AnalogInput getLeftDist() {
+        return left_dist;
+    }
+
+    public AnalogInput getRightDist() {
+        return right_dist;
     }
 }

@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.util.Urm09;
 import org.inventors.ftc.robotbase.controllers.IIRSubsystem;
 
-@Disabled
+//@Disabled
 @Config
 @TeleOp(name = "Urm09 Test", group = "Tests")
 public class Urm09Test extends LinearOpMode {
@@ -21,7 +21,7 @@ public class Urm09Test extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        distanceSensor = hardwareMap.get(AnalogInput.class, "rear_dist");
+        distanceSensor = hardwareMap.get(AnalogInput.class, "left_dist");
         iirSubsystem = new IIRSubsystem(ALPHA, () -> (distanceSensor.getVoltage()/3.3) * 500);
 
         Telemetry dash_telemetry = FtcDashboard.getInstance().getTelemetry();
