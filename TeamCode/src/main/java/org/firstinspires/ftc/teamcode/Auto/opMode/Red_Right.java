@@ -4,7 +4,6 @@ import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.Tile
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robotX;
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robotY;
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.tipPoseTransfer;
-import static org.firstinspires.ftc.teamcode.Auto.opMode.OpCommon.fixedPose2d;
 import static org.firstinspires.ftc.teamcode.Auto.opMode.OpCommon.init_mechanisms;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -160,7 +159,7 @@ public class Red_Right extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
 //        PoseStorage.currentPose = drive.getPoseEstimate();
     }

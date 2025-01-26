@@ -6,7 +6,6 @@ import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robo
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.tipPoseTransfer;
 import static org.firstinspires.ftc.teamcode.Auto.features.DistanceSensorLocalizer.calculateReal2dLocation;
 import static org.firstinspires.ftc.teamcode.Auto.features.DistanceSensorLocalizer.calculateRealYLocation;
-import static org.firstinspires.ftc.teamcode.Auto.opMode.OpCommon.fixedPose2d;
 import static org.firstinspires.ftc.teamcode.Auto.opMode.OpCommon.init_mechanisms;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -162,7 +161,7 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         //distance sensor here
         double value = 5;
@@ -170,7 +169,7 @@ public class Blue_Right_Speciments extends CommandOpMode {
         drive.setPoseEstimate(new Pose2d(
             calculateRealYLocation(current_pose, value), Math.toRadians(current_pose.getHeading())
         ));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         init_toPreload_1();
         drive.followTrajectorySequenceAsync(toPreload_1.build());
@@ -178,7 +177,7 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         //mechanisms
 
@@ -190,7 +189,7 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         //mechanisms
 
@@ -200,7 +199,7 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         //mechanisms
 
@@ -212,7 +211,7 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         //mechanisms
 
@@ -222,7 +221,7 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         //mechanisms
 
@@ -234,7 +233,7 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         //mechanisms
 
@@ -244,7 +243,7 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         //mechanisms
 
@@ -256,7 +255,7 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         //distance sensor here
         double value_1 = 5;
@@ -265,7 +264,7 @@ public class Blue_Right_Speciments extends CommandOpMode {
         drive.setPoseEstimate(new Pose2d(
             calculateReal2dLocation(current_pose, value_1, value_2), Math.toRadians(current_pose.getHeading())
         ));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         init_toObservationZone_1();
         drive.followTrajectorySequenceAsync(toObservationZone_1.build());
@@ -273,7 +272,7 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         //mechanisms
 
@@ -285,14 +284,14 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         //distance sensor here
 
         drive.setPoseEstimate(new Pose2d(
             calculateRealYLocation(current_pose, value), Math.toRadians(current_pose.getHeading())
         ));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         init_toScoreSpeciment_1();
         drive.followTrajectorySequenceAsync(toScoreSpeciment_1.build());
@@ -300,7 +299,7 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         /* -----1----- */
         chambers = new Pose2d(chambers.getX() + 2, chambers.getY(), Math.toRadians(chambers.getHeading()));
@@ -311,14 +310,14 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         //distance sensor here
 
         drive.setPoseEstimate(new Pose2d(
             calculateReal2dLocation(current_pose, value_1, value_2), Math.toRadians(current_pose.getHeading())
         ));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         init_toObservationZone_1();
         drive.followTrajectorySequenceAsync(toObservationZone_1.build());
@@ -326,7 +325,7 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         //mechanisms
 
@@ -338,14 +337,14 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         //distance sensor here
 
         drive.setPoseEstimate(new Pose2d(
             calculateRealYLocation(current_pose, value), Math.toRadians(current_pose.getHeading())
         ));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         init_toScoreSpeciment_1();
         drive.followTrajectorySequenceAsync(toScoreSpeciment_1.build());
@@ -353,7 +352,7 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         //mechanisms
 
@@ -366,14 +365,14 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         //distance sensor here
 
         drive.setPoseEstimate(new Pose2d(
             calculateReal2dLocation(current_pose, value_1, value_2), Math.toRadians(current_pose.getHeading())
         ));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         init_toObservationZone_1();
         drive.followTrajectorySequenceAsync(toObservationZone_1.build());
@@ -381,7 +380,7 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         //mechanisms
 
@@ -393,14 +392,14 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         //distance sensor here
 
         drive.setPoseEstimate(new Pose2d(
             calculateRealYLocation(current_pose, value), Math.toRadians(current_pose.getHeading())
         ));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         init_toScoreSpeciment_1();
         drive.followTrajectorySequenceAsync(toScoreSpeciment_1.build());
@@ -408,7 +407,7 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         /* -----P----- */
 
@@ -418,7 +417,7 @@ public class Blue_Right_Speciments extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
 //        PoseStorage.currentPose = drive.getPoseEstimate();
     }

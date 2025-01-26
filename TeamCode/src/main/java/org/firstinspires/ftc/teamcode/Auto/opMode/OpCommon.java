@@ -14,13 +14,6 @@ public class OpCommon extends CommandBase {
     //TODO: Make class
 
     /**
-     * Commands and Subsystems for mechanisms
-     */
-    public static Pose2d fixedPose2d(Pose2d pose) {
-        return new Pose2d(pose.vec(), Math.toRadians(pose.getHeading()));
-    }
-
-    /**
      * Initialization of all subsystems and mechanisms
      */
     public static void init_mechanisms(HardwareMap hm, Telemetry tele) {

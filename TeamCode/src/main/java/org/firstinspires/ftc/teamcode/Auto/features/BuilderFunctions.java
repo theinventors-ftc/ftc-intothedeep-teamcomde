@@ -15,8 +15,8 @@ public class BuilderFunctions {
      */
 
     public static double
-        robotY = 15,
-        robotX = 15;
+        robotY = 15.1875,
+        robotX = 14;
 
     public static double
         Tile = 24; /*-inches-*/

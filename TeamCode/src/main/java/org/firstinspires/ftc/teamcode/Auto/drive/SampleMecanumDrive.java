@@ -55,14 +55,12 @@ import java.util.List;
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(13, 0, 0.8);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(12, 0, 0.8);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(10, 0, 0.2);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(8, 0, 0.3);
 
     public static double LATERAL_MULTIPLIER = 1.1464206615067540924657099022576;
 
-    public static volatile double LIVE_TARGET_VELOCITY = 0.0;
-
-    public static double VX_WEIGHT = 1;
+    public static double VX_WEIGHT = 1.2;
     public static double VY_WEIGHT = 1;
     public static double OMEGA_WEIGHT = 1;
 
@@ -286,18 +284,8 @@ public class SampleMecanumDrive extends MecanumDrive {
         return wheelVelocities;
     }
 
-    public void calculateMecanumVelocity(double fl, double fr, double bl, double br) {
-        // Calculate translational and rotational components
-        double Vx = 0.25 * (fl - fr + bl - br);
-        double Vy = 0.25 * (fl + fr + bl + br);
-
-        // Calculate resultant translational velocity
-        LIVE_TARGET_VELOCITY = Math.hypot(Vx, Vy);
-    }
-
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
-        calculateMecanumVelocity(v, v3, v1, v2);
         leftFront.setPower(v);
         leftRear.setPower(v1);
         rightRear.setPower(v2);

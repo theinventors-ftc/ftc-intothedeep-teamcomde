@@ -5,7 +5,6 @@ import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robo
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robotY;
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.tipPoseTransfer;
 import static org.firstinspires.ftc.teamcode.Auto.features.DistanceSensorLocalizer.calculateRealYLocation;
-import static org.firstinspires.ftc.teamcode.Auto.opMode.OpCommon.fixedPose2d;
 import static org.firstinspires.ftc.teamcode.Auto.opMode.OpCommon.init_mechanisms;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -23,7 +22,7 @@ public class Red_Left_Preload_Park extends CommandOpMode {
 
     private SampleMecanumDrive drive;
     private volatile Pose2d current_pose;
-    private DoubleSupplier extedno_length;
+    private Double extedno_length = 0.0;
 
     /**
      * Poses
@@ -38,9 +37,9 @@ public class Red_Left_Preload_Park extends CommandOpMode {
             -0.25 * Tile, -Tile - (robotY/2), Math.toRadians(270)
         ),
 
-        parking = tipPoseTransfer(new Pose2d(
-            -Tile, -0.5 * Tile, Math.toRadians(45)
-        ), extedno_length.getAsDouble());
+        parking = new Pose2d(
+            -Tile, -0.5 * Tile, Math.toRadians(0)
+        );
 
     /**
      * Trajectories
@@ -60,8 +59,9 @@ public class Red_Left_Preload_Park extends CommandOpMode {
     }
     public void init_toParking() {
         toParking = drive.trajectorySequenceBuilder(current_pose)
-            .setTangent(225)
-            .splineTo(parking.vec(), Math.toRadians(parking.getHeading()));
+            .setTangent(Math.toRadians(270))
+            .splineTo(new Vector2d(-1.5 * Tile, -1.5 * Tile), Math.toRadians(135))
+            .splineTo(parking.vec(), Math.toRadians(0));
     }
 
     /**
@@ -75,7 +75,9 @@ public class Red_Left_Preload_Park extends CommandOpMode {
     }
 
     @Override
-    public void run() {
+    public void runOpMode() {
+        initialize();
+        waitForStart();
 
         init_toPreload_0();
         drive.followTrajectorySequenceAsync(toPreload_0.build());
@@ -83,15 +85,15 @@ public class Red_Left_Preload_Park extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
-        //distance sensor here
-        double value = 5;
-
-        drive.setPoseEstimate(new Pose2d(
-            calculateRealYLocation(current_pose, value), Math.toRadians(current_pose.getHeading())
-        ));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+//        //distance sensor here
+//        double value = 5;
+//
+//        drive.setPoseEstimate(new Pose2d(
+//            calculateRealYLocation(current_pose, value), Math.toRadians(current_pose.getHeading())
+//        ));
+//        current_pose = drive.getPoseEstimate();
 
         init_toPreload_1();
         drive.followTrajectorySequenceAsync(toPreload_1.build());
@@ -99,7 +101,7 @@ public class Red_Left_Preload_Park extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
+        current_pose = drive.getPoseEstimate();
 
         //mechanisms ktlp
 
@@ -109,7 +111,6 @@ public class Red_Left_Preload_Park extends CommandOpMode {
             drive.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = fixedPose2d(drive.getPoseEstimate());
 
 //        PoseStorage.currentPose = drive.getPoseEstimate();
     }

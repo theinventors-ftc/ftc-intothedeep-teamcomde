@@ -21,9 +21,9 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 public class DriveConstants {
 
     public static RevHubOrientationOnRobot.LogoFacingDirection LOGO_FACING_DIR =
-        RevHubOrientationOnRobot.LogoFacingDirection.DOWN;
+        RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD;
     public static RevHubOrientationOnRobot.UsbFacingDirection USB_FACING_DIR =
-        RevHubOrientationOnRobot.UsbFacingDirection.LEFT;
+        RevHubOrientationOnRobot.UsbFacingDirection.DOWN;
 
     /*
      * These are motor constants that should be listed online for your motors.
@@ -53,7 +53,7 @@ public class DriveConstants {
      */
     public static double WHEEL_RADIUS = 1.8898; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 12; // in
+    public static double TRACK_WIDTH = 11.46; // in
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -94,9 +94,9 @@ public class DriveConstants {
 
      */
     public static double MAX_VEL = 52.48291908330528;
-    public static double MAX_ACCEL = 52.48291908330528;
-    public static double MAX_ANG_VEL = Math.toRadians(225);
-    public static double MAX_ANG_ACCEL = Math.toRadians(225);
+    public static double MAX_ACCEL = 45;
+    public static double MAX_ANG_VEL = Math.toRadians(270.4000421308573);
+    public static double MAX_ANG_ACCEL = Math.toRadians(270.4000421308573);
 
 
     public static double encoderTicksToInches(double ticks) {
