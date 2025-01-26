@@ -57,9 +57,11 @@ public class IntoTheDeepRobot extends RobotEx {
         elevatorSubsystem = new ElevatorSubsystem(
                 this.robotMap,
                 () -> -toolOp.getRightY(),
-                telemetry
+                telemetry,
+                true
         );
-        extendoSubsystem = new ExtendoSubsystem(this.robotMap, () -> toolOp.getLeftY(), telemetry);
+        extendoSubsystem = new ExtendoSubsystem(this.robotMap, () -> toolOp.getLeftY(), telemetry
+            , true);
         couplersSubsystem = new CouplersSubsystem(this.robotMap);
         distanceSensorsSubsystem = new DistanceSensorsSubsystem(this.robotMap, telemetry);
 

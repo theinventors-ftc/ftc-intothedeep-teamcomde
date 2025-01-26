@@ -41,7 +41,7 @@ public class ExtendoSubsystem extends SubsystemBase {
     );
 
     public static int targetPosition = 0;
-    private int spring_off = 25;
+    private int springs_off = 25;
     private Telemetry telemetry;
 
     // Zeroing
@@ -50,7 +50,7 @@ public class ExtendoSubsystem extends SubsystemBase {
     private final Timing.Timer timer;
     private boolean found_zero = false;
 
-    public ExtendoSubsystem(RobotMap robotMap, DoubleSupplier power, Telemetry telemetry) {
+    public ExtendoSubsystem(RobotMap robotMap, DoubleSupplier power, Telemetry telemetry, boolean attempt_Zero) {
         extendoMotor = robotMap.getExtendoMotor();
 //        extendoMotor.setInverted(true);
         extendoMotor.setRunMode(MotorExEx.RunMode.RawPower);
@@ -60,6 +60,10 @@ public class ExtendoSubsystem extends SubsystemBase {
         this.telemetry = telemetry;
 
         timer = new Timing.Timer(600, TimeUnit.MILLISECONDS);
+
+        found_zero = !attempt_Zero;
+
+        springs_off = attempt_Zero ? springs_off : 0;
     }
 
     private void set(double power) {
@@ -99,7 +103,7 @@ public class ExtendoSubsystem extends SubsystemBase {
     }
 
     public int getExtension() {
-        return extendoMotor.getCurrentPosition()-spring_off;
+        return extendoMotor.getCurrentPosition()-springs_off;
     }
 
     // Zeroing

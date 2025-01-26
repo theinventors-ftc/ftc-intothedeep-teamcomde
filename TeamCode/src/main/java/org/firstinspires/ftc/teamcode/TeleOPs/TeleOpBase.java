@@ -29,7 +29,7 @@ public class TeleOpBase extends CommandOpMode {
         driverOp = new GamepadExEx(gamepad1);
         toolOp = new GamepadExEx(gamepad2);
 
-        robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2);
+        robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, false);
 
         // ----------------------------------- Robot Constants ---------------------------------- //
         RobotConstants = new DriveConstants();

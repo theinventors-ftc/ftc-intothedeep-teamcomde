@@ -78,10 +78,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     public double ampThreshold = 3.4;
     private final Timing.Timer timer;
     private boolean found_zero = false;
+    private boolean attempt_Zero;
 
     private Telemetry telemetry;
 
-    public ElevatorSubsystem(RobotMap robotMap, DoubleSupplier power, Telemetry telemetry) {
+    public ElevatorSubsystem(RobotMap robotMap, DoubleSupplier power, Telemetry telemetry,
+                             boolean attempt_Zero) {
         elevatorMotor = robotMap.getSliderMotor();
         elevatorMotorFollow = robotMap.getSliderFollow();
         elevatorMotor.setRunMode(MotorExEx.RunMode.RawPower);
@@ -97,6 +99,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         this.telemetry = telemetry;
 
         setLevel(Level.INTAKE);
+
+        springs_off = attempt_Zero ? springs_off : 0;
+
+        found_zero = !attempt_Zero;
     }
 
     private void set(double power) {
