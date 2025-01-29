@@ -70,6 +70,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         put(Level.HANGING, 0);
     }};
 
+    public final double ratio = 20.0/24.0;
+
     public static int target_height = 0;
     private int springs_off = 34;
 
@@ -108,7 +110,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void setLevel(Level level) {
         this.level = level;
-        target_height = (int)levelMap.get(level);
+        target_height = (int)(levelMap.get(level)*ratio);
     }
 
     @Override
