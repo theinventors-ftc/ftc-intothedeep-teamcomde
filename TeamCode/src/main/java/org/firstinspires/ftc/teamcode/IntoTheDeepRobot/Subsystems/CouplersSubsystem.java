@@ -15,7 +15,7 @@ public class CouplersSubsystem extends SubsystemBase {
     }
 
     private CouplerState state;
-    private static double engaged_position = 0.2, disengaged_position = 0.65;
+    private static double engaged_position = 0.05, disengaged_position = 0.65;
 
     public CouplersSubsystem(RobotMap robotMap) {
         this.coupler_servo = robotMap.getCouplerServo();

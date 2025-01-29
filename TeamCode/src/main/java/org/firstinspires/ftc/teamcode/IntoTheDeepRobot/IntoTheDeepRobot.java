@@ -57,6 +57,7 @@ public class IntoTheDeepRobot extends RobotEx {
         elevatorSubsystem = new ElevatorSubsystem(
                 this.robotMap,
                 () -> -toolOp.getRightY(),
+                robotMap.getRearLeftMotor(),
                 telemetry
         );
         extendoSubsystem = new ExtendoSubsystem(this.robotMap, () -> toolOp.getLeftY(), telemetry);
@@ -371,7 +372,13 @@ public class IntoTheDeepRobot extends RobotEx {
                 new SequentialCommandGroup( // Ascending Cmd
                         new InstantCommand(
                                 () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.HANGING)
-                        )
+                        ),
+                        new InstantCommand(() -> this.drive_setEnabled(false)),
+                        new WaitUntilCommand(
+                                () -> elevatorSubsystem.getHeight() < 350
+                        ),
+                        new InstantCommand(couplersSubsystem::engage, couplersSubsystem),
+                        new InstantCommand(()->elevatorSubsystem.setCoupled(true))
                 ),
                 () -> elevatorSubsystem.getLevel() != ElevatorSubsystem.Level.HANGING_AIM
         ));
