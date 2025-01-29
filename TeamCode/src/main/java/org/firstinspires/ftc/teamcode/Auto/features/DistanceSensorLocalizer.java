@@ -28,7 +28,7 @@ public class DistanceSensorLocalizer {
         if (curr_pose.getX() < 0) x_direction_mltplr = -1;
         if (curr_pose.getY() < 0) y_direction_mltplr = -1;
 
-        double heading = 90 - curr_pose.getHeading();
+        double heading = 90 - Math.toDegrees(curr_pose.getHeading());
         double x1 = SIDE_DIST_OFFSET_X / cos(heading);
         double opposite_offset = tan(heading) * SIDE_DIST_OFFSET_X;
         double hypot = hypot(side_Dist, (opposite_offset + SIDE_DIST_OFFSET_Y));
@@ -46,7 +46,7 @@ public class DistanceSensorLocalizer {
 
         if (curr_pose.getX() < 0) x_direction_mltplr = -1;
 
-        double heading = 90 - curr_pose.getHeading();
+        double heading = 90 - Math.toDegrees(curr_pose.getHeading());
         double x1 = SIDE_DIST_OFFSET_X / cos(heading);
         double opposite_offset = tan(heading) * SIDE_DIST_OFFSET_X;
         double hypot = hypot(dist, (opposite_offset + SIDE_DIST_OFFSET_Y));
@@ -62,7 +62,7 @@ public class DistanceSensorLocalizer {
 
         if (curr_pose.getY() < 0) y_direction_mltplr = -1;
 
-        double heading = 90 - curr_pose.getHeading();
+        double heading = 90 - Math.toDegrees(curr_pose.getHeading());
         double real_Y = (FIELD_SIZE / 2) - cos(heading) * (dist + REAR_DIST_OFFSET_Y);
 
         return new Vector2d(curr_pose.getX(), y_direction_mltplr * real_Y);
