@@ -43,5 +43,5 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7'
     implementation 'com.acmerobotics.roadrunner:core:0.5.6'
     
-    implementation 'com.github.theinventors-ftc:InventorsFtcLib:a0a72ed'
+    implementation 'com.github.theinventors-ftc:InventorsFtcLib:e9d08f3'
 }

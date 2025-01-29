@@ -19,7 +19,7 @@ import java.util.function.DoubleSupplier;
 
 @Config
 public class ElevatorSubsystem extends SubsystemBase {
-    private MotorExEx elevatorMotor, elevatorMotorFollow;
+    private MotorExEx elevatorMotor, elevatorMotorFollow, couplingMotor;
     private final double MAX_ELEVATOR_POWER = 1.0;
     private final int MAX_ELEVATOR_HEIGHT = 0;
     private DoubleSupplier power;
@@ -67,13 +67,13 @@ public class ElevatorSubsystem extends SubsystemBase {
         put(Level.LOW_CHAMBER, 0);
         put(Level.HIGH_CHAMBER, 565);
         put(Level.HANGING_AIM, 1000);
-        put(Level.HANGING, 0);
+        put(Level.HANGING, -150);
     }};
 
-    public final double ratio = 20.0/24.0;
+    public final double ratio = 22.0/24.0;
 
     public static int target_height = 0;
-    private int springs_off = 34;
+    private int springs_off = (int)(34*ratio);
 
     // Zeroing
     public boolean isStalled = false;
@@ -81,9 +81,13 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final Timing.Timer timer;
     private boolean found_zero = false;
 
+    // Coupler
+    private boolean coupled = false;
+
     private Telemetry telemetry;
 
-    public ElevatorSubsystem(RobotMap robotMap, DoubleSupplier power, Telemetry telemetry) {
+    public ElevatorSubsystem(RobotMap robotMap, DoubleSupplier power, MotorExEx couplingMotor,
+                             Telemetry telemetry) {
         elevatorMotor = robotMap.getSliderMotor();
         elevatorMotorFollow = robotMap.getSliderFollow();
         elevatorMotor.setRunMode(MotorExEx.RunMode.RawPower);
@@ -91,6 +95,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         elevatorMotorFollow.setRunMode(MotorExEx.RunMode.RawPower);
         elevatorMotor.resetEncoder();
         elevatorMotorFollow.resetEncoder();
+        this.couplingMotor = couplingMotor;
 
         this.power = power;
 
@@ -104,8 +109,14 @@ public class ElevatorSubsystem extends SubsystemBase {
     private void set(double power) {
         power *= MAX_ELEVATOR_POWER;
         double ffPower = ff.calculate(power);
-        elevatorMotor.set(ffPower);
-        elevatorMotorFollow.set(ffPower);
+        if(coupled) {
+            elevatorMotor.set(ffPower*48.0/60.0);
+            elevatorMotorFollow.set(ffPower*48.0/60.0);
+            couplingMotor.set(ffPower);
+        } else {
+            elevatorMotor.set(ffPower);
+            elevatorMotorFollow.set(ffPower);
+        }
     }
 
     public void setLevel(Level level) {
@@ -168,5 +179,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public boolean isSliderBottom() {
         return isStalled;
+    }
+
+    public void setCoupled(boolean coupled) {
+        this.coupled = coupled;
     }
 }
