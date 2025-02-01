@@ -70,7 +70,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         put(Level.HANGING, 0);
     }};
 
-    public final double ratio = 20.0/24.0;
+    public final double ratio = 22.0/24.0;
 
     public static int target_height = 0;
     private int springs_off = 34;
@@ -80,7 +80,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     public double ampThreshold = 3.4;
     private final Timing.Timer timer;
     private boolean found_zero = false;
-    private boolean attempt_Zero;
 
     private Telemetry telemetry;
 
