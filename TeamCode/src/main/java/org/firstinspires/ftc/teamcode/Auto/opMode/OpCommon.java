@@ -48,6 +48,7 @@ public class OpCommon {
         elevatorSubsystem = new ElevatorSubsystem(
             this.robotMap,
             () -> 0.0,
+            robotMap.getRearLeftMotor(),
             robotMap.getTelemetry(),
             false
         );
