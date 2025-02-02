@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.CouplersSubsys
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.DistanceSensorsSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ExtendoSubsystem;
+import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.HangingSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.ForwardControllerSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.HeadingControllerSubsystem;
@@ -32,6 +33,7 @@ public class IntoTheDeepRobot extends RobotEx {
     protected IntakeSubsystem intakeSubsystem;
     protected ElevatorSubsystem elevatorSubsystem;
     protected ExtendoSubsystem extendoSubsystem;
+    protected HangingSubsystem hangingSubsystem;
     protected CouplersSubsystem couplersSubsystem;
     protected DistanceSensorsSubsystem distanceSensorsSubsystem;
 
@@ -62,6 +64,7 @@ public class IntoTheDeepRobot extends RobotEx {
         );
         extendoSubsystem = new ExtendoSubsystem(this.robotMap, () -> toolOp.getLeftY(), telemetry
             , true);
+        hangingSubsystem = new HangingSubsystem(this.robotMap);
         couplersSubsystem = new CouplersSubsystem(this.robotMap);
         distanceSensorsSubsystem = new DistanceSensorsSubsystem(this.robotMap, telemetry);
 
@@ -208,7 +211,8 @@ public class IntoTheDeepRobot extends RobotEx {
                         // Intake Procedure
                         new IntakeCommand(
                                 intakeSubsystem,
-                                IntakeCommand.COLOR.RED_YELLOW
+                                (this.getAlliance() == Alliance.RED ?
+                                IntakeCommand.COLOR.RED_YELLOW : IntakeCommand.COLOR.BLUE_YELLOW)
                         ),
                         new InstantCommand(intakeSubsystem::brake_reverse),
                         new WaitCommand(80),
@@ -362,13 +366,25 @@ public class IntoTheDeepRobot extends RobotEx {
                                 )
                         ),
                         () -> armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_HIGH
-
                 ));
 
         // Hanging Automation
         toolOp.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenPressed(new ConditionalCommand(
-                new InstantCommand(
-                        () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.HANGING_AIM)
+                new SequentialCommandGroup(
+                        new InstantCommand(
+                                () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.HANGING_AIM)
+                        ),
+                        new InstantCommand(intakeSubsystem::raise, intakeSubsystem),
+                        new InstantCommand(intakeSubsystem::stop, intakeSubsystem),
+                        new InstantCommand(clawSubsystem::grab, clawSubsystem),
+                        new InstantCommand(extendoSubsystem::returnToZero, extendoSubsystem),
+                        new InstantCommand(() -> armSubsystem.setWristState(
+                                ArmSubsystem.WristState.PARK
+                        )),
+                        new WaitCommand(120),
+                        new InstantCommand(() -> armSubsystem.setArmState(
+                                ArmSubsystem.ArmState.PARK
+                        ))
                 ),
                 new SequentialCommandGroup( // Ascending Cmd
                         new InstantCommand(
@@ -381,7 +397,13 @@ public class IntoTheDeepRobot extends RobotEx {
                                 () -> elevatorSubsystem.getHeight() < 350
                         ),
                         new InstantCommand(couplersSubsystem::engage, couplersSubsystem),
-                        new InstantCommand(()->elevatorSubsystem.setCoupled(true))
+                        new InstantCommand(()->elevatorSubsystem.setCoupled(true)),
+                        new WaitUntilCommand(
+                                () -> elevatorSubsystem.getHeight() < 80
+                        ),
+                        new InstantCommand(hangingSubsystem::release, hangingSubsystem),
+                        new WaitCommand(1500),
+                        new InstantCommand(elevatorSubsystem::disable)
                 ),
                 () -> elevatorSubsystem.getLevel() != ElevatorSubsystem.Level.HANGING_AIM
         ));

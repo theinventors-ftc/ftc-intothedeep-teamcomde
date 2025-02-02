@@ -68,14 +68,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         put(Level.LOW_CHAMBER, 0);
         put(Level.HIGH_CHAMBER, 565);
         put(Level.HANGING_AIM, 1000);
-        put(Level.HANGING, -150);
-        put(Level.HANGING_RELEASE, 250);
+        put(Level.HANGING, -180);
+        put(Level.HANGING_RELEASE, 80);
     }};
 
     public final double ratio = 22.0/24.0;
 
     public static int target_height = 0;
-    private int springs_off = (int)(34*ratio);
+    private int springs_off = 40;
 
     // Zeroing
     public boolean isStalled = false;
@@ -193,5 +193,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void setCoupled(boolean coupled) {
         this.coupled = coupled;
+    }
+
+    public void disable() {
+//        elevatorMotor.disable();
+//        elevatorMotorFollow.disable();
+//        couplingMotor.disable();
+        setLevel(Level.HANGING_RELEASE);
     }
 }

@@ -48,6 +48,9 @@ public class RobotMap implements RobotMapInterface {
     // ----------------------------------------- Extendo ---------------------------------------- //
     private MotorExEx extendoMotor;
 
+    // ---------------------------------------- Hanging ----------------------------------------- //
+    private ServoImplEx hangingReleaseServo1, hangingReleaseServo2;
+
     // ----------------------------------------- Couplers --------------------------------------- //
     private ServoImplEx coupler_servo;
 
@@ -113,6 +116,10 @@ public class RobotMap implements RobotMapInterface {
 
         // ---------------------------------------- Extendo ------------------------------------- //
         extendoMotor = new MotorExEx(hm, "extendo", Motor.GoBILDA.RPM_435);
+
+        // ---------------------------------------- Hanging ------------------------------------- //
+        hangingReleaseServo1 = hm.get(ServoImplEx.class, "release1");
+        hangingReleaseServo2 = hm.get(ServoImplEx.class, "release2");
 
         // --------------------------------------- Couplers ------------------------------------- //
         coupler_servo = hm.get(ServoImplEx.class, "coupler");
@@ -242,6 +249,15 @@ public class RobotMap implements RobotMapInterface {
     // ----------------------------------------- Extendo ---------------------------------------- //
     public MotorExEx getExtendoMotor() {
         return extendoMotor;
+    }
+
+    // ---------------------------------------- Hanging ----------------------------------------- //
+    public ServoImplEx getHangingReleaseServo1() {
+        return hangingReleaseServo1;
+    }
+
+    public ServoImplEx getHangingReleaseServo2() {
+        return hangingReleaseServo2;
     }
 
     // ----------------------------------------- Couplers --------------------------------------- //
