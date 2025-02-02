@@ -20,8 +20,8 @@ import org.firstinspires.ftc.teamcode.RobotMap;
 
 import java.util.function.DoubleSupplier;
 
-@Autonomous(name = "Red Left Samples ONLY 2", group = "RED")
-public class Red_Left_Samples_2_ONLY extends CommandOpMode {
+@Autonomous(name = "Blue Left Samples ONLY 2", group = "BLUE")
+public class Blue_Left_Samples_2_ONLY extends CommandOpMode {
 
     private SampleMecanumDrive drive;
     private volatile Pose2d current_pose;
@@ -36,31 +36,35 @@ public class Red_Left_Samples_2_ONLY extends CommandOpMode {
     private Pose2d
 
         startPose = new Pose2d(
-            -Tile + robotX/2, (-3 * Tile) + robotY/2, Math.toRadians(270)
-        ),
+        Tile - robotX/2, (3 * Tile) - robotY/2, Math.toRadians(90)
+    ),
 
         chambers = new Pose2d(
-            -0.25 * Tile, -1.1 * Tile - (robotY/2), Math.toRadians(270)
+            0.25 * Tile, 1.1 * Tile + (robotY/2), Math.toRadians(90)
+        ),
+
+        submersibleSide = new Pose2d(
+            Tile + (robotY/2), Tile/2, Math.toRadians(180)
         ),
 
         basket = new Pose2d(
-            -2.55 * Tile, -2 * Tile + 1, Math.toRadians(75)
+            2.55 * Tile, 2 * Tile + 1 , Math.toRadians(255)
         ),
 
         neutralSampleRight = new Pose2d(
-            -2 * Tile - 2, -Tile - 2, Math.toRadians(90)
+            2 * Tile + 2, Tile + 2, Math.toRadians(270)
         ),
 
         neutralSampleMid = tipPoseTransfer(new Pose2d(
-            -2.5 * Tile, -Tile, Math.toRadians(90)
+            2.5 * Tile, Tile, Math.toRadians(270)
         ), extedno_length.getAsDouble()),
 
         neutralSampleLeft = new Pose2d(
-            -2.5 * Tile, -Tile - 5, Math.toRadians(180)
+            3 * Tile - 3, Tile, Math.toRadians(270)
         ),
 
         parking = new Pose2d(
-            -1.25 * Tile, -0.5 * Tile, Math.toRadians(0)
+           1.25 * Tile, 0.5 * Tile, Math.toRadians(180)
         );
 
     /**
@@ -82,8 +86,8 @@ public class Red_Left_Samples_2_ONLY extends CommandOpMode {
     }
     public void init_toNeutral_0() {
         toNeutral_0 = drive.trajectorySequenceBuilder(current_pose)
-            .setTangent(Math.toRadians(270))
-            .splineTo(neutralSampleRight.vec(), Math.toRadians(135),
+            .setTangent(Math.toRadians(90))
+            .splineTo(neutralSampleRight.vec(), Math.toRadians(315),
                       SampleMecanumDrive.getVelocityConstraint(
                           DriveConstants.MAX_VEL,
                           DriveConstants.MAX_ANG_VEL,
@@ -93,19 +97,19 @@ public class Red_Left_Samples_2_ONLY extends CommandOpMode {
     }
     public void init_toNeutral_1() {
         toNeutral_1 = drive.trajectorySequenceBuilder(current_pose)
-            .lineToLinearHeading(new Pose2d(basket.getX(), basket.getY() + 5, Math.toRadians(85)));
+            .lineToLinearHeading(new Pose2d(basket.getX(), basket.getY() - 5, Math.toRadians(265)));
     }
     public void init_toNeutral_2() {
         toNeutral_2 = drive.trajectorySequenceBuilder(current_pose)
-            .splineTo(new Vector2d(-1.8 * Tile, -1.5 * Tile), Math.toRadians(90))
-            .splineToSplineHeading(neutralSampleLeft, Math.toRadians(180));
+            .splineTo(new Vector2d(1.8 * Tile, 1.5 * Tile), Math.toRadians(270))
+            .splineToSplineHeading(neutralSampleLeft, Math.toRadians(0));
     }
     public void init_toBasket_0() {
         toBasket_0 = drive.trajectorySequenceBuilder(current_pose)
             .setReversed(true)
-            .setTangent(Math.toRadians(315))
-            .splineToSplineHeading(new Pose2d(basket.getX(), basket.getY() + 5,
-                                             basket.getHeading()), Math.toRadians(180));
+            .setTangent(Math.toRadians(135))
+            .splineToSplineHeading(new Pose2d(basket.getX(), basket.getY() - 5,
+                                             basket.getHeading()), Math.toRadians(0));
     }
     public void init_toBasket_1() {
         toBasket_1 = drive.trajectorySequenceBuilder(current_pose)
@@ -114,7 +118,7 @@ public class Red_Left_Samples_2_ONLY extends CommandOpMode {
     }
     public void init_toParking() {
         toParking = drive.trajectorySequenceBuilder(current_pose)
-            .splineTo(parking.vec(), Math.toRadians(0));
+            .splineTo(parking.vec(), Math.toRadians(180));
     }
 
     /**

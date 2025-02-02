@@ -65,12 +65,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         put(Level.LOW_BASKET, 740);
         put(Level.HIGH_BASKET, 2245);
         put(Level.LOW_CHAMBER, 0);
-        put(Level.HIGH_CHAMBER, 565);
+        put(Level.HIGH_CHAMBER, 580);
         put(Level.HANGING_AIM, 1000);
         put(Level.HANGING, 0);
     }};
 
-    public final double ratio = 22.0/24.0;
+    public final double ratio = -22.0/24.0;
 
     public static int target_height = 0;
     private int springs_off = 34;
