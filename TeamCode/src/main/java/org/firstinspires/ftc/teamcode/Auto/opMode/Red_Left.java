@@ -22,7 +22,7 @@ public class Red_Left extends CommandOpMode {
 
     private SampleMecanumDrive drive;
     private volatile Pose2d current_pose;
-    private DoubleSupplier extedno_length;
+    private DoubleSupplier extendo_length;
 
     /**
      * Poses
@@ -47,19 +47,19 @@ public class Red_Left extends CommandOpMode {
 
         neutralSampleRight = tipPoseTransfer(new Pose2d(
             -2 * Tile - 2, -Tile, Math.toRadians(90)
-        ), extedno_length.getAsDouble()),
+        ), extendo_length.getAsDouble()),
 
         neutralSampleMid = tipPoseTransfer(new Pose2d(
             -2.5 * Tile, -Tile, Math.toRadians(90)
-        ), extedno_length.getAsDouble()),
+        ), extendo_length.getAsDouble()),
 
         neutralSampleLeft = tipPoseTransfer(new Pose2d(
             -3 * Tile + 3, -Tile, Math.toRadians(90)
-        ), extedno_length.getAsDouble()),
+        ), extendo_length.getAsDouble()),
 
         parking = tipPoseTransfer(new Pose2d(
             -Tile, -0.5 * Tile, Math.toRadians(45)
-        ), extedno_length.getAsDouble());
+        ), extendo_length.getAsDouble());
 
     /**
      * Trajectories

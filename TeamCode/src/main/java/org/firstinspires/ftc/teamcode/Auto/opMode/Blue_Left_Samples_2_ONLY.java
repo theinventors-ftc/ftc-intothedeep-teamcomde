@@ -25,7 +25,7 @@ public class Blue_Left_Samples_2_ONLY extends CommandOpMode {
 
     private SampleMecanumDrive drive;
     private volatile Pose2d current_pose;
-    private DoubleSupplier extedno_length = ()-> 0.0;
+    private DoubleSupplier extendo_length = ()-> 0.0;
     private OpCommon opCommon;
     private RobotMap robotMap;
     private SequentialCommandGroup temp;
@@ -57,7 +57,7 @@ public class Blue_Left_Samples_2_ONLY extends CommandOpMode {
 
         neutralSampleMid = tipPoseTransfer(new Pose2d(
             2.5 * Tile, Tile, Math.toRadians(270)
-        ), extedno_length.getAsDouble()),
+        ), extendo_length.getAsDouble()),
 
         neutralSampleLeft = new Pose2d(
             3 * Tile - 3, Tile, Math.toRadians(270)

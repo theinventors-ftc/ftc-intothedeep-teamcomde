@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.IntoTheDeepRobot.controllers;
+package org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;

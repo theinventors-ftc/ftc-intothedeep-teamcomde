@@ -24,7 +24,7 @@ public class Blue_Right_Speciments extends CommandOpMode {
 
     private SampleMecanumDrive drive;
     private volatile Pose2d current_pose;
-    private DoubleSupplier extedno_length;
+    private DoubleSupplier extendo_length;
 
     /**
      * Poses
@@ -53,19 +53,19 @@ public class Blue_Right_Speciments extends CommandOpMode {
 
         allianceSampleLeft = tipPoseTransfer(new Pose2d(
             -2 * Tile - 2, Tile, Math.toRadians(225)
-        ), extedno_length.getAsDouble()),
+        ), extendo_length.getAsDouble()),
 
         allianceSampleMid = tipPoseTransfer(new Pose2d(
             -2.5 * Tile, Tile, Math.toRadians(225)
-        ), extedno_length.getAsDouble()),
+        ), extendo_length.getAsDouble()),
 
         allianceSampleRight = tipPoseTransfer(new Pose2d(
             -3 * Tile + 3, Tile, Math.toRadians(225)
-        ), extedno_length.getAsDouble()),
+        ), extendo_length.getAsDouble()),
 
         parking = tipPoseTransfer(new Pose2d(
             -2 * Tile, 2.75 * Tile, Math.toRadians(135)
-        ), extedno_length.getAsDouble());
+        ), extendo_length.getAsDouble());
 
     /**
      * Trajectories

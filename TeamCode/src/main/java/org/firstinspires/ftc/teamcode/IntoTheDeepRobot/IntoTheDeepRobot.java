@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.IntoTheDeepRobot;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -18,9 +17,9 @@ import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.DistanceSensor
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ExtendoSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.controllers.ForwardControllerSubsystem;
-import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.controllers.HeadingControllerSubsystem;
-import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.controllers.StrafeControllerSubsystem;
+import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.ForwardControllerSubsystem;
+import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.HeadingControllerSubsystem;
+import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.StrafeControllerSubsystem;
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.RobotEx;
 import org.inventors.ftc.robotbase.drive.DriveConstants;

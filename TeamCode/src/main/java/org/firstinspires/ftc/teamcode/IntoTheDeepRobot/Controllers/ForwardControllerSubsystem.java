@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.IntoTheDeepRobot.controllers;
+package org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
@@ -7,7 +7,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.inventors.ftc.robotbase.controllers.PIDFControllerEx;
 
 import java.util.function.DoubleSupplier;
-import java.util.function.IntSupplier;
 
 @Config
 public class ForwardControllerSubsystem extends SubsystemBase {
