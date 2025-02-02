@@ -10,6 +10,9 @@ public class HangingSubsystem extends SubsystemBase {
     private MotorExEx coupler1, coupler2, coupler3;
     private ServoImplEx releaseServo1, releaseServo2;
 
+    private double power = 1.0;
+    private boolean is_hanging = false;
+
     public HangingSubsystem(RobotMap robotMap) {
         coupler1 = robotMap.getFrontLeftMotor();
         coupler2 = robotMap.getFrontRightMotor();
@@ -20,6 +23,11 @@ public class HangingSubsystem extends SubsystemBase {
         secure();
     }
 
+    @Override
+    public void periodic() {
+
+    }
+
     public void secure() {
         releaseServo1.setPosition(0.0);
         releaseServo2.setPosition(1.0);
@@ -28,5 +36,17 @@ public class HangingSubsystem extends SubsystemBase {
     public void release() {
         releaseServo1.setPosition(0.65);
         releaseServo2.setPosition(0.35);
+    }
+
+    public void ascend() {
+        coupler1.set(-power);
+        coupler2.set(power);
+        coupler3.set(power);
+    }
+
+    public void stop() {
+        coupler1.set(0);
+        coupler2.set(0);
+        coupler3.set(0);
     }
 }

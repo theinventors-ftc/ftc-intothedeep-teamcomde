@@ -156,6 +156,13 @@ public class IntoTheDeepRobot extends RobotEx {
                         () -> couplersSubsystem.getState() == CouplersSubsystem.CouplerState.ENGAGED
                 ));
 
+        toolOp.getGamepadButton(GamepadKeys.Button.START).whenPressed(new SequentialCommandGroup(
+                new InstantCommand(() -> this.drive_setEnabled(false)), new InstantCommand(() -> hangingSubsystem.ascend()
+        ))
+        ).whenReleased(
+                new InstantCommand(() -> hangingSubsystem.stop())
+        );
+
         // ------------------------------------ Automatations ----------------------------------- //
         //// Intake Specimen Automation
         toolOp.getGamepadButton(GamepadKeys.Button.B).whenPressed(
@@ -379,11 +386,11 @@ public class IntoTheDeepRobot extends RobotEx {
                         new InstantCommand(clawSubsystem::grab, clawSubsystem),
                         new InstantCommand(extendoSubsystem::returnToZero, extendoSubsystem),
                         new InstantCommand(() -> armSubsystem.setWristState(
-                                ArmSubsystem.WristState.PARK
+                                ArmSubsystem.WristState.INTAKE
                         )),
                         new WaitCommand(120),
                         new InstantCommand(() -> armSubsystem.setArmState(
-                                ArmSubsystem.ArmState.PARK
+                                ArmSubsystem.ArmState.INTAKE
                         ))
                 ),
                 new SequentialCommandGroup( // Ascending Cmd

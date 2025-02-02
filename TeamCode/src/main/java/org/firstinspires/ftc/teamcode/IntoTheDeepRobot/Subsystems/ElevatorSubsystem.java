@@ -69,13 +69,13 @@ public class ElevatorSubsystem extends SubsystemBase {
         put(Level.HIGH_CHAMBER, 565);
         put(Level.HANGING_AIM, 1000);
         put(Level.HANGING, -180);
-        put(Level.HANGING_RELEASE, 80);
+        put(Level.HANGING_RELEASE, -10); // TODO Go intake in auto hang
     }};
 
     public final double ratio = 22.0/24.0;
 
     public static int target_height = 0;
-    private int springs_off = 40;
+    private int springs_off = 47;
 
     // Zeroing
     public boolean isStalled = false;
