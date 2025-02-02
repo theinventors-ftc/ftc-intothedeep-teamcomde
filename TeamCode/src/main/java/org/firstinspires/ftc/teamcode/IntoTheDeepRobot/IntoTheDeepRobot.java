@@ -373,6 +373,8 @@ public class IntoTheDeepRobot extends RobotEx {
                         new InstantCommand(
                                 () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.HANGING)
                         ),
+                        new InstantCommand(extendoSubsystem::returnToZero),
+                        new InstantCommand(intakeSubsystem::raise),
                         new InstantCommand(() -> this.drive_setEnabled(false)),
                         new WaitUntilCommand(
                                 () -> elevatorSubsystem.getHeight() < 350
