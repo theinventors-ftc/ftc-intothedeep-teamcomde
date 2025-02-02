@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.util.Urm09;
 import org.inventors.ftc.robotbase.controllers.IIRSubsystem;
 
-//@Disabled
+@Disabled
 @Config
 @TeleOp(name = "Urm09 Test", group = "Tests")
 public class Urm09Test extends LinearOpMode {

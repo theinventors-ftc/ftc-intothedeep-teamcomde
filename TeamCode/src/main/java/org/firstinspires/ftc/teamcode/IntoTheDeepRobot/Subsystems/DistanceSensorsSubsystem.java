@@ -15,8 +15,8 @@ public class DistanceSensorsSubsystem extends SubsystemBase {
     */
 
     private AnalogInput sensors[];
-    private final double[] distances = {0.0, 0.0, 0.0};
-    private final double[] filt_distances = {0.0, 0.0, 0.0};
+    private double[] distances = {0.0, 0.0, 0.0};
+    private double[] filt_distances = {0.0, 0.0, 0.0};
     private IIRSubsystem iirSubsystem[];
     private double A = 0;
 

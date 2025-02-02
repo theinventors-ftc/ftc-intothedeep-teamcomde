@@ -7,12 +7,14 @@ import com.arcrobotics.ftclib.controller.wpilibcontroller.ElevatorFeedforward;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.arcrobotics.ftclib.util.Timing;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.controllers.PIDFControllerEx;
 import org.inventors.ftc.robotbase.hardware.MotorExEx;
+import org.inventors.ftc.util.MathUtils;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleSupplier;
@@ -20,7 +22,7 @@ import java.util.function.DoubleSupplier;
 @Config
 public class ExtendoSubsystem extends SubsystemBase {
     private MotorExEx extendoMotor;
-    private final double MAX_EXTENDO_POWER = 1.0;
+    private double MAX_EXTENDO_POWER = 1.0;
     private final int MAX_EXTENSION = 0;
     private DoubleSupplier power;
 
@@ -41,7 +43,7 @@ public class ExtendoSubsystem extends SubsystemBase {
     );
 
     public static int targetPosition = 0;
-    private int spring_off = 25;
+    private int springs_off = 25;
     private Telemetry telemetry;
 
     // Zeroing
@@ -50,7 +52,7 @@ public class ExtendoSubsystem extends SubsystemBase {
     private final Timing.Timer timer;
     private boolean found_zero = false;
 
-    public ExtendoSubsystem(RobotMap robotMap, DoubleSupplier power, Telemetry telemetry) {
+    public ExtendoSubsystem(RobotMap robotMap, DoubleSupplier power, Telemetry telemetry, boolean attempt_Zero) {
         extendoMotor = robotMap.getExtendoMotor();
 //        extendoMotor.setInverted(true);
         extendoMotor.setRunMode(MotorExEx.RunMode.RawPower);
@@ -60,10 +62,18 @@ public class ExtendoSubsystem extends SubsystemBase {
         this.telemetry = telemetry;
 
         timer = new Timing.Timer(600, TimeUnit.MILLISECONDS);
+
+        found_zero = !attempt_Zero;
+
+        springs_off = attempt_Zero ? springs_off : 0;
     }
 
     private void set(double power) {
-        extendoMotor.set(ff.calculate(power * MAX_EXTENDO_POWER));
+        extendoMotor.set(Range.clip(ff.calculate(power), -MAX_EXTENDO_POWER,  MAX_EXTENDO_POWER));
+    }
+
+    public void set_MAX_POWER(double power) {
+        MAX_EXTENDO_POWER = power;
     }
 
     @Override
@@ -99,7 +109,7 @@ public class ExtendoSubsystem extends SubsystemBase {
     }
 
     public int getExtension() {
-        return extendoMotor.getCurrentPosition()-spring_off;
+        return extendoMotor.getCurrentPosition()-springs_off;
     }
 
     // Zeroing

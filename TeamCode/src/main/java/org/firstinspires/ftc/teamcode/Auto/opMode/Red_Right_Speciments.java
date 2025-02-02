@@ -6,18 +6,20 @@ import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robo
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.tipPoseTransfer;
 import static org.firstinspires.ftc.teamcode.Auto.features.DistanceSensorLocalizer.calculateReal2dLocation;
 import static org.firstinspires.ftc.teamcode.Auto.features.DistanceSensorLocalizer.calculateRealYLocation;
-import static org.firstinspires.ftc.teamcode.Auto.opMode.OpCommon.init_mechanisms;
+
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Auto.trajectorysequence.TrajectorySequenceBuilder;
 
 import java.util.function.DoubleSupplier;
 
+@Disabled
 @Autonomous(name = "Autonomous Right Red Speciments")
 public class Red_Right_Speciments extends CommandOpMode {
 
@@ -149,7 +151,6 @@ public class Red_Right_Speciments extends CommandOpMode {
     public void initialize() {
         drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(startPose);
-        init_mechanisms(hardwareMap, telemetry);
     }
 
     @Override

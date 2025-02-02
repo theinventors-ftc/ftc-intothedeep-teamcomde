@@ -4,12 +4,9 @@ import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.Tile
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robotX;
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robotY;
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.tipPoseTransfer;
-import static org.firstinspires.ftc.teamcode.Auto.features.DistanceSensorLocalizer.calculateReal2dLocation;
-import static org.firstinspires.ftc.teamcode.Auto.features.DistanceSensorLocalizer.calculateRealYLocation;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.profile.VelocityConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
@@ -23,8 +20,8 @@ import org.firstinspires.ftc.teamcode.RobotMap;
 
 import java.util.function.DoubleSupplier;
 
-@Autonomous(name = "Red Left Samples")
-public class Red_Left_Samples extends CommandOpMode {
+@Autonomous(name = "Red Left Samples ONLY 2", group = "RED")
+public class Red_Left_Samples_2_ONLY extends CommandOpMode {
 
     private SampleMecanumDrive drive;
     private volatile Pose2d current_pose;
@@ -263,65 +260,6 @@ public class Red_Left_Samples extends CommandOpMode {
             !isStopRequested()
             && opModeIsActive()
             && CommandScheduler.getInstance().isScheduled(temp)
-        ) {
-            run();
-        }
-
-        /* -----2----- */
-
-        temp = opCommon.sample_intake();
-        temp.schedule();
-        init_toNeutral_2();
-        drive.followTrajectorySequenceAsync(toNeutral_2.build());
-        while (
-            !isStopRequested()
-            && opModeIsActive()
-            && (drive.isBusy()
-            || CommandScheduler.getInstance().isScheduled(temp))
-        ) {
-            drive.update();
-            run();
-        }
-        drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = drive.getPoseEstimate();
-
-        temp = opCommon.basket_scoring();
-        temp.schedule();
-        init_toBasket_0();
-        drive.followTrajectorySequenceAsync(toBasket_0.build());
-        while (
-            !isStopRequested()
-            && opModeIsActive()
-            && (drive.isBusy()
-            || CommandScheduler.getInstance().isScheduled(temp))
-        ) {
-            drive.update();
-            run();
-        }
-        drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = drive.getPoseEstimate();
-
-        //distance sensor here
-//
-//        drive.setPoseEstimate(new Pose2d(
-//            calculateReal2dLocation(current_pose, value_1, value_2), Math.toRadians(current_pose.getHeading())
-//        ));
-//        current_pose = drive.getPoseEstimate();
-
-        init_toBasket_1();
-        drive.followTrajectorySequenceAsync(toBasket_1.build());
-        while (!isStopRequested() && opModeIsActive() && drive.isBusy()) {
-            drive.update();
-        }
-        drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = drive.getPoseEstimate();
-
-        temp = opCommon.release_sample();
-        temp.schedule();
-        while (
-            !isStopRequested()
-                && opModeIsActive()
-                && CommandScheduler.getInstance().isScheduled(temp)
         ) {
             run();
         }

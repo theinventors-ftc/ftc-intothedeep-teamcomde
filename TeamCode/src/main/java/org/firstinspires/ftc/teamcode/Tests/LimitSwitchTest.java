@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+@Disabled
 @Config
 @TeleOp(name = "Limit Switch Test", group = "Tests")
 public class LimitSwitchTest extends LinearOpMode {

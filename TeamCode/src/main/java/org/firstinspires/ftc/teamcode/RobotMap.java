@@ -54,29 +54,31 @@ public class RobotMap implements RobotMapInterface {
     // -------------------------------------- Distance Sensors ---------------------------------- //
     private AnalogInput rear_dist, left_dist, right_dist;
 
-    public RobotMap(HardwareMap hm, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2) {
-        frontLeft = new MotorExEx(hm, "front_left", Motor.GoBILDA.RPM_435);
-        frontRight = new MotorExEx(hm, "front_right", Motor.GoBILDA.RPM_435);
-        rearLeft = new MotorExEx(hm, "rear_left", Motor.GoBILDA.RPM_435);
-        rearRight = new MotorExEx(hm, "rear_right", Motor.GoBILDA.RPM_435);
-        frontLeft.setRunMode(Motor.RunMode.RawPower);
-        frontRight.setRunMode(Motor.RunMode.RawPower);
-        rearLeft.setRunMode(Motor.RunMode.RawPower);
-        rearRight.setRunMode(Motor.RunMode.RawPower);
+    public RobotMap(HardwareMap hm, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2, boolean is_auto) {
+        if(!is_auto) {
+            frontLeft = new MotorExEx(hm, "front_left", Motor.GoBILDA.RPM_435);
+            frontRight = new MotorExEx(hm, "front_right", Motor.GoBILDA.RPM_435);
+            rearLeft = new MotorExEx(hm, "rear_left", Motor.GoBILDA.RPM_435);
+            rearRight = new MotorExEx(hm, "rear_right", Motor.GoBILDA.RPM_435);
+            frontLeft.setRunMode(Motor.RunMode.RawPower);
+            frontRight.setRunMode(Motor.RunMode.RawPower);
+            rearLeft.setRunMode(Motor.RunMode.RawPower);
+            rearRight.setRunMode(Motor.RunMode.RawPower);
+
+            imu = hm.get(IMU.class, "external_imu");
+            IMU.Parameters imuParameters = new IMU.Parameters(
+                new RevHubOrientationOnRobot(
+                    RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD,
+                    RevHubOrientationOnRobot.UsbFacingDirection.DOWN
+                )
+            );
+            imu.initialize(imuParameters);
+
+            driverOp = new GamepadExEx(gamepad1);
+            toolOp = new GamepadExEx(gamepad2);
+        }
 
         this.telemetry = telemetry;
-
-        imu = hm.get(IMU.class, "external_imu");
-        IMU.Parameters imuParameters = new IMU.Parameters(
-                new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD,
-                        RevHubOrientationOnRobot.UsbFacingDirection.DOWN
-                )
-        );
-        imu.initialize(imuParameters);
-
-        driverOp = new GamepadExEx(gamepad1);
-        toolOp = new GamepadExEx(gamepad2);
 
         battery = new Battery(hm);
 

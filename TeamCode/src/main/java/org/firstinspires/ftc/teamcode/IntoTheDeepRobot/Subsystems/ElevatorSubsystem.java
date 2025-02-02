@@ -89,7 +89,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private Telemetry telemetry;
 
     public ElevatorSubsystem(RobotMap robotMap, DoubleSupplier power, MotorExEx couplingMotor,
-                             Telemetry telemetry) {
+                             Telemetry telemetry, boolean attempt_Zero) {
         elevatorMotor = robotMap.getSliderMotor();
         elevatorMotorFollow = robotMap.getSliderFollow();
         elevatorMotor.setRunMode(MotorExEx.RunMode.RawPower);
@@ -106,6 +106,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         this.telemetry = telemetry;
 
         setLevel(Level.INTAKE);
+
+        springs_off = attempt_Zero ? springs_off : 0;
+
+        found_zero = !attempt_Zero;
     }
 
     private void set(double power) {
@@ -152,6 +156,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public Level getLevel() {
         return level;
+    }
+
+    public boolean atTarget() {
+        return Math.abs(getHeight() - target_height) < 25;
     }
 
     // ----------------------------------------- Zeroing ---------------------------------------- //
