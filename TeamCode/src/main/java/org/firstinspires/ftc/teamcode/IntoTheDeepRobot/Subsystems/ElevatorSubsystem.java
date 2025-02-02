@@ -52,6 +52,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         HIGH_CHAMBER,
         HANGING_AIM,
         HANGING,
+        HANGING_RELEASE,
         MANUAL
     }
 
@@ -68,6 +69,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         put(Level.HIGH_CHAMBER, 565);
         put(Level.HANGING_AIM, 1000);
         put(Level.HANGING, -150);
+        put(Level.HANGING_RELEASE, 250);
     }};
 
     public final double ratio = 22.0/24.0;
