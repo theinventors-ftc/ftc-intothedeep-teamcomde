@@ -64,7 +64,7 @@ public class IntoTheDeepRobot extends RobotEx {
         );
         extendoSubsystem = new ExtendoSubsystem(this.robotMap, () -> toolOp.getLeftY(), telemetry
             , true);
-        hangingSubsystem = new HangingSubsystem(this.robotMap);
+        hangingSubsystem = new HangingSubsystem(this.robotMap, telemetry);
         couplersSubsystem = new CouplersSubsystem(this.robotMap);
         distanceSensorsSubsystem = new DistanceSensorsSubsystem(this.robotMap, telemetry);
 
@@ -397,8 +397,8 @@ public class IntoTheDeepRobot extends RobotEx {
                         new InstantCommand(
                                 () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.HANGING)
                         ),
-                        new InstantCommand(extendoSubsystem::returnToZero),
-                        new InstantCommand(intakeSubsystem::raise),
+                        new InstantCommand(extendoSubsystem::returnToZero, extendoSubsystem),
+                        new InstantCommand(intakeSubsystem::raise, intakeSubsystem),
                         new InstantCommand(() -> this.drive_setEnabled(false)),
                         new WaitUntilCommand(
                                 () -> elevatorSubsystem.getHeight() < 350
@@ -410,7 +410,10 @@ public class IntoTheDeepRobot extends RobotEx {
                         ),
                         new InstantCommand(hangingSubsystem::release, hangingSubsystem),
                         new WaitCommand(1500),
-                        new InstantCommand(elevatorSubsystem::disable)
+                        new InstantCommand(elevatorSubsystem::disable, elevatorSubsystem)
+//                        new InstantCommand(hangingSubsystem::ascend, hangingSubsystem),
+//                        new WaitUntilCommand(() -> hangingSubsystem.reached_hanging_pos()),
+//                        new InstantCommand(hangingSubsystem::stop, hangingSubsystem)
                 ),
                 () -> elevatorSubsystem.getLevel() != ElevatorSubsystem.Level.HANGING_AIM
         ));

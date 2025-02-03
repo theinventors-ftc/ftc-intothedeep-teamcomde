@@ -15,12 +15,15 @@ public class DistanceSensorLocalizer {
     private static final double FIELD_SIZE = 144; // Inches
 
     private static final double
-        SIDE_DIST_OFFSET_X = 0, // Inch
-        SIDE_DIST_OFFSET_Y = 0, // Inch
-        REAR_DIST_OFFSET_Y = 0; // Inch
-//        SIDE_DIST_OFFSET_X = 7, // Inch
-//        SIDE_DIST_OFFSET_Y = -5.34375, // Inch
-//        REAR_DIST_OFFSET_Y = 7.59375; // Inch
+//        SIDE_DIST_OFFSET_X = 0, // Inch
+//        SIDE_DIST_OFFSET_Y = 0, // Inch
+//        REAR_DIST_OFFSET_Y = 0; // Inch
+        SIDE_DIST_OFFSET_X = 7, // Inch
+        SIDE_DIST_OFFSET_Y = -5.34375, // Inch
+        REAR_DIST_OFFSET_Y = 7.59375; // Inch
+
+    //rear 44.54 - 44.69 -- 44.615
+    //left 3.48 - 3.63
 
     private static double
         x_direction_mltplr = 1,

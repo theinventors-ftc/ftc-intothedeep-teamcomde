@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Auto.opMode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.command.CommandOpMode;
@@ -13,7 +14,11 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Commands.IntakeCommand;
+import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.ForwardControllerSubsystem;
+import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.HeadingControllerSubsystem;
+import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.StrafeControllerSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ArmSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.CouplersSubsystem;
@@ -27,7 +32,9 @@ import org.inventors.ftc.robotbase.hardware.GamepadExEx;
 public class OpCommon {
 
     private RobotMap robotMap;
+    private FtcDashboard dashboard;
 
+    /*--Subsystems--*/
     protected HardwareMap hardwareMap;
     public ClawSubsystem clawSubsystem;
     public ArmSubsystem armSubsystem;
@@ -36,6 +43,11 @@ public class OpCommon {
     public ExtendoSubsystem extendoSubsystem;
     public CouplersSubsystem couplersSubsystem;
     public DistanceSensorsSubsystem distanceSensorsSubsystem;
+
+    /*--Controllers--*/
+    public ForwardControllerSubsystem forwardControllerSubsystem;
+    public StrafeControllerSubsystem strafeControllerSubsystem;
+    public HeadingControllerSubsystem gyroFollow;
 
     /**
      * Initialization of all subsystems and mechanisms
@@ -87,6 +99,23 @@ public class OpCommon {
             ),
             () -> armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_HIGH
         ));
+    }
+
+    public void init_controllers(SampleMecanumDrive drive) {
+        this.dashboard = FtcDashboard.getInstance();
+        forwardControllerSubsystem = new ForwardControllerSubsystem(
+            () -> distanceSensorsSubsystem.getDistances()[0],
+            dashboard.getTelemetry()
+        );
+        strafeControllerSubsystem = new StrafeControllerSubsystem(
+            () -> distanceSensorsSubsystem.getDistances()[1], // TODO Change to 2
+            dashboard.getTelemetry()
+        );
+        gyroFollow = new HeadingControllerSubsystem(
+            () -> Math.toDegrees(drive.getPoseEstimate().getHeading()),
+            () -> 0,
+            dashboard.getTelemetry()
+        );
     }
 
     public SequentialCommandGroup reset_elevator() {
@@ -219,6 +248,25 @@ public class OpCommon {
         return new SequentialCommandGroup(
             new InstantCommand(()-> extendoSubsystem.set_MAX_POWER(0.5)),
             new InstantCommand(()-> extendoSubsystem.setTargetPosition(1065))
+        );
+    }
+
+    public SequentialCommandGroup activateDistanceCalibration() {
+        return new SequentialCommandGroup(
+            new InstantCommand(gyroFollow::enable),
+            new InstantCommand(strafeControllerSubsystem::enable),
+            new InstantCommand(forwardControllerSubsystem::enable),
+            new InstantCommand(() -> gyroFollow.setGyroTarget(75)),
+            new InstantCommand(() -> strafeControllerSubsystem.setDistTarget(3.555)),
+            new InstantCommand(() -> forwardControllerSubsystem.setGyroTarget(44.615))
+        );
+    }
+
+    public SequentialCommandGroup deactivateDistanceCalibration() {
+        return new SequentialCommandGroup(
+            new InstantCommand(gyroFollow::disable),
+            new InstantCommand(strafeControllerSubsystem::disable),
+            new InstantCommand(forwardControllerSubsystem::disable)
         );
     }
 }
