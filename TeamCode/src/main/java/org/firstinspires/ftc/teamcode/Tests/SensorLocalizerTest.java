@@ -27,7 +27,7 @@ public class SensorLocalizerTest extends CommandOpMode {
 
     @Override
     public void initialize() {
-        robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, false);
+        robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.TELEOP);
         distanceSensorsSubsystem = new DistanceSensorsSubsystem(this.robotMap, telemetry);
         drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(new Pose2d(-2 * 24, -2 * 24, Math.toRadians(90)));

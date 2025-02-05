@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.RobotMap;
@@ -31,7 +30,7 @@ public class ClawSubsystem extends SubsystemBase {
     }};
 
     private final HashMap<ClawRotState, Double> claw_rot_positions = new HashMap<ClawRotState, Double>() {{
-        put(ClawRotState.NORMAL, 0.06);
+        put(ClawRotState.NORMAL, 0.048);
         put(ClawRotState.FLIPPED, 0.4);
     }};
 

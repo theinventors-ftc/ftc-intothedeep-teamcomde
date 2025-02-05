@@ -13,24 +13,18 @@ public class HangingSubsystem extends SubsystemBase {
 
     private double power = 1.0;
     private boolean is_hanging = false;
+    private int hanging_pos = 3050;
 
     private Telemetry telemetry;
 
-    public HangingSubsystem(RobotMap robotMap, Telemetry telemetry) {
+    public HangingSubsystem(RobotMap robotMap) {
         coupler1 = robotMap.getFrontLeftMotor();
         coupler2 = robotMap.getFrontRightMotor();
         coupler3 = robotMap.getRearRightMotor();
         releaseServo1 = robotMap.getHangingReleaseServo1();
         releaseServo2 = robotMap.getHangingReleaseServo2();
 
-        this.telemetry = telemetry;
-
         secure();
-    }
-
-    @Override
-    public void periodic () {
-        telemetry.addData("Hanging Pos: ", coupler2.getCurrentPosition());
     }
 
     public void secure() {
@@ -39,6 +33,7 @@ public class HangingSubsystem extends SubsystemBase {
     }
 
     public void release() {
+        coupler2.resetEncoder();
         releaseServo1.setPosition(0.65);
         releaseServo2.setPosition(0.35);
     }
@@ -55,7 +50,13 @@ public class HangingSubsystem extends SubsystemBase {
         coupler3.set(0);
     }
 
+    public void descend() {
+        coupler1.set(power/3);
+        coupler2.set(-power/3);
+        coupler3.set(-power/3);
+    }
+
     public boolean reached_hanging_pos() {
-        return coupler2.getCurrentPosition() > 300;
+        return coupler2.getCurrentPosition() >= hanging_pos;
     }
 }

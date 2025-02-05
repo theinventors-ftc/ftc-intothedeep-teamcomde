@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Auto.features;
 
+import static java.lang.Math.abs;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
@@ -74,5 +75,19 @@ public class BuilderFunctions {
         return new Pose2d(pose.getX() - x,
                           pose.getY() - y,
                           pose.getHeading());
+    }
+
+    public double[] robotCentricMovement(double x, double y, double t) {
+
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio,
+        // but only if at least one is out of the range [-1, 1]
+        double denominator = Math.max(abs(y) + abs(x) + abs(t), 1);
+        double frontLeftPower = (y + x + t) / denominator;
+        double backLeftPower = (y - x + t) / denominator;
+        double frontRightPower = (y - x - t) / denominator;
+        double backRightPower = (y + x - t) / denominator;
+
+        return new double[]{frontLeftPower, backLeftPower, frontRightPower, backRightPower};
     }
 }

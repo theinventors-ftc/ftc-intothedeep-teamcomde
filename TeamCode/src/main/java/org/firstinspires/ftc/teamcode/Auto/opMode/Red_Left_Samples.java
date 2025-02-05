@@ -12,6 +12,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.profile.VelocityConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -20,6 +21,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Auto.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions;
 import org.firstinspires.ftc.teamcode.Auto.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.RobotMap;
 
@@ -34,6 +36,7 @@ public class Red_Left_Samples extends CommandOpMode {
     private OpCommon opCommon;
     private RobotMap robotMap;
     private SequentialCommandGroup temp;
+    private BuilderFunctions builderFunctions;
 
     /**
      * Poses
@@ -128,9 +131,10 @@ public class Red_Left_Samples extends CommandOpMode {
     public void initialize() {
         drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(startPose);
-        robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, true);
+        robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.AUTO);
         opCommon = new OpCommon(robotMap);
         opCommon.init_controllers(drive);
+        builderFunctions = new BuilderFunctions();
     }
 
     @Override
@@ -155,103 +159,101 @@ public class Red_Left_Samples extends CommandOpMode {
 
         /* -----0----- */
 
-//        temp = new SequentialCommandGroup(
-//            new WaitCommand(1000),
-//            opCommon.sample_intake()
-//        );
-//        temp.schedule();
-//        init_toNeutral_0();
-//        drive.followTrajectorySequenceAsync(toNeutral_0.build());
-//        while (
-//            !isStopRequested()
-//            && opModeIsActive()
-//            && (drive.isBusy()
-//            || CommandScheduler.getInstance().isScheduled(temp))
-//        ) {
+        temp = new SequentialCommandGroup(
+            new WaitCommand(1000),
+            opCommon.sample_intake()
+        );
+        temp.schedule();
+        init_toNeutral_0();
+        drive.followTrajectorySequenceAsync(toNeutral_0.build());
+        while (
+            !isStopRequested()
+            && opModeIsActive()
+            && (drive.isBusy()
+            || CommandScheduler.getInstance().isScheduled(temp))
+        ) {
+            drive.update();
+            run();
+        }
+        current_pose = drive.getPoseEstimate();
+
+        temp = opCommon.basket_scoring();
+        temp.schedule();
+        init_toBasket_0();
+        drive.followTrajectorySequenceAsync(toBasket_0.build());
+        while (
+            !isStopRequested()
+            && opModeIsActive()
+            && drive.isBusy()
+            && CommandScheduler.getInstance().isScheduled(temp)
+        ) {
+            drive.update();
+            run();
+        }
+//        drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
+        current_pose = drive.getPoseEstimate();
+
+//        init_toBasket_1();
+//        drive.followTrajectorySequenceAsync(toBasket_1.build());
+//        while (!isStopRequested() && opModeIsActive() && drive.isBusy()) {
 //            drive.update();
-//            run();
-//        }
-//        current_pose = drive.getPoseEstimate();
-//
-//        temp = opCommon.basket_scoring();
-//        temp.schedule();
-//        init_toBasket_0();
-//        drive.followTrajectorySequenceAsync(toBasket_0.build());
-//        while (
-//            !isStopRequested()
-//            && opModeIsActive()
-//            && drive.isBusy()
-//            && CommandScheduler.getInstance().isScheduled(temp)
-//        ) {
-//            drive.update();
-//            run();
 //        }
 //        drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
 //        current_pose = drive.getPoseEstimate();
-//
-////        init_toBasket_1();
-////        drive.followTrajectorySequenceAsync(toBasket_1.build());
-////        while (!isStopRequested() && opModeIsActive() && drive.isBusy()) {
-////            drive.update();
-////        }
-////        drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-////        current_pose = drive.getPoseEstimate();
-//
-//        temp = new SequentialCommandGroup(
-//            opCommon.activateDistanceCalibration(),
-//            new WaitCommand(10000)
-//        );
-//        temp.schedule();
-//
-//        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//
-//        while (
-//            !isStopRequested()
-//                && opModeIsActive()
-//                && CommandScheduler.getInstance().isScheduled(temp)
-////                && !(opCommon.distanceSensorsSubsystem.getDistances()[0] <= 46
-////                && opCommon.distanceSensorsSubsystem.getDistances()[0] >= 42)
-////                && !(opCommon.distanceSensorsSubsystem.getDistances()[1] <= 4)
-//        ) {
-//            drive.setWeightedDrivePower(
-//                new Pose2d(
-////                opCommon.strafeControllerSubsystem.calculatePower(),
-////                opCommon.forwardControllerSubsystem.calculatePower(),
-//                    0,
-//                    0,
-//                    0*Range.clip(-opCommon.gyroFollow.calculateTurn(), -1, 1)
-//            ));
-//
-//            telemetry.addData("Theta Estimate: ", Math.toDegrees(drive.getPoseEstimate().getHeading()));
-//            telemetry.addData("PID Output: ", Range.clip(-opCommon.gyroFollow.calculateTurn(), -1, 1));
-//            drive.update();
-//            run();
-//        }
-//
-//        temp = opCommon.deactivateDistanceCalibration();
-//        temp.schedule();
-//        while (
-//            !isStopRequested()
-//                && opModeIsActive()
-//                && CommandScheduler.getInstance().isScheduled(temp)
-//        ) {
-//            run();
-//        }
-//
-////      drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//
-//        drive.setPoseEstimate(new Pose2d(-64, -44, Math.toRadians(75)));
-//        current_pose = drive.getPoseEstimate();
-//
-//        temp = opCommon.release_sample();
-//        temp.schedule();
-//        while (
-//            !isStopRequested()
-//            && opModeIsActive()
-//            && CommandScheduler.getInstance().isScheduled(temp)
-//        ) {
-//            run();
-//        }
+
+        temp = new SequentialCommandGroup(
+            new InstantCommand(opCommon::activateDistanceCalibration),
+            new WaitCommand(10000)
+        );
+        temp.schedule();
+
+        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        double[] vels = new double[4];
+
+        while (
+            !isStopRequested()
+                && opModeIsActive()
+                && CommandScheduler.getInstance().isScheduled(temp)
+//                && !(opCommon.distanceSensorsSubsystem.getDistances()[0] <= 46
+//                && opCommon.distanceSensorsSubsystem.getDistances()[0] >= 42)
+//                && !(opCommon.distanceSensorsSubsystem.getDistances()[1] <= 4)
+        ) {
+            vels = builderFunctions.robotCentricMovement(0.0, 0.0,
+                                                         opCommon.calculate_turn());
+            drive.setMotorPowers(vels[0], vels[1], vels[2], vels[3]);
+
+            telemetry.addData("Theta Estimate: ", Math.toDegrees(drive.getPoseEstimate().getHeading()));
+            telemetry.addData("PID Output: ", opCommon.calculate_turn());
+            telemetry.update();
+            drive.update();
+            run();
+        }
+
+        temp = opCommon.deactivateDistanceCalibration();
+        temp.schedule();
+        while (
+            !isStopRequested()
+                && opModeIsActive()
+                && CommandScheduler.getInstance().isScheduled(temp)
+        ) {
+            run();
+        }
+
+//      drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        drive.setPoseEstimate(new Pose2d(-64, -44, Math.toRadians(75)));
+        current_pose = drive.getPoseEstimate();
+
+        temp = opCommon.release_sample();
+        temp.schedule();
+        while (
+            !isStopRequested()
+            && opModeIsActive()
+            && CommandScheduler.getInstance().isScheduled(temp)
+        ) {
+            run();
+        }
 
         /* -----1----- */
 //

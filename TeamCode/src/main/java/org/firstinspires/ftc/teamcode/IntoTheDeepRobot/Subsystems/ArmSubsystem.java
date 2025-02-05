@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.RobotMap;
@@ -41,7 +40,7 @@ public class ArmSubsystem extends SubsystemBase {
     private ArmState armState;
     private WristState wristState;
 
-    private final HashMap<ArmState, Double> arm_positionsL = new HashMap<ArmState, Double>() {{
+    private final HashMap<ArmState, Double> arm_positions = new HashMap<ArmState, Double>() {{
         put(ArmState.INTAKE, 0.075);
         put(ArmState.PARK, 0.17);
         put(ArmState.HIGH, 0.45);
@@ -55,20 +54,8 @@ public class ArmSubsystem extends SubsystemBase {
         put(ArmState.HUMAN_PLAYER, 0.88);
     }};
 
-//    private final HashMap<ArmState, Double> arm_positionsR = new HashMap<ArmState, Double>() {{
-//        put(ArmState.INTAKE, 0.075);
-//        put(ArmState.PARK, 0.17);
-//        put(ArmState.HIGH, 0.45);
-//        put(ArmState.PERP, 0.75);
-//        put(ArmState.INTAKE_B_ABOVE, 0.88);
-//        put(ArmState.INTAKE_B, 0.91);
-//        put(ArmState.BASKET_OUTTAKE, 0.46);
-//        put(ArmState.SPECIMENT_OUTTAKE, 0.7);
-//        put(ArmState.SPECIMENT_LOW_OUTTAKE, 0.84);
-//    }};
-
     private final HashMap<WristState, Double> wrist_positions = new HashMap<WristState, Double>() {{
-        put(WristState.INTAKE, 0.23);
+        put(WristState.INTAKE, 0.2);
         put(WristState.PARK, 0.09);
         put(WristState.HIGH, 0.52);
         put(WristState.PERP, 0.48);
@@ -93,8 +80,8 @@ public class ArmSubsystem extends SubsystemBase {
     // ---------------------------------------- Actuators --------------------------------------- //
     public void setArmState(ArmState state) {
         armState = state;
-        armLeft.setPosition((double)arm_positionsL.get(state));
-        armRight.setPosition((double)arm_positionsL.get(state));
+        armLeft.setPosition((double)arm_positions.get(state));
+        armRight.setPosition((double)arm_positions.get(state));
     }
 
     public void setWristState(WristState state) {

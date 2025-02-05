@@ -3,9 +3,6 @@ package org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -140,16 +137,16 @@ public class IntakeSubsystem extends SubsystemBase {
     public COLOR getSampleColor() {
         double[] colors = colorSensor.getNormalizedColors();
 
-        telemetry.addData("Red: ", colors[0]);
-        telemetry.addData("Green: ", colors[1]);
-        telemetry.addData("Blue: ", colors[2]);
-        telemetry.addData("Color Prediction: ", predict(colors[0], colors[1], colors[2]));
+        telemetry.addData("Intake Red: ", colors[0]);
+        telemetry.addData("Intake Green: ", colors[1]);
+        telemetry.addData("Intake Blue: ", colors[2]);
+        telemetry.addData("Intake Color Prediction: ", predict(colors[0], colors[1], colors[2]));
 
         return predict(colors[0], colors[1], colors[2]);
     }
 
     public boolean isSample() {
-        telemetry.addData("Is Sample: ", limitSwitch.getState());
+        telemetry.addData("Intake has Sample?: ", limitSwitch.getState());
         return limitSwitch.getState();
     }
 }

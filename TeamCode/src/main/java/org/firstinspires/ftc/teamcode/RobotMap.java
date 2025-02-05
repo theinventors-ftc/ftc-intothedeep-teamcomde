@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
-import org.firstinspires.ftc.ftccommon.internal.manualcontrol.parameters.ImuParameters;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.inventors.ftc.robotbase.RobotMapInterface;
 import org.inventors.ftc.robotbase.hardware.Battery;
@@ -21,6 +20,12 @@ import org.inventors.ftc.robotbase.hardware.MotorExEx;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 public class RobotMap implements RobotMapInterface {
+    public enum OpMode {
+        AUTO,
+        TELEOP
+    }
+    private OpMode opMode;
+
     private Telemetry telemetry;
     private GamepadExEx driverOp, toolOp;
     private MotorExEx frontLeft, frontRight, rearLeft, rearRight;
@@ -57,8 +62,10 @@ public class RobotMap implements RobotMapInterface {
     // -------------------------------------- Distance Sensors ---------------------------------- //
     private AnalogInput rear_dist, left_dist, right_dist;
 
-    public RobotMap(HardwareMap hm, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2, boolean is_auto) {
-        if(!is_auto) {
+    public RobotMap(HardwareMap hm, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2,
+                    OpMode opMode) {
+        this.opMode = opMode;
+        if(opMode == OpMode.TELEOP) {
             frontLeft = new MotorExEx(hm, "front_left", Motor.GoBILDA.RPM_435);
             frontRight = new MotorExEx(hm, "front_right", Motor.GoBILDA.RPM_435);
             rearLeft = new MotorExEx(hm, "rear_left", Motor.GoBILDA.RPM_435);
@@ -128,6 +135,10 @@ public class RobotMap implements RobotMapInterface {
         rear_dist = hm.get(AnalogInput.class, "rear_dist");
         left_dist = hm.get(AnalogInput.class, "left_dist");
         right_dist = hm.get(AnalogInput.class, "right_dist");
+    }
+
+    public OpMode getOpMode() {
+        return opMode;
     }
 
     // ------------------------------------ Drivetrain Motors ----------------------------------- //

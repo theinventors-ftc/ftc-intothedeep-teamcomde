@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.arcrobotics.ftclib.controller.wpilibcontroller.ElevatorFeedforward;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.arcrobotics.ftclib.util.Timing;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -14,7 +12,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.controllers.PIDFControllerEx;
 import org.inventors.ftc.robotbase.hardware.MotorExEx;
-import org.inventors.ftc.util.MathUtils;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleSupplier;
@@ -23,7 +20,6 @@ import java.util.function.DoubleSupplier;
 public class ExtendoSubsystem extends SubsystemBase {
     private MotorExEx extendoMotor;
     private double MAX_EXTENDO_POWER = 1.0;
-    private final int MAX_EXTENSION = 0;
     private DoubleSupplier power;
 
     private SimpleMotorFeedforward ff = new SimpleMotorFeedforward(
@@ -54,7 +50,6 @@ public class ExtendoSubsystem extends SubsystemBase {
 
     public ExtendoSubsystem(RobotMap robotMap, DoubleSupplier power, Telemetry telemetry, boolean attempt_Zero) {
         extendoMotor = robotMap.getExtendoMotor();
-//        extendoMotor.setInverted(true);
         extendoMotor.setRunMode(MotorExEx.RunMode.RawPower);
         extendoMotor.resetEncoder();
         this.power = power;
@@ -86,7 +81,6 @@ public class ExtendoSubsystem extends SubsystemBase {
         pid.setSetPoint(targetPosition);
 
         telemetry.addData("Extendo Position", getExtension());
-        telemetry.update();
 
         if(Math.abs(power.getAsDouble()) > 0.05){ // Manual
             set(power.getAsDouble());

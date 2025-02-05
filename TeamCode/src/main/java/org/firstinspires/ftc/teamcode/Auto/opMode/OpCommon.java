@@ -1,19 +1,17 @@
 package org.firstinspires.ftc.teamcode.Auto.opMode;
 
+import static java.lang.Math.abs;
+
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.arcrobotics.ftclib.command.CommandBase;
-import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.command.button.Trigger;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.ForwardControllerSubsystem;
@@ -27,10 +25,8 @@ import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ElevatorSubsys
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ExtendoSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.RobotMap;
-import org.inventors.ftc.robotbase.hardware.GamepadExEx;
 
 public class OpCommon {
-
     private RobotMap robotMap;
     private FtcDashboard dashboard;
 
@@ -116,6 +112,10 @@ public class OpCommon {
             () -> 0,
             dashboard.getTelemetry()
         );
+    }
+
+    public double calculate_turn() {
+        return Range.clip(-gyroFollow.calculateTurn(), -1, 1);
     }
 
     public SequentialCommandGroup reset_elevator() {

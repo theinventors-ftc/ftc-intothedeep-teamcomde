@@ -124,7 +124,7 @@ public class Red_Left_Samples_2_ONLY extends CommandOpMode {
     public void initialize() {
         drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(startPose);
-        robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, true);
+        robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.AUTO);
         opCommon = new OpCommon(robotMap);
     }
 

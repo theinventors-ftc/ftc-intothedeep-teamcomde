@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
@@ -39,7 +40,7 @@ public class IntoTheDeepRobot extends RobotEx {
     protected DistanceSensorsSubsystem distanceSensorsSubsystem;
 
     // ---------------------------------- Initialize Controllers -------------------------------- //
-    protected ForwardControllerSubsystem forwardController;
+//    protected ForwardControllerSubsystem forwardController;
     protected StrafeControllerSubsystem strafeControllerSubsystem;
     protected HeadingControllerSubsystem gyroFollow;
 
@@ -64,7 +65,7 @@ public class IntoTheDeepRobot extends RobotEx {
         );
         extendoSubsystem = new ExtendoSubsystem(this.robotMap, () -> toolOp.getLeftY(), telemetry
             , true);
-        hangingSubsystem = new HangingSubsystem(this.robotMap, telemetry);
+        hangingSubsystem = new HangingSubsystem(this.robotMap);
         couplersSubsystem = new CouplersSubsystem(this.robotMap);
         distanceSensorsSubsystem = new DistanceSensorsSubsystem(this.robotMap, telemetry);
 
@@ -74,7 +75,7 @@ public class IntoTheDeepRobot extends RobotEx {
 //        );
 
         strafeControllerSubsystem = new StrafeControllerSubsystem(
-                () -> distanceSensorsSubsystem.getDistances()[1], // TODO Change to 2
+                () -> distanceSensorsSubsystem.getDistances()[2],
                 dashboard.getTelemetry()
         );
 
@@ -136,16 +137,6 @@ public class IntoTheDeepRobot extends RobotEx {
                 () -> intakeSubsystem.getRaiseState() == IntakeSubsystem.RaiseState.LOWERED
         ));
 
-        // Elevator Intake/Park Toggle
-//        toolOp.getGamepadButton(GamepadKeys.Button.Y).toggleWhenPressed(
-//                new InstantCommand(
-//                        () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
-//                ),
-//                new InstantCommand(
-//                        () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.PARK)
-//                )
-//        );
-
         // Coupler Engage/Disengage Toggle
         new Trigger(
                 () -> toolOp.getGamepadButton(GamepadKeys.Button.START).get() &&
@@ -157,10 +148,14 @@ public class IntoTheDeepRobot extends RobotEx {
                 ));
 
         toolOp.getGamepadButton(GamepadKeys.Button.START).whenPressed(new SequentialCommandGroup(
-                new InstantCommand(() -> this.drive_setEnabled(false)), new InstantCommand(() -> hangingSubsystem.ascend()
+                new InstantCommand(() -> this.drive_setEnabled(false)),
+                new InstantCommand(hangingSubsystem::ascend
         ))
         ).whenReleased(
-                new InstantCommand(() -> hangingSubsystem.stop())
+            new SequentialCommandGroup(
+                new InstantCommand(() -> this.drive_setEnabled(true)),
+                new InstantCommand(hangingSubsystem::stop)
+            )
         );
 
         // ------------------------------------ Automatations ----------------------------------- //
@@ -199,27 +194,28 @@ public class IntoTheDeepRobot extends RobotEx {
         //// Intake Sample Automation
         toolOp.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).toggleWhenPressed(
                 new SequentialCommandGroup(
-//                        // Lower Intake Arm System
-//                        new InstantCommand(intakeSubsystem::lower),
-//                        new WaitCommand(80),
                         // Go to Park State: Elevator, Arm, Wrist, Claw
                         new InstantCommand(
                                 () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.PARK)
                         ),
-                        new InstantCommand(() -> armSubsystem.setWristState(
-                                ArmSubsystem.WristState.INTAKE
-                        )),
-                        new InstantCommand(clawSubsystem::goNormal, clawSubsystem),
-                        new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
-                        new WaitCommand(120),
-                        new InstantCommand(() -> armSubsystem.setArmState(
-                                ArmSubsystem.ArmState.INTAKE
-                        )),
-                        // Intake Procedure
-                        new IntakeCommand(
+                        new ParallelCommandGroup(
+                            new SequentialCommandGroup(
+                                new InstantCommand(() -> armSubsystem.setWristState(
+                                    ArmSubsystem.WristState.INTAKE
+                                )),
+                                new InstantCommand(clawSubsystem::goNormal, clawSubsystem),
+                                new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
+                                new WaitCommand(120),
+                                new InstantCommand(() -> armSubsystem.setArmState(
+                                    ArmSubsystem.ArmState.INTAKE
+                                ))
+                            ),
+                            // Intake Procedure
+                            new IntakeCommand(
                                 intakeSubsystem,
                                 (this.getAlliance() == Alliance.RED ?
-                                IntakeCommand.COLOR.RED_YELLOW : IntakeCommand.COLOR.BLUE_YELLOW)
+                                    IntakeCommand.COLOR.RED_YELLOW : IntakeCommand.COLOR.BLUE_YELLOW)
+                            )
                         ),
                         new InstantCommand(intakeSubsystem::brake_reverse),
                         new WaitCommand(80),
@@ -249,7 +245,7 @@ public class IntoTheDeepRobot extends RobotEx {
                         new InstantCommand(
                                 () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
                         ),
-                        new WaitCommand(200), // TODO Check if this is necessary
+                        new WaitUntilCommand(() -> elevatorSubsystem.atTarget()),
                         new InstantCommand(clawSubsystem::grab),
                         new WaitCommand(400),
                         // Disengage Sample from the Intake/Parrot
@@ -362,14 +358,14 @@ public class IntoTheDeepRobot extends RobotEx {
                             new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
                             new WaitCommand(150),
                             new InstantCommand(
-                                    () -> armSubsystem.setArmState(ArmSubsystem.ArmState.PERP) //TODO
+                                    () -> armSubsystem.setArmState(ArmSubsystem.ArmState.PERP)
                             )
                         ),
                         new SequentialCommandGroup(
                                 new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
                                 new WaitCommand(150),
                                 new InstantCommand(
-                                        () -> armSubsystem.setArmState(ArmSubsystem.ArmState.INTAKE_B) //TODO
+                                        () -> armSubsystem.setArmState(ArmSubsystem.ArmState.INTAKE_B)
                                 )
                         ),
                         () -> armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_HIGH
@@ -410,15 +406,17 @@ public class IntoTheDeepRobot extends RobotEx {
                         ),
                         new InstantCommand(hangingSubsystem::release, hangingSubsystem),
                         new WaitCommand(1500),
-                        new InstantCommand(elevatorSubsystem::disable, elevatorSubsystem)
-//                        new InstantCommand(hangingSubsystem::ascend, hangingSubsystem),
-//                        new WaitUntilCommand(() -> hangingSubsystem.reached_hanging_pos()),
-//                        new InstantCommand(hangingSubsystem::stop, hangingSubsystem)
+                        new InstantCommand(elevatorSubsystem::disable, elevatorSubsystem),
+                        new InstantCommand(hangingSubsystem::ascend, hangingSubsystem),
+                        new WaitUntilCommand(() -> hangingSubsystem.reached_hanging_pos()),
+                        new InstantCommand(hangingSubsystem::descend, hangingSubsystem),
+                        new WaitCommand(300),
+                        new InstantCommand(hangingSubsystem::stop, hangingSubsystem)
                 ),
                 () -> elevatorSubsystem.getLevel() != ElevatorSubsystem.Level.HANGING_AIM
         ));
 
-        // Specimen Outtake Automation with Distance Sensor (6.3, 14.9)
+        // Specimen Outtake Automation with Distance Sensor (6.3, 11)
         new Trigger(
                 () -> distanceSensorsSubsystem.getDistances()[0] <=
                         (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ? 6.7 : 11) &&
@@ -429,14 +427,14 @@ public class IntoTheDeepRobot extends RobotEx {
                         new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
                         new WaitCommand(150),
                         new InstantCommand(
-                                () -> armSubsystem.setArmState(ArmSubsystem.ArmState.PERP) //TODO
+                                () -> armSubsystem.setArmState(ArmSubsystem.ArmState.PERP)
                         )
                 ),
                 new SequentialCommandGroup(
                         new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
                         new WaitCommand(150),
                         new InstantCommand(
-                                () -> armSubsystem.setArmState(ArmSubsystem.ArmState.INTAKE_B) //TODO
+                                () -> armSubsystem.setArmState(ArmSubsystem.ArmState.INTAKE_B)
                         )
                 ),
                 () -> armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_HIGH

@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ElevatorFeedforward;
 import com.arcrobotics.ftclib.util.Timing;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -21,10 +21,8 @@ import java.util.function.DoubleSupplier;
 public class ElevatorSubsystem extends SubsystemBase {
     private MotorExEx elevatorMotor, elevatorMotorFollow, couplingMotor;
     private final double MAX_ELEVATOR_POWER = 1.0;
-    private final int MAX_ELEVATOR_HEIGHT = 0;
+    private final int MAX_ELEVATOR_HEIGHT = 2100;
     private DoubleSupplier power;
-
-//    public static double kP = 0.007, kI=0.008, kD=0.0002;
 
     private ElevatorFeedforward ff = new ElevatorFeedforward(
             0.1,
@@ -34,7 +32,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     );
     private PIDFControllerEx pid = new PIDFControllerEx(
             0.008,
-            0.008,
+            0.0, // 0.008
             0.0002,
             0.0,
             0,
@@ -137,6 +135,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             return;
         }
 
+        pid.setSetPoint(Range.clip(target_height, -250, MAX_ELEVATOR_HEIGHT));
         pid.setSetPoint(target_height);
 
         telemetry.addData("Cur Height: ", getHeight());
