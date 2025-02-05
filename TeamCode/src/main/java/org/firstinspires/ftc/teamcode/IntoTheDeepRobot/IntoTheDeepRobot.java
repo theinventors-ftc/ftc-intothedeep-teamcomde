@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.IntoTheDeepRobot;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -58,8 +59,7 @@ public class IntoTheDeepRobot extends RobotEx {
         elevatorSubsystem = new ElevatorSubsystem(
                 this.robotMap,
                 () -> -toolOp.getRightY(),
-                robotMap.getRearLeftMotor(),
-                telemetry,
+                robotMap.getRearLeftMotor(), FtcDashboard.getInstance().getTelemetry(),
                 true
         );
         extendoSubsystem = new ExtendoSubsystem(this.robotMap, () -> toolOp.getLeftY(), telemetry
@@ -421,7 +421,7 @@ public class IntoTheDeepRobot extends RobotEx {
         // Specimen Outtake Automation with Distance Sensor (6.3, 14.9)
         new Trigger(
                 () -> distanceSensorsSubsystem.getDistances()[0] <=
-                        (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ? 6.7 : 14.9) &&
+                        (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ? 6.7 : 11) &&
                         (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ||
                                 armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_HIGH)
         ).whenActive(new ConditionalCommand(

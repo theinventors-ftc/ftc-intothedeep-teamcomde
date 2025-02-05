@@ -79,7 +79,7 @@ public class OpCommon {
         //Auto release speciment
         new Trigger(
             () -> distanceSensorsSubsystem.getDistances()[0] <=
-                (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ? 6.7 : 14.9) &&
+                (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ? 6.7 : 11) &&
                 (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ||
                     armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_HIGH)
         ).whenActive(new ConditionalCommand(

@@ -24,6 +24,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final int MAX_ELEVATOR_HEIGHT = 0;
     private DoubleSupplier power;
 
+//    public static double kP = 0.007, kI=0.008, kD=0.0002;
+
     private ElevatorFeedforward ff = new ElevatorFeedforward(
             0.1,
             0.16,
@@ -31,9 +33,9 @@ public class ElevatorSubsystem extends SubsystemBase {
             0.0
     );
     private PIDFControllerEx pid = new PIDFControllerEx(
-            0.007,
             0.008,
-            0.0001,
+            0.008,
+            0.0002,
             0.0,
             0,
             0.0,
@@ -60,26 +62,24 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     HashMap<Level, Integer> levelMap = new HashMap<Level, Integer>() {{
         put(Level.INTAKE, 0);
-        put(Level.SPECIMEN_DISLOCATE, 150);
-        put(Level.PARK, 250);
-        put(Level.PARK2, 500);
-        put(Level.LOW_BASKET, 740);
-        put(Level.HIGH_BASKET, 2245);
+        put(Level.SPECIMEN_DISLOCATE, 137);
+        put(Level.PARK, 230);
+        put(Level.PARK2, 450);
+        put(Level.LOW_BASKET, 680);
+        put(Level.HIGH_BASKET, 2058);
         put(Level.LOW_CHAMBER, 0);
-        put(Level.HIGH_CHAMBER, 565);
-        put(Level.HANGING_AIM, 1000);
-        put(Level.HANGING, -180);
+        put(Level.HIGH_CHAMBER, 518);
+        put(Level.HANGING_AIM, 917);
+        put(Level.HANGING, -165);
         put(Level.HANGING_RELEASE, -10); // TODO Go intake in auto hang
     }};
 
-    public final double ratio = 22.0/24.0;
-
     public static int target_height = 0;
-    private int springs_off = 47;
+    private int springs_off = 30;
 
     // Zeroing
     public boolean isStalled = false;
-    public double ampThreshold = 3.4;
+    public double ampThreshold = 4.5;
     private final Timing.Timer timer;
     private boolean found_zero = false;
 
@@ -115,7 +115,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private void set(double power) {
         power *= MAX_ELEVATOR_POWER;
         double ffPower = ff.calculate(power);
-        if(coupled) {
+        if(coupled) { // This syncs the elevator and couples
             elevatorMotor.set(ffPower*48.0/60.0);
             elevatorMotorFollow.set(ffPower*48.0/60.0);
             couplingMotor.set(ffPower);
@@ -127,7 +127,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void setLevel(Level level) {
         this.level = level;
-        target_height = (int)(levelMap.get(level)*ratio);
+        target_height = (int)(levelMap.get(level));
     }
 
     @Override
@@ -140,6 +140,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         pid.setSetPoint(target_height);
 
         telemetry.addData("Cur Height: ", getHeight());
+        telemetry.addData("Target Height: ", getHeight());
 
         if(Math.abs(power.getAsDouble()) > 0.05){ // Manual
             set(power.getAsDouble());
@@ -159,7 +160,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public boolean atTarget() {
-        return Math.abs(getHeight() - target_height) < 25;
+        return Math.abs(getHeight() - target_height) < 20;
     }
 
     // ----------------------------------------- Zeroing ---------------------------------------- //

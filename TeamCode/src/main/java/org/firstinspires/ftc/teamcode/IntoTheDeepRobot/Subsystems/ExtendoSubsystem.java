@@ -33,7 +33,7 @@ public class ExtendoSubsystem extends SubsystemBase {
     );
     private PIDFControllerEx pid = new PIDFControllerEx(
             0.007,
-            0.08,
+            0.06,
             0.06,
             0.0,
             0.0,
@@ -48,7 +48,7 @@ public class ExtendoSubsystem extends SubsystemBase {
 
     // Zeroing
     public boolean isStalled = false;
-    public double ampThreshold = 3.4;
+    public double ampThreshold = 4;
     private final Timing.Timer timer;
     private boolean found_zero = false;
 
