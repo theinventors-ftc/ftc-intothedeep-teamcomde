@@ -60,11 +60,16 @@ public class IntoTheDeepRobot extends RobotEx {
         elevatorSubsystem = new ElevatorSubsystem(
                 this.robotMap,
                 () -> -toolOp.getRightY(),
-                robotMap.getRearLeftMotor(), FtcDashboard.getInstance().getTelemetry(),
+                robotMap.getRearLeftMotor(),
+                telemetry,
                 true
         );
-        extendoSubsystem = new ExtendoSubsystem(this.robotMap, () -> toolOp.getLeftY(), telemetry
-            , true);
+        extendoSubsystem = new ExtendoSubsystem(
+                this.robotMap,
+                () -> toolOp.getLeftY(),
+                telemetry,
+                true
+        );
         hangingSubsystem = new HangingSubsystem(this.robotMap);
         couplersSubsystem = new CouplersSubsystem(this.robotMap);
         distanceSensorsSubsystem = new DistanceSensorsSubsystem(this.robotMap, telemetry);
@@ -85,8 +90,8 @@ public class IntoTheDeepRobot extends RobotEx {
                 dashboard.getTelemetry()
         );
 
-        // ------------------------------------ Manual Actions ---------------------------------- //
-        // Claw Grab/Release(Just Open) Toggle
+        //------------------------------------ Manual Actions ---------------------------------- //
+//         Claw Grab/Release(Just Open) Toggle
         toolOp.getGamepadButton(GamepadKeys.Button.X).whenPressed(new ConditionalCommand(
                 new InstantCommand(clawSubsystem::grab),
                 new InstantCommand(clawSubsystem::justOpen),
@@ -416,10 +421,10 @@ public class IntoTheDeepRobot extends RobotEx {
                 () -> elevatorSubsystem.getLevel() != ElevatorSubsystem.Level.HANGING_AIM
         ));
 
-        // Specimen Outtake Automation with Distance Sensor (6.3, 11)
+        // Specimen Outtake Automation with Distance Sensor (6.3, 13)
         new Trigger(
                 () -> distanceSensorsSubsystem.getDistances()[0] <=
-                        (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ? 6.7 : 11) &&
+                        (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ? 6.7 : 13) &&
                         (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ||
                                 armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_HIGH)
         ).whenActive(new ConditionalCommand(
@@ -474,14 +479,14 @@ public class IntoTheDeepRobot extends RobotEx {
 
     @Override
     public double drivetrainStrafe() {
-        if (strafeControllerSubsystem.isEnabled()) return strafeControllerSubsystem.calculatePower();
+//        if (strafeControllerSubsystem.isEnabled()) return strafeControllerSubsystem.calculatePower();
 
         return super.drivetrainStrafe();
     }
 
     @Override
     public double drivetrainTurn() {
-        if (gyroFollow.isEnabled()) return -gyroFollow.calculateTurn();
+//        if (gyroFollow.isEnabled()) return -gyroFollow.calculateTurn();
 
         return super.drivetrainTurn();
     }

@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.TeleOPs;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -26,9 +28,7 @@ public class TeleOpBase extends CommandOpMode {
 
     @Override
     public void initialize() {
-        driverOp = new GamepadExEx(gamepad1);
-        toolOp = new GamepadExEx(gamepad2);
-
+        CommandScheduler.getInstance().reset();
         robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.TELEOP);
 
         // ----------------------------------- Robot Constants ---------------------------------- //
@@ -87,5 +87,6 @@ public class TeleOpBase extends CommandOpMode {
     public void run() {
         super.run();
         telemetry.update();
+        FtcDashboard.getInstance().getTelemetry().update();
     }
 }

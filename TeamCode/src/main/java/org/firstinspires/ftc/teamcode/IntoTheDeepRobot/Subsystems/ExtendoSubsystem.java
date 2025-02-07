@@ -20,6 +20,7 @@ import java.util.function.DoubleSupplier;
 public class ExtendoSubsystem extends SubsystemBase {
     private MotorExEx extendoMotor;
     private double MAX_EXTENDO_POWER = 1.0;
+    private int MAX_EXTENSION = 1800; // Allowed: 1200, Max: 1800
     private DoubleSupplier power;
 
     private SimpleMotorFeedforward ff = new SimpleMotorFeedforward(
@@ -29,7 +30,7 @@ public class ExtendoSubsystem extends SubsystemBase {
     );
     private PIDFControllerEx pid = new PIDFControllerEx(
             0.007,
-            0.06,
+            0.0, // 0.06
             0.06,
             0.0,
             0.0,
@@ -48,7 +49,12 @@ public class ExtendoSubsystem extends SubsystemBase {
     private final Timing.Timer timer;
     private boolean found_zero = false;
 
-    public ExtendoSubsystem(RobotMap robotMap, DoubleSupplier power, Telemetry telemetry, boolean attempt_Zero) {
+    public ExtendoSubsystem(
+            RobotMap robotMap,
+            DoubleSupplier power,
+            Telemetry telemetry,
+            boolean attempt_Zero
+    ) {
         extendoMotor = robotMap.getExtendoMotor();
         extendoMotor.setRunMode(MotorExEx.RunMode.RawPower);
         extendoMotor.resetEncoder();
@@ -61,6 +67,7 @@ public class ExtendoSubsystem extends SubsystemBase {
         found_zero = !attempt_Zero;
 
         springs_off = attempt_Zero ? springs_off : 0;
+        targetPosition = -springs_off;
     }
 
     private void set(double power) {
@@ -83,15 +90,18 @@ public class ExtendoSubsystem extends SubsystemBase {
         telemetry.addData("Extendo Position", getExtension());
 
         if(Math.abs(power.getAsDouble()) > 0.05){ // Manual
-            set(power.getAsDouble());
-            targetPosition = getExtension();
+            set(Range.clip(
+                    power.getAsDouble(),
+                    -1,
+                    getExtension() < MAX_EXTENSION ? 1 : 0.0));
+            targetPosition = Range.clip(getExtension(), -100, MAX_EXTENSION);
         } else { // Auto
             set(pid.calculate(getExtension()));
         }
     }
 
     public void setTargetPosition(int position) {
-        targetPosition = position;
+        targetPosition = Range.clip(position, -100, MAX_EXTENSION);
     }
 
     public void returnToZero() {

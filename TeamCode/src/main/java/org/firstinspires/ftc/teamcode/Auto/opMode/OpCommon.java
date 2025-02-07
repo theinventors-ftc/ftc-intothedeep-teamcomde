@@ -31,7 +31,7 @@ public class OpCommon {
     private FtcDashboard dashboard;
 
     /*--Subsystems--*/
-    protected HardwareMap hardwareMap;
+//    protected HardwareMap hardwareMap;
     public ClawSubsystem clawSubsystem;
     public ArmSubsystem armSubsystem;
     public IntakeSubsystem intakeSubsystem;

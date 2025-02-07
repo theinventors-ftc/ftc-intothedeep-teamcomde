@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.controllers.PIDFControllerEx;
+import org.inventors.ftc.robotbase.hardware.GamepadExEx;
 import org.inventors.ftc.robotbase.hardware.MotorExEx;
 
 import java.util.HashMap;
@@ -79,12 +80,14 @@ public class ElevatorSubsystem extends SubsystemBase {
     public boolean isStalled = false;
     public double ampThreshold = 4.5;
     private final Timing.Timer timer;
-    private boolean found_zero = false;
+    private boolean found_zero = false, attempt_Zero = false;
 
     // Coupler
     private boolean coupled = false;
 
     private Telemetry telemetry;
+
+    private GamepadExEx toolOp;
 
     public ElevatorSubsystem(RobotMap robotMap, DoubleSupplier power, MotorExEx couplingMotor,
                              Telemetry telemetry, boolean attempt_Zero) {
@@ -98,6 +101,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         this.couplingMotor = couplingMotor;
 
         this.power = power;
+        this.toolOp = robotMap.getToolOp();
 
         timer = new Timing.Timer(600, TimeUnit.MILLISECONDS);
 
@@ -106,6 +110,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         setLevel(Level.INTAKE);
 
         springs_off = attempt_Zero ? springs_off : 0;
+        target_height = -springs_off;
 
         found_zero = !attempt_Zero;
     }
@@ -136,10 +141,13 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
 
         pid.setSetPoint(Range.clip(target_height, -250, MAX_ELEVATOR_HEIGHT));
-        pid.setSetPoint(target_height);
+//        pid.setSetPoint(target_height);
 
         telemetry.addData("Cur Height: ", getHeight());
-        telemetry.addData("Target Height: ", getHeight());
+        telemetry.addData("Target Height: ", target_height);
+        telemetry.addData("Power: ", power.getAsDouble());
+
+
 
         if(Math.abs(power.getAsDouble()) > 0.05){ // Manual
             set(power.getAsDouble());

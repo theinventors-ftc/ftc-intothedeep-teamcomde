@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.hardware.MotorExEx;
 
@@ -12,10 +11,7 @@ public class HangingSubsystem extends SubsystemBase {
     private ServoImplEx releaseServo1, releaseServo2;
 
     private double power = 1.0;
-    private boolean is_hanging = false;
-    private int hanging_pos = 3050;
-
-    private Telemetry telemetry;
+    private int hanging_pos = 3080;
 
     public HangingSubsystem(RobotMap robotMap) {
         coupler1 = robotMap.getFrontLeftMotor();

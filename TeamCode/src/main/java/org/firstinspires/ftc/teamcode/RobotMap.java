@@ -89,7 +89,6 @@ public class RobotMap implements RobotMapInterface {
         }
 
         this.telemetry = telemetry;
-
         battery = new Battery(hm);
 
         //// ----------------------------------- Mechanisms ----------------------------------- ////
@@ -118,8 +117,8 @@ public class RobotMap implements RobotMapInterface {
 //        raiseLimitSwitch = hm.get(DigitalChannel.class, "raise_switch");
 
         // ---------------------------------------- Slider -------------------------------------- //
-        sliderMotor = new MotorExEx(hm, "slider", Motor.GoBILDA.RPM_312);
-        sliderFollow = new MotorExEx(hm, "slider2", Motor.GoBILDA.RPM_312);
+        sliderMotor = new MotorExEx(hm, "slider", 383.6, 435);
+        sliderFollow = new MotorExEx(hm, "slider2", 383.6, 435);
 
         // ---------------------------------------- Extendo ------------------------------------- //
         extendoMotor = new MotorExEx(hm, "extendo", Motor.GoBILDA.RPM_435);
