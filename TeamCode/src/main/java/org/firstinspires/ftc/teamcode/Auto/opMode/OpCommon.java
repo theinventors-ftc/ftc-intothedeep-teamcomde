@@ -74,26 +74,26 @@ public class OpCommon {
 
         //Auto release speciment
         new Trigger(
-            () -> distanceSensorsSubsystem.getDistances()[0] <=
-                (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ? 6.7 : 11) &&
-                (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ||
-                    armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_HIGH)
+                () -> distanceSensorsSubsystem.getDistances()[0] <=
+                        (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ? 6.7 : 11) &&
+                        (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ||
+                                armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_HIGH)
         ).whenActive(new ConditionalCommand(
-            new SequentialCommandGroup(
-                new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
-                new WaitCommand(150),
-                new InstantCommand(
-                    () -> armSubsystem.setArmState(ArmSubsystem.ArmState.PERP) //TODO
-                )
-            ),
-            new SequentialCommandGroup(
-                new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
-                new WaitCommand(150),
-                new InstantCommand(
-                    () -> armSubsystem.setArmState(ArmSubsystem.ArmState.INTAKE_B) //TODO
-                )
-            ),
-            () -> armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_HIGH
+                new SequentialCommandGroup(
+                        new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
+                        new WaitCommand(150),
+                        new InstantCommand(
+                                () -> armSubsystem.setArmState(ArmSubsystem.ArmState.PERP) //TODO
+                        )
+                ),
+                new SequentialCommandGroup(
+                        new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
+                        new WaitCommand(150),
+                        new InstantCommand(
+                                () -> armSubsystem.setArmState(ArmSubsystem.ArmState.INTAKE_B) //TODO
+                        )
+                ),
+                () -> armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_HIGH
         ));
     }
 
@@ -171,7 +171,8 @@ public class OpCommon {
             // Intake Procedure
             new IntakeCommand(
                 intakeSubsystem,
-                IntakeCommand.COLOR.RED_YELLOW
+                IntakeCommand.COLOR.RED_YELLOW,
+        1500
             ),
             new InstantCommand(intakeSubsystem::brake_reverse),
             new WaitCommand(80),
@@ -244,10 +245,17 @@ public class OpCommon {
         );
     }
 
-    public SequentialCommandGroup extendo() {
+    public SequentialCommandGroup extendo(double power) {
         return new SequentialCommandGroup(
-            new InstantCommand(()-> extendoSubsystem.set_MAX_POWER(0.5)),
-            new InstantCommand(()-> extendoSubsystem.setTargetPosition(1065))
+            new InstantCommand(()-> extendoSubsystem.set_MAX_POWER(power)),
+            new InstantCommand(()-> extendoSubsystem.setTargetPosition(1200))
+        );
+    }
+
+    public SequentialCommandGroup extendo3dSample(double power) {
+        return new SequentialCommandGroup(
+                new InstantCommand(()-> extendoSubsystem.set_MAX_POWER(power)),
+                new InstantCommand(()-> extendoSubsystem.setTargetPosition(700))
         );
     }
 

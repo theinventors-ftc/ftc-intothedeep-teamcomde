@@ -218,7 +218,7 @@ public class Blue_Left_Samples_2_ONLY extends CommandOpMode {
         /* -----1----- */
 
         temp = new SequentialCommandGroup(
-            opCommon.extendo(),
+            opCommon.extendo(0.5),
             opCommon.sample_intake()
         );
         temp.schedule();

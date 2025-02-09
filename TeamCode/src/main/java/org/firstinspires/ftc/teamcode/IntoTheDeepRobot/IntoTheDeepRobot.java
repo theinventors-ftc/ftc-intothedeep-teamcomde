@@ -52,6 +52,69 @@ public class IntoTheDeepRobot extends RobotEx {
         this.initMechanismsTeleOp();
     }
 
+    public SequentialCommandGroup intake_sample() {
+        return new SequentialCommandGroup(
+                // Go to Park State: Elevator, Arm, Wrist, Claw
+                new InstantCommand(
+                        () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.PARK)
+                ),
+                new ParallelCommandGroup(
+                        new SequentialCommandGroup(
+                                new InstantCommand(() -> armSubsystem.setWristState(
+                                        ArmSubsystem.WristState.INTAKE
+                                )),
+                                new InstantCommand(clawSubsystem::goNormal, clawSubsystem),
+                                new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
+                                new WaitCommand(120),
+                                new InstantCommand(() -> armSubsystem.setArmState(
+                                        ArmSubsystem.ArmState.INTAKE
+                                ))
+                        ),
+                        // Intake Procedure
+                        new IntakeCommand(
+                                intakeSubsystem,
+                                (this.getAlliance() == Alliance.RED ?
+                                        IntakeCommand.COLOR.RED_YELLOW : IntakeCommand.COLOR.BLUE_YELLOW)
+                        )
+                ),
+                new InstantCommand(intakeSubsystem::brake_reverse),
+                new WaitCommand(80),
+                new InstantCommand(intakeSubsystem::stop),
+                new WaitCommand(50),
+                // Raise Intake and Return Extendo
+                new InstantCommand(intakeSubsystem::raise, intakeSubsystem),
+                // FAILSAFE
+                new InstantCommand(() -> armSubsystem.setWristState(
+                        ArmSubsystem.WristState.INTAKE
+                )),
+                new InstantCommand(clawSubsystem::goNormal, clawSubsystem),
+                new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
+                new WaitCommand(120),
+                new InstantCommand(() -> armSubsystem.setArmState(
+                        ArmSubsystem.ArmState.INTAKE
+                )),
+                //
+                new InstantCommand(extendoSubsystem::returnToZero, extendoSubsystem),
+                new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
+                // Push Sample (Align to Parrot)
+                new InstantCommand(intakeSubsystem::run),
+                new WaitCommand(240),
+                new InstantCommand(intakeSubsystem::stop),
+                new WaitCommand(50),
+                // Lower Slider w/ Claw and grab Sample
+                new InstantCommand(
+                        () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
+                ),
+                new WaitUntilCommand(() -> elevatorSubsystem.atTarget()),
+                new InstantCommand(clawSubsystem::grab),
+                new WaitCommand(400),
+                // Disengage Sample from the Intake/Parrot
+                new InstantCommand(
+                        () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.PARK2)
+                )
+        );
+    }
+
     @Override
     public void initMechanismsTeleOp() {
         clawSubsystem = new ClawSubsystem(this.robotMap);
@@ -197,68 +260,7 @@ public class IntoTheDeepRobot extends RobotEx {
                 )
         );
         //// Intake Sample Automation
-        toolOp.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).toggleWhenPressed(
-                new SequentialCommandGroup(
-                        // Go to Park State: Elevator, Arm, Wrist, Claw
-                        new InstantCommand(
-                                () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.PARK)
-                        ),
-                        new ParallelCommandGroup(
-                            new SequentialCommandGroup(
-                                new InstantCommand(() -> armSubsystem.setWristState(
-                                    ArmSubsystem.WristState.INTAKE
-                                )),
-                                new InstantCommand(clawSubsystem::goNormal, clawSubsystem),
-                                new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
-                                new WaitCommand(120),
-                                new InstantCommand(() -> armSubsystem.setArmState(
-                                    ArmSubsystem.ArmState.INTAKE
-                                ))
-                            ),
-                            // Intake Procedure
-                            new IntakeCommand(
-                                intakeSubsystem,
-                                (this.getAlliance() == Alliance.RED ?
-                                    IntakeCommand.COLOR.RED_YELLOW : IntakeCommand.COLOR.BLUE_YELLOW)
-                            )
-                        ),
-                        new InstantCommand(intakeSubsystem::brake_reverse),
-                        new WaitCommand(80),
-                        new InstantCommand(intakeSubsystem::stop),
-                        new WaitCommand(50),
-                        // Raise Intake and Return Extendo
-                        new InstantCommand(intakeSubsystem::raise, intakeSubsystem),
-                        // FAILSAFE
-                        new InstantCommand(() -> armSubsystem.setWristState(
-                                ArmSubsystem.WristState.INTAKE
-                        )),
-                        new InstantCommand(clawSubsystem::goNormal, clawSubsystem),
-                        new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
-                        new WaitCommand(120),
-                        new InstantCommand(() -> armSubsystem.setArmState(
-                                ArmSubsystem.ArmState.INTAKE
-                        )),
-                        //
-                        new InstantCommand(extendoSubsystem::returnToZero, extendoSubsystem),
-                        new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
-                        // Push Sample (Align to Parrot)
-                        new InstantCommand(intakeSubsystem::run),
-                        new WaitCommand(240),
-                        new InstantCommand(intakeSubsystem::stop),
-                        new WaitCommand(50),
-                        // Lower Slider w/ Claw and grab Sample
-                        new InstantCommand(
-                                () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
-                        ),
-                        new WaitUntilCommand(() -> elevatorSubsystem.atTarget()),
-                        new InstantCommand(clawSubsystem::grab),
-                        new WaitCommand(400),
-                        // Disengage Sample from the Intake/Parrot
-                        new InstantCommand(
-                                () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.PARK2)
-                        )
-                )
-        );
+        toolOp.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).toggleWhenPressed(intake_sample());
 
         toolOp.getGamepadButton(GamepadKeys.Button.LEFT_STICK_BUTTON)
                 .whenPressed(new SequentialCommandGroup(
@@ -267,7 +269,9 @@ public class IntoTheDeepRobot extends RobotEx {
                 ))
                 .whenReleased(new SequentialCommandGroup(
                         new InstantCommand(intakeSubsystem::lower),
-                        new InstantCommand(intakeSubsystem::stop)
+                        new InstantCommand(intakeSubsystem::stop),
+                        new WaitCommand(100),
+                        intake_sample()
                 ));
 
         //// Elevator Height Automations ++ Arm
@@ -411,8 +415,9 @@ public class IntoTheDeepRobot extends RobotEx {
                         ),
                         new InstantCommand(hangingSubsystem::release, hangingSubsystem),
                         new WaitCommand(1500),
-                        new InstantCommand(elevatorSubsystem::disable, elevatorSubsystem),
                         new InstantCommand(hangingSubsystem::ascend, hangingSubsystem),
+                        new WaitCommand(1200),
+                        new InstantCommand(elevatorSubsystem::disable, elevatorSubsystem),
                         new WaitUntilCommand(() -> hangingSubsystem.reached_hanging_pos()),
                         new InstantCommand(hangingSubsystem::descend, hangingSubsystem),
                         new WaitCommand(300),

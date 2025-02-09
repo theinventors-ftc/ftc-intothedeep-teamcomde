@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.util.Timing;
 
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.IntakeSubsystem;
+
+import java.util.concurrent.TimeUnit;
 
 public class IntakeCommand extends CommandBase {
     private final IntakeSubsystem intake;
@@ -16,10 +19,19 @@ public class IntakeCommand extends CommandBase {
     }
 
     private final COLOR color_preference;
+    private Timing.Timer timer;
+
+    public IntakeCommand(IntakeSubsystem intakeSubsystem, COLOR color_preference, long MAX_ms) {
+        this.intake = intakeSubsystem;
+        this.color_preference = color_preference;
+        this.timer = new Timing.Timer(MAX_ms, TimeUnit.MILLISECONDS);
+        addRequirements(intakeSubsystem);
+    }
 
     public IntakeCommand(IntakeSubsystem intakeSubsystem, COLOR color_preference) {
         this.intake = intakeSubsystem;
         this.color_preference = color_preference;
+        this.timer = new Timing.Timer(125000, TimeUnit.MILLISECONDS);
         addRequirements(intakeSubsystem);
     }
 
@@ -41,6 +53,7 @@ public class IntakeCommand extends CommandBase {
     }
 
     public void initialize() {
+        timer.start();
         intake.run();
     }
 
@@ -53,10 +66,11 @@ public class IntakeCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return intake.isSample()
+        return (intake.isSample()
                 &&
                 check_color(intake.getSampleColor())
                 &&
-                intake.getSampleColor() != IntakeSubsystem.COLOR.NONE;
+                intake.getSampleColor() != IntakeSubsystem.COLOR.NONE)
+                || timer.done();
     }
 }
