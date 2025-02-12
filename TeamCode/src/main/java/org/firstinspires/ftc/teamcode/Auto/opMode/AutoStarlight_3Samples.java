@@ -6,22 +6,22 @@ import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robo
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.tipPoseTransfer;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
+import com.arcrobotics.ftclib.util.Timing;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.Auto.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Auto.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.RobotMap;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleSupplier;
 
-@Autonomous(name = "AutoStarlight", group = "Special")
-public class AutoStarlight extends CommandOpMode {
+@Autonomous(name = "AutoStarlight_v2", group = "Special")
+public class AutoStarlight_3Samples extends CommandOpMode {
 
     private SampleMecanumDrive drive;
     private volatile Pose2d current_pose;
@@ -29,6 +29,7 @@ public class AutoStarlight extends CommandOpMode {
     private OpCommon opCommon;
     private RobotMap robotMap;
     private SequentialCommandGroup temp;
+    private Timing.Timer timer;
 
     /**
      * Poses
@@ -56,7 +57,7 @@ public class AutoStarlight extends CommandOpMode {
         ), extendo_length.getAsDouble()),
 
         neutralSampleLeft = new Pose2d(
-            -2.5 * Tile, -Tile - 5, Math.toRadians(180)
+            -2.3 * Tile, -1.5 * Tile - 2, Math.toRadians(143)
         ),
 
         parking = new Pose2d(
@@ -72,6 +73,7 @@ public class AutoStarlight extends CommandOpMode {
         toNeutral_1,
         toNeutral_2,
         toBasketExtra,
+        toBasketFinal,
         toBasket_0,
         toBasket_1,
         toParking;
@@ -84,7 +86,7 @@ public class AutoStarlight extends CommandOpMode {
     }
     public void init_toNeutral_0() {
         toNeutral_0 = drive.trajectorySequenceBuilder(current_pose)
-                .lineToLinearHeading(new Pose2d(current_pose.getX() + 2, current_pose.getY(), Math.toRadians(60)));
+                .lineToLinearHeading(new Pose2d(current_pose.getX() + 3, current_pose.getY(), Math.toRadians(60)));
     }
     public void init_toNeutral_1() {
         toNeutral_1 = drive.trajectorySequenceBuilder(current_pose)
@@ -92,8 +94,7 @@ public class AutoStarlight extends CommandOpMode {
     }
     public void init_toNeutral_2() {
         toNeutral_2 = drive.trajectorySequenceBuilder(current_pose)
-            .splineTo(new Vector2d(-1.8 * Tile, -1.5 * Tile), Math.toRadians(90))
-            .splineToSplineHeading(neutralSampleLeft, Math.toRadians(180));
+            .lineToLinearHeading(neutralSampleLeft);
     }
     public void init_toBasket_0() {
         toBasket_0 = drive.trajectorySequenceBuilder(current_pose)
@@ -114,6 +115,12 @@ public class AutoStarlight extends CommandOpMode {
             .setReversed(true)
             .strafeTo(basket.vec());
     }
+    public void init_toBasketFinal() {
+        toBasketFinal = drive.trajectorySequenceBuilder(current_pose)
+                .setReversed(true)
+                .lineToLinearHeading(new Pose2d(basket.getX(), basket.getY() + 5,
+                        basket.getHeading()));
+    }
     public void init_toParking() {
         toParking = drive.trajectorySequenceBuilder(current_pose)
             .splineTo(parking.vec(), Math.toRadians(0));
@@ -129,6 +136,7 @@ public class AutoStarlight extends CommandOpMode {
         drive.setPoseEstimate(startPose);
         robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.AUTO);
         opCommon = new OpCommon(robotMap);
+        timer = new Timing.Timer(3000, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -272,6 +280,69 @@ public class AutoStarlight extends CommandOpMode {
             run();
         }
 
+        /*-- 2 --*/
+        temp = new SequentialCommandGroup(
+            new WaitCommand(2000),
+            opCommon.extendo3dSample(0.4),
+            opCommon.sample_intake()
+        );
+        temp.schedule();
+        init_toNeutral_2();
+        drive.followTrajectorySequenceAsync(toNeutral_2.build());
+        while (
+            !isStopRequested()
+            && opModeIsActive()
+            && (drive.isBusy()
+            || CommandScheduler.getInstance().isScheduled(temp))
+        ) {
+            drive.update();
+            run();
+        }
+        drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
+        current_pose = drive.getPoseEstimate();
+
+        temp = opCommon.basket_scoring();
+        temp.schedule();
+        basket = new Pose2d(basket.getX() + 5, basket.getY(), Math.toRadians(65));
+        init_toBasketFinal();
+        drive.followTrajectorySequenceAsync(toBasketFinal.build());
+        while (
+            !isStopRequested()
+            && opModeIsActive()
+            && drive.isBusy()
+            && CommandScheduler.getInstance().isScheduled(temp)
+        ) {
+            drive.update();
+            run();
+        }
+        drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
+        current_pose = drive.getPoseEstimate();
+
+        //distance sensor here
+//
+//        drive.setPoseEstimate(new Pose2d(
+//            calculateReal2dLocation(current_pose, value_1, value_2), Math.toRadians(current_pose.getHeading())
+//        ));
+//        current_pose = drive.getPoseEstimate();
+
+        init_toBasket_1();
+        drive.followTrajectorySequenceAsync(toBasket_1.build());
+        while (!isStopRequested() && opModeIsActive() && drive.isBusy()) {
+            drive.update();
+        }
+        drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
+        current_pose = drive.getPoseEstimate();
+
+        temp = opCommon.release_sample();
+        temp.schedule();
+        while (
+            !isStopRequested()
+                && opModeIsActive()
+                && CommandScheduler.getInstance().isScheduled(temp)
+        ) {
+            run();
+        }
+
         /* -----P----- */
 
         temp = opCommon.reset_elevator();
@@ -279,10 +350,10 @@ public class AutoStarlight extends CommandOpMode {
         init_toParking();
         drive.followTrajectorySequenceAsync(toParking.build());
         while (
-            !isStopRequested()
-            && opModeIsActive()
-            && (drive.isBusy()
-            || CommandScheduler.getInstance().isScheduled(temp))
+                !isStopRequested()
+                        && opModeIsActive()
+                        && (drive.isBusy()
+                        || CommandScheduler.getInstance().isScheduled(temp))
         ) {
             drive.update();
             run();

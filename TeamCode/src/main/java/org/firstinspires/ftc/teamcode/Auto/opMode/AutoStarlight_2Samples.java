@@ -13,15 +13,14 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.Auto.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Auto.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.RobotMap;
 
 import java.util.function.DoubleSupplier;
 
-@Autonomous(name = "Red Left Samples ONLY 2", group = "RED")
-public class Red_Left_Samples_2_ONLY extends CommandOpMode {
+@Autonomous(name = "AutoStarlight", group = "Special")
+public class AutoStarlight_2Samples extends CommandOpMode {
 
     private SampleMecanumDrive drive;
     private volatile Pose2d current_pose;
@@ -71,25 +70,20 @@ public class Red_Left_Samples_2_ONLY extends CommandOpMode {
         toNeutral_0,
         toNeutral_1,
         toNeutral_2,
+        toBasketExtra,
         toBasket_0,
         toBasket_1,
         toParking;
 
     public void init_toPreload() {
         toPreload = drive.trajectorySequenceBuilder(startPose)
-            .waitSeconds(0.5)
-            .strafeTo(chambers.vec());
+            .setReversed(true)
+            .setTangent(Math.toRadians(90))
+            .splineToSplineHeading(new Pose2d(basket.getX() + 1, basket.getY(), Math.toRadians(75)), Math.toRadians(225));
     }
     public void init_toNeutral_0() {
         toNeutral_0 = drive.trajectorySequenceBuilder(current_pose)
-            .setTangent(Math.toRadians(270))
-            .splineTo(neutralSampleRight.vec(), Math.toRadians(135),
-                      SampleMecanumDrive.getVelocityConstraint(
-                          DriveConstants.MAX_VEL,
-                          DriveConstants.MAX_ANG_VEL,
-                          DriveConstants.TRACK_WIDTH
-                      ),
-                      SampleMecanumDrive.getAccelerationConstraint(20));
+                .lineToLinearHeading(new Pose2d(current_pose.getX() + 2, current_pose.getY(), Math.toRadians(60)));
     }
     public void init_toNeutral_1() {
         toNeutral_1 = drive.trajectorySequenceBuilder(current_pose)
@@ -106,6 +100,13 @@ public class Red_Left_Samples_2_ONLY extends CommandOpMode {
             .setTangent(Math.toRadians(315))
             .splineToSplineHeading(new Pose2d(basket.getX(), basket.getY() + 5,
                                              basket.getHeading()), Math.toRadians(180));
+    }
+    public void init_toBasketExtra() {
+        toBasketExtra = drive.trajectorySequenceBuilder(current_pose)
+                .setReversed(true)
+                .setTangent(Math.toRadians(315))
+                .splineToSplineHeading(new Pose2d(basket.getX(), basket.getY() + 5,
+                        Math.toRadians(50)), Math.toRadians(180));
     }
     public void init_toBasket_1() {
         toBasket_1 = drive.trajectorySequenceBuilder(current_pose)
@@ -134,14 +135,18 @@ public class Red_Left_Samples_2_ONLY extends CommandOpMode {
         initialize();
         waitForStart();
 
-        temp = opCommon.raise_high_chamber();
+        temp = new SequentialCommandGroup(
+                new WaitCommand(2000),
+                opCommon.basket_scoring()
+        );
         temp.schedule();
         init_toPreload();
         drive.followTrajectorySequenceAsync(toPreload.build());
         while (
             !isStopRequested()
                 && opModeIsActive()
-                && drive.isBusy()
+                && (drive.isBusy()
+                || CommandScheduler.getInstance().isScheduled(temp))
         ) {
             drive.update();
             run();
@@ -149,10 +154,20 @@ public class Red_Left_Samples_2_ONLY extends CommandOpMode {
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
         current_pose = drive.getPoseEstimate();
 
+        temp = opCommon.release_sample();
+        temp.schedule();
+        while (
+                !isStopRequested()
+                        && opModeIsActive()
+                        && CommandScheduler.getInstance().isScheduled(temp)
+        ) {
+            run();
+        }
+
         /* -----0----- */
 
         temp = new SequentialCommandGroup(
-            new WaitCommand(1000),
+            opCommon.extendo(0.5),
             opCommon.sample_intake()
         );
         temp.schedule();
@@ -171,19 +186,13 @@ public class Red_Left_Samples_2_ONLY extends CommandOpMode {
 
         temp = opCommon.basket_scoring();
         temp.schedule();
-        init_toBasket_0();
-        drive.followTrajectorySequenceAsync(toBasket_0.build());
         while (
             !isStopRequested()
             && opModeIsActive()
-            && drive.isBusy()
             && CommandScheduler.getInstance().isScheduled(temp)
         ) {
-            drive.update();
             run();
         }
-        drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = drive.getPoseEstimate();
 
 //        //distance sensor here
 //        double value_1 = 5;
@@ -193,14 +202,6 @@ public class Red_Left_Samples_2_ONLY extends CommandOpMode {
 //            calculateReal2dLocation(current_pose, value_1, value_2), Math.toRadians(current_pose.getHeading())
 //        ));
 //        current_pose = drive.getPoseEstimate();
-
-        init_toBasket_1();
-        drive.followTrajectorySequenceAsync(toBasket_1.build());
-        while (!isStopRequested() && opModeIsActive() && drive.isBusy()) {
-            drive.update();
-        }
-        drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = drive.getPoseEstimate();
 
         temp = opCommon.release_sample();
         temp.schedule();
@@ -215,6 +216,7 @@ public class Red_Left_Samples_2_ONLY extends CommandOpMode {
         /* -----1----- */
 
         temp = new SequentialCommandGroup(
+            new WaitCommand(500),
             opCommon.extendo(0.5),
             opCommon.sample_intake()
         );
@@ -246,6 +248,7 @@ public class Red_Left_Samples_2_ONLY extends CommandOpMode {
             run();
         }
 
+        basket = new Pose2d(basket.getX() - 2, basket.getY(), basket.getHeading());
         init_toBasket_1();
         drive.followTrajectorySequenceAsync(toBasket_1.build());
         while (
