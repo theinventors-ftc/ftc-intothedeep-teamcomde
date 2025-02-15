@@ -14,6 +14,7 @@ import org.inventors.ftc.robotbase.controllers.PIDFControllerEx;
 import org.inventors.ftc.robotbase.hardware.MotorExEx;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 @Config
@@ -41,6 +42,8 @@ public class ExtendoSubsystem extends SubsystemBase {
 
     public static int targetPosition = 0;
     private int springs_off = 25;
+    private BooleanSupplier hasSample;
+
     private Telemetry telemetry;
 
     // Zeroing
@@ -49,11 +52,13 @@ public class ExtendoSubsystem extends SubsystemBase {
     private final Timing.Timer timer;
     private boolean found_zero = false;
 
+
     public ExtendoSubsystem(
             RobotMap robotMap,
             DoubleSupplier power,
             Telemetry telemetry,
-            boolean attempt_Zero
+            boolean attempt_Zero,
+            BooleanSupplier hasSample
     ) {
         extendoMotor = robotMap.getExtendoMotor();
         extendoMotor.setRunMode(MotorExEx.RunMode.RawPower);
@@ -68,6 +73,8 @@ public class ExtendoSubsystem extends SubsystemBase {
 
         springs_off = attempt_Zero ? springs_off : 0;
         targetPosition = -springs_off;
+
+        this.hasSample = hasSample;
     }
 
     private void set(double power) {

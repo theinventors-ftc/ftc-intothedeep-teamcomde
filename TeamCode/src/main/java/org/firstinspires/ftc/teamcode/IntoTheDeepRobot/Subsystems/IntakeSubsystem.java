@@ -20,7 +20,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     // ------------------------------------------ States ---------------------------------------- //
     // Intake Constant
-    private static double intaking_power = 0.9;
+    private static double intaking_power = 1.0;
     private static double brake_power = 0.4;
 
     // Raise States
