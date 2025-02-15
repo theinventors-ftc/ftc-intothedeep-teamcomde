@@ -26,7 +26,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private DoubleSupplier power;
 
     private ElevatorFeedforward ff = new ElevatorFeedforward(
-            0.1,
+            0.08,
             0.16,
             1.0,
             0.0
@@ -45,6 +45,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public enum Level {
         INTAKE,
         SPECIMEN_DISLOCATE,
+        PARK0,
         PARK,
         PARK2,
         LOW_BASKET,
@@ -62,6 +63,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     HashMap<Level, Integer> levelMap = new HashMap<Level, Integer>() {{
         put(Level.INTAKE, 0);
         put(Level.SPECIMEN_DISLOCATE, 137);
+        put(Level.PARK0, 80);
         put(Level.PARK, 230);
         put(Level.PARK2, 450);
         put(Level.LOW_BASKET, 680);
