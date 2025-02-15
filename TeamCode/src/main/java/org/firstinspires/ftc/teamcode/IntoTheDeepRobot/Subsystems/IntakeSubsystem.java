@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RobotMap;
+import org.inventors.ftc.robotbase.RobotEx;
 import org.inventors.ftc.robotbase.hardware.ColorSensor;
 
 import java.util.HashMap;
@@ -143,6 +144,12 @@ public class IntakeSubsystem extends SubsystemBase {
         telemetry.addData("Intake Color Prediction: ", predict(colors[0], colors[1], colors[2]));
 
         return predict(colors[0], colors[1], colors[2]);
+    }
+
+    public boolean check_color(RobotEx.Alliance alliance) {
+        return (getSampleColor() == (alliance == RobotEx.Alliance.RED ? COLOR.RED : COLOR.BLUE))
+                ||
+                getSampleColor() == COLOR.YELLOW;
     }
 
     public boolean isSample() {

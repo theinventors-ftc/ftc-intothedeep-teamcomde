@@ -33,7 +33,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     );
     private PIDFControllerEx pid = new PIDFControllerEx(
             0.008,
-            0.0, // 0.008
+            0.008, // 0.008
             0.0002,
             0.0,
             0,
@@ -55,6 +55,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         HANGING_AIM,
         HANGING,
         HANGING_RELEASE,
+        HIGH_CHAMBER_RELEASE,
         MANUAL
     }
 
@@ -70,6 +71,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         put(Level.HIGH_BASKET, 2058);
         put(Level.LOW_CHAMBER, 0);
         put(Level.HIGH_CHAMBER, 518);
+        put(Level.HIGH_CHAMBER_RELEASE, 0);
         put(Level.HANGING_AIM, 917);
         put(Level.HANGING, -165);
         put(Level.HANGING_RELEASE, -10); // TODO Go intake in auto hang
@@ -80,7 +82,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     // Zeroing
     public boolean isStalled = false;
-    public double ampThreshold = 4.5;
+    public double ampThreshold = 4;
     private final Timing.Timer timer;
     private boolean found_zero = false, attempt_Zero = false;
 

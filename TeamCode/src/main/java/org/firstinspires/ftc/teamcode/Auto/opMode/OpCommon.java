@@ -64,8 +64,7 @@ public class OpCommon {
             this.robotMap,
             () -> 0.0,
             robotMap.getTelemetry(),
-            false,
-                intakeSubsystem::isSample
+            false
         );
         couplersSubsystem = new CouplersSubsystem(this.robotMap);
         distanceSensorsSubsystem = new DistanceSensorsSubsystem(
