@@ -31,7 +31,7 @@ public class ClawSubsystem extends SubsystemBase {
 
     private final HashMap<ClawRotState, Double> claw_rot_positions = new HashMap<ClawRotState, Double>() {{
         put(ClawRotState.NORMAL, 0.048);
-        put(ClawRotState.FLIPPED, 0.4);
+        put(ClawRotState.FLIPPED, 0.7);
     }};
 
     public ClawSubsystem(RobotMap robotMap) {
