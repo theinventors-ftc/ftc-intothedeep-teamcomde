@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Auto.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.RobotMap;
+import org.inventors.ftc.robotbase.RobotEx;
 
 import java.util.function.DoubleSupplier;
 
@@ -43,7 +44,7 @@ public class AutoStarlight_2Samples extends CommandOpMode {
         ),
 
         basket = new Pose2d(
-            -2.55 * Tile, -2 * Tile, Math.toRadians(50)
+            -2.55 * Tile, -1.85 * Tile, Math.toRadians(50)
         ),
 
         neutralSampleRight = new Pose2d(
@@ -79,7 +80,8 @@ public class AutoStarlight_2Samples extends CommandOpMode {
         toPreload = drive.trajectorySequenceBuilder(startPose)
             .setReversed(true)
             .setTangent(Math.toRadians(90))
-            .splineToSplineHeading(new Pose2d(basket.getX() + 1, basket.getY(), Math.toRadians(75)), Math.toRadians(225));
+            .splineToSplineHeading(new Pose2d(basket.getX() + 1, basket.getY(),
+                                              Math.toRadians(75)), Math.toRadians(200));
     }
     public void init_toNeutral_0() {
         toNeutral_0 = drive.trajectorySequenceBuilder(current_pose)
@@ -127,7 +129,7 @@ public class AutoStarlight_2Samples extends CommandOpMode {
         drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(startPose);
         robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.AUTO);
-        opCommon = new OpCommon(robotMap);
+        opCommon = new OpCommon(robotMap, RobotEx.Alliance.RED);
     }
 
     @Override

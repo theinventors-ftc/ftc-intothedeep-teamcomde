@@ -24,6 +24,7 @@ import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions;
 import org.firstinspires.ftc.teamcode.Auto.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.RobotMap;
+import org.inventors.ftc.robotbase.RobotEx;
 
 import java.util.function.DoubleSupplier;
 
@@ -132,7 +133,7 @@ public class Red_Left_Samples extends CommandOpMode {
         drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(startPose);
         robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.AUTO);
-        opCommon = new OpCommon(robotMap);
+        opCommon = new OpCommon(robotMap, RobotEx.Alliance.RED);
         opCommon.init_controllers(drive);
         builderFunctions = new BuilderFunctions();
     }
@@ -206,8 +207,6 @@ public class Red_Left_Samples extends CommandOpMode {
             new WaitCommand(10000)
         );
         temp.schedule();
-
-        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         double[] vels = new double[4];
 

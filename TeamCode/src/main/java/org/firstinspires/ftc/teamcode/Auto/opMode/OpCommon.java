@@ -5,6 +5,7 @@ import static java.lang.Math.abs;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
@@ -25,10 +26,12 @@ import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ElevatorSubsys
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ExtendoSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.RobotMap;
+import org.inventors.ftc.robotbase.RobotEx;
 
 public class OpCommon {
     private RobotMap robotMap;
     private FtcDashboard dashboard;
+    private RobotEx.Alliance alliance;
 
     /*--Subsystems--*/
 //    protected HardwareMap hardwareMap;
@@ -48,7 +51,8 @@ public class OpCommon {
     /**
      * Initialization of all subsystems and mechanisms
      */
-    public OpCommon(RobotMap robotMap) {
+    public OpCommon(RobotMap robotMap, RobotEx.Alliance alliance) {
+        this.alliance = alliance;
         this.robotMap = robotMap;
         clawSubsystem = new ClawSubsystem(this.robotMap);
         armSubsystem = new ArmSubsystem(this.robotMap);
@@ -135,83 +139,93 @@ public class OpCommon {
 
     public SequentialCommandGroup raise_high_chamber() {
         return new SequentialCommandGroup(
-            new InstantCommand(
-                () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.HIGH_CHAMBER)
-            ),
-            new WaitCommand(50),
+            new InstantCommand(clawSubsystem::goNormal),
+            new InstantCommand(() -> elevatorSubsystem.setLevel(
+                ElevatorSubsystem.Level.HIGH_CHAMBER
+            )),
+            new WaitCommand(150),
             new InstantCommand(() -> armSubsystem.setWristState(
-                ArmSubsystem.WristState.SPECIMENT_OUTTAKE_HIGH
+                ArmSubsystem.WristState.SPECIMEN_OUTTAKE
             )),
-            new WaitCommand(120),
+            new WaitCommand(100),
             new InstantCommand(() -> armSubsystem.setArmState(
-                ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_HIGH
-            )),
-            new WaitCommand(5000)
+                ArmSubsystem.ArmState.SPECIMEN_OUTTAKE
+            ))
         );
     }
 
     public SequentialCommandGroup sample_intake() {
         return new SequentialCommandGroup(
-            // Lower Intake Arm System
-            new InstantCommand(intakeSubsystem::lower),
-            new WaitCommand(80),
             // Go to Park State: Elevator, Arm, Wrist, Claw
-            new InstantCommand(
-                () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.PARK)
-            ),
-            new InstantCommand(() -> armSubsystem.setWristState(
-                ArmSubsystem.WristState.INTAKE
-            )),
-            new InstantCommand(clawSubsystem::goNormal, clawSubsystem),
-            new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
-            new WaitCommand(120),
-            new InstantCommand(() -> armSubsystem.setArmState(
-                ArmSubsystem.ArmState.INTAKE
-            )),
-            // Intake Procedure
-            new IntakeCommand(
-                intakeSubsystem,
-                IntakeCommand.COLOR.RED_YELLOW,
-        1500
-            ),
-            new InstantCommand(intakeSubsystem::brake_reverse),
-            new WaitCommand(80),
-            new InstantCommand(intakeSubsystem::stop),
-            new WaitCommand(50),
-            // Raise Intake and Return Extendo
-            new InstantCommand(intakeSubsystem::raise, intakeSubsystem),
-            // FAILSAFE
-            new InstantCommand(() -> armSubsystem.setWristState(
-                ArmSubsystem.WristState.INTAKE
-            )),
-            new InstantCommand(clawSubsystem::goNormal, clawSubsystem),
-            new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
-            new WaitCommand(120),
-            new InstantCommand(() -> armSubsystem.setArmState(
-                ArmSubsystem.ArmState.INTAKE
-            )),
-            //
-            new InstantCommand(()-> extendoSubsystem.set_MAX_POWER(1)),
-            new InstantCommand(extendoSubsystem::returnToZero, extendoSubsystem),
-            new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
-            // Push Sample (Align to Parrot)
-            new InstantCommand(intakeSubsystem::run),
-            new WaitCommand(240),
-            new InstantCommand(intakeSubsystem::stop),
-            new WaitCommand(50),
-            // Lower Slider w/ Claw and grab Sample
+            new InstantCommand(intakeSubsystem::lower),
             new InstantCommand(
                 () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
             ),
-            new WaitUntilCommand(()-> elevatorSubsystem.atTarget()),
-            new InstantCommand(clawSubsystem::grab),
-            new WaitCommand(200)
+//            new ConditionalCommand(
+//                new InstantCommand(() -> extendoSubsystem.setTargetPosition(200), extendoSubsystem),
+//                new InstantCommand(),
+//                () -> extendoSubsystem.getExtension() < 200
+//            ),
+            new ParallelCommandGroup(
+                new SequentialCommandGroup(
+                    new InstantCommand(() -> armSubsystem.setWristState(
+                        ArmSubsystem.WristState.INTAKE
+                    )),
+                    new InstantCommand(clawSubsystem::goNormal, clawSubsystem),
+                    new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
+                    new WaitCommand(120),
+                    new InstantCommand(() -> armSubsystem.setArmState(
+                        ArmSubsystem.ArmState.INTAKE
+                    ))
+                ),
+                // Intake Procedure
+                new IntakeCommand(
+                    intakeSubsystem,
+                    (alliance == RobotEx.Alliance.RED ?
+                        IntakeCommand.COLOR.RED_YELLOW : IntakeCommand.COLOR.BLUE_YELLOW)
+                )
+            ),
+            new ConditionalCommand(
+                new SequentialCommandGroup(
+                    new InstantCommand(() -> extendoSubsystem.blockManual(true)),
+                    new InstantCommand(
+                        () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
+                    ),
+                    new InstantCommand(() -> extendoSubsystem.set_MAX_POWER(1)),
+                    new InstantCommand(() -> extendoSubsystem.setTargetPosition(90), extendoSubsystem),
+                    // Push Sample (Align to Parrot)
+                    new InstantCommand(intakeSubsystem::run),
+                    new WaitCommand(120),
+                    new InstantCommand(intakeSubsystem::stop),
+                    new InstantCommand(intakeSubsystem::raise, intakeSubsystem),
+                    new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
+                    new WaitUntilCommand(() -> elevatorSubsystem.atTarget()),
+                    new InstantCommand(clawSubsystem::grab),
+                    new WaitCommand(60),
+                    // Disengage Sample from the Intake/Parrot
+                    new InstantCommand(
+                        () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.PARK2)
+                    ),
+                    new InstantCommand(() -> extendoSubsystem.blockManual(false))
+                ),
+                discard_sample(),
+                () -> intakeSubsystem.check_color(alliance)
+            )
+        );
+    }
+
+    public SequentialCommandGroup discard_sample() {
+        return new SequentialCommandGroup(
+            new InstantCommand(intakeSubsystem::raise),
+            new InstantCommand(intakeSubsystem::reverse),
+            new WaitCommand(1000),
+            new InstantCommand(intakeSubsystem::stop),
+            new InstantCommand(intakeSubsystem::lower)
         );
     }
 
     public SequentialCommandGroup basket_scoring() {
         return new SequentialCommandGroup(
-            // Disengage Sample from the Intake/Parrot
             new InstantCommand(
                 () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.HIGH_BASKET)
             ),
@@ -223,7 +237,7 @@ public class OpCommon {
             new InstantCommand(() -> armSubsystem.setArmState(
                 ArmSubsystem.ArmState.BASKET_OUTTAKE
             )),
-            new WaitUntilCommand(elevatorSubsystem::atTarget)
+            new WaitUntilCommand(() -> elevatorSubsystem.atTarget())
         );
     }
 
@@ -231,7 +245,7 @@ public class OpCommon {
         return new SequentialCommandGroup(
             new WaitCommand(250),
             new InstantCommand(clawSubsystem::release),
-            new WaitCommand(1200),
+            new WaitCommand(400),
             new InstantCommand(() -> armSubsystem.setWristState(
                 ArmSubsystem.WristState.PARK
             )),
@@ -247,6 +261,7 @@ public class OpCommon {
 
     public SequentialCommandGroup extendo(double power) {
         return new SequentialCommandGroup(
+            new InstantCommand(intakeSubsystem::lower),
             new InstantCommand(()-> extendoSubsystem.set_MAX_POWER(power)),
             new InstantCommand(()-> extendoSubsystem.setTargetPosition(1200))
         );
@@ -254,8 +269,9 @@ public class OpCommon {
 
     public SequentialCommandGroup extendo3dSample(double power) {
         return new SequentialCommandGroup(
-                new InstantCommand(()-> extendoSubsystem.set_MAX_POWER(power)),
-                new InstantCommand(()-> extendoSubsystem.setTargetPosition(700))
+            new InstantCommand(intakeSubsystem::lower),
+            new InstantCommand(()-> extendoSubsystem.set_MAX_POWER(power)),
+            new InstantCommand(()-> extendoSubsystem.setTargetPosition(700))
         );
     }
 

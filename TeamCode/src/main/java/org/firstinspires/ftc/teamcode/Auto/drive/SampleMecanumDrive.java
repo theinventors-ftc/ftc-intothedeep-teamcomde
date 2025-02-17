@@ -80,6 +80,8 @@ public class SampleMecanumDrive extends MecanumDrive {
     private List<Integer> lastEncPositions = new ArrayList<>();
     private List<Integer> lastEncVels = new ArrayList<>();
 
+    private boolean active = true;
+
     public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
@@ -286,10 +288,12 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
-        leftFront.setPower(v);
-        leftRear.setPower(v1);
-        rightRear.setPower(v2);
-        rightFront.setPower(v3);
+        if (active) {
+            leftFront.setPower(v);
+            leftRear.setPower(v1);
+            rightRear.setPower(v2);
+            rightFront.setPower(v3);
+        }
     }
 
     @Override
@@ -311,5 +315,17 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public static TrajectoryAccelerationConstraint getAccelerationConstraint(double maxAccel) {
         return new ProfileAccelerationConstraint(maxAccel);
+    }
+
+    public void activate() {
+        active = true;
+    }
+
+    public void deactivate() {
+        active = false;
+    }
+
+    public boolean getState() {
+        return active;
     }
 }

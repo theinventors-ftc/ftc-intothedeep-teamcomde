@@ -6,12 +6,14 @@ import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robo
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Auto.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.RobotMap;
+import org.inventors.ftc.robotbase.RobotEx;
 
 import java.util.function.DoubleSupplier;
 
@@ -64,10 +66,11 @@ public class Red_Right_Preload extends CommandOpMode {
      */
     @Override
     public void initialize() {
+        CommandScheduler.getInstance().reset();
         drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(startPose);
         robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.AUTO);
-        opCommon = new OpCommon(robotMap);
+        opCommon = new OpCommon(robotMap, RobotEx.Alliance.RED);
     }
 
     @Override
