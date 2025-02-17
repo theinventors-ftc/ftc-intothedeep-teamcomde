@@ -24,6 +24,7 @@ import org.firstinspires.ftc.teamcode.Auto.trajectorysequence.sequencesegment.Tu
 import org.firstinspires.ftc.teamcode.Auto.trajectorysequence.sequencesegment.WaitSegment;
 import org.firstinspires.ftc.teamcode.Auto.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.Auto.util.LogFiles;
+import org.inventors.ftc.robotbase.hardware.Battery;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,12 +61,12 @@ public class TrajectorySequenceRunner {
     private final FtcDashboard dashboard;
     private final LinkedList<Pose2d> poseHistory = new LinkedList<>();
 
-    private VoltageSensor voltageSensor;
+    private Battery battery;
 
     private List<Integer> lastDriveEncPositions, lastDriveEncVels, lastTrackingEncPositions, lastTrackingEncVels;
 
     public TrajectorySequenceRunner(
-            TrajectoryFollower follower, PIDCoefficients headingPIDCoefficients, VoltageSensor voltageSensor,
+            TrajectoryFollower follower, PIDCoefficients headingPIDCoefficients, Battery battery,
             List<Integer> lastDriveEncPositions, List<Integer> lastDriveEncVels, List<Integer> lastTrackingEncPositions, List<Integer> lastTrackingEncVels
     ) {
         this.follower = follower;
@@ -73,7 +74,7 @@ public class TrajectorySequenceRunner {
         turnController = new PIDFController(headingPIDCoefficients);
         turnController.setInputBounds(0, 2 * Math.PI);
 
-        this.voltageSensor = voltageSensor;
+        this.battery = battery;
 
         this.lastDriveEncPositions = lastDriveEncPositions;
         this.lastDriveEncVels = lastDriveEncVels;
@@ -202,7 +203,7 @@ public class TrajectorySequenceRunner {
         }
 
         final double NOMINAL_VOLTAGE = 12.0;
-        double voltage = voltageSensor.getVoltage();
+        double voltage = battery.getVoltage();
         if (driveSignal != null && !DriveConstants.RUN_USING_ENCODER) {
             driveSignal = new DriveSignal(
                     driveSignal.getVel().times(NOMINAL_VOLTAGE / voltage),

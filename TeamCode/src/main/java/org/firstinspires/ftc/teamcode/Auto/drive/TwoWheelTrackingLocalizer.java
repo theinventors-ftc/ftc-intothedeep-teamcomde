@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Auto.drive;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -8,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Auto.util.Encoder;
+import org.firstinspires.ftc.teamcode.RobotMap;
 
 import java.util.Arrays;
 import java.util.List;
@@ -52,7 +55,7 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 
     private SampleMecanumDrive drive;
 
-    public TwoWheelTrackingLocalizer(HardwareMap hardwareMap, SampleMecanumDrive drive) {
+    public TwoWheelTrackingLocalizer(RobotMap robotMap, SampleMecanumDrive drive) {
         super(Arrays.asList(
             new Pose2d(PARALLEL_X, PARALLEL_Y, 0),
             new Pose2d(PERPENDICULAR_X, PERPENDICULAR_Y, Math.toRadians(90))
@@ -60,8 +63,9 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 
         this.drive = drive;
 
-        parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "rear_right"));
-        perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "front_left"));
+        // Original
+        parallelEncoder = new Encoder(robotMap.getHardwareMap().get(DcMotorEx.class, "rear_right"));
+        perpendicularEncoder = new Encoder(robotMap.getHardwareMap().get(DcMotorEx.class, "front_left"));
 
         parallelEncoder.setDirection(Encoder.Direction.REVERSE);
     }

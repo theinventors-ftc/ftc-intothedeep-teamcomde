@@ -130,9 +130,9 @@ public class Red_Left_Samples extends CommandOpMode {
      */
     @Override
     public void initialize() {
-        drive = new SampleMecanumDrive(hardwareMap);
-        drive.setPoseEstimate(startPose);
         robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.AUTO);
+        drive = new SampleMecanumDrive(robotMap);
+        drive.setPoseEstimate(startPose);
         opCommon = new OpCommon(robotMap, RobotEx.Alliance.RED);
         opCommon.init_controllers(drive);
         builderFunctions = new BuilderFunctions();

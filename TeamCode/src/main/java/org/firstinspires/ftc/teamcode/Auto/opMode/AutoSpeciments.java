@@ -124,9 +124,9 @@ public class AutoSpeciments extends CommandOpMode {
     @Override
     public void initialize() {
         CommandScheduler.getInstance().reset();
-        drive = new SampleMecanumDrive(hardwareMap);
-        drive.setPoseEstimate(startPose);
         robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.AUTO);
+        drive = new SampleMecanumDrive(robotMap);
+        drive.setPoseEstimate(startPose);
         opCommon = new OpCommon(robotMap, RobotEx.Alliance.RED);
     }
 

@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.Auto.util;
 
 import com.acmerobotics.roadrunner.util.NanoClock;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import org.inventors.ftc.robotbase.hardware.MotorExEx;
 
 /**
  * Wraps a motor instance to provide corrected velocity counts and allow reversing independently of the corresponding

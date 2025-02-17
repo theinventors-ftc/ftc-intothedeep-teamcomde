@@ -38,6 +38,8 @@ public class ControlTest extends CommandOpMode {
     private RobotMap robotMap;
     private FtcDashboard dashboard;
 
+    private double[] pidaTargets = {44.615, 10, 75};
+
     /*--Subsystems--*/
     //    protected HardwareMap hardwareMap;
     public ClawSubsystem clawSubsystem;
@@ -58,9 +60,10 @@ public class ControlTest extends CommandOpMode {
             new InstantCommand(gyroFollow::enable),
             new InstantCommand(strafeControllerSubsystem::enable),
             new InstantCommand(forwardControllerSubsystem::enable),
-            new InstantCommand(() -> gyroFollow.setGyroTarget(75)),
-            new InstantCommand(() -> strafeControllerSubsystem.setDistTarget(10)), //3.555
-            new InstantCommand(() -> forwardControllerSubsystem.setGyroTarget(44.615))
+            new InstantCommand(() -> gyroFollow.setGyroTarget(pidaTargets[2])),
+            new InstantCommand(() -> strafeControllerSubsystem.setDistTarget(pidaTargets[1])),//3
+            // .555
+            new InstantCommand(() -> forwardControllerSubsystem.setGyroTarget(pidaTargets[0]))
         );
     }
 
@@ -122,6 +125,7 @@ public class ControlTest extends CommandOpMode {
 
     @Override
     public void initialize() {
+        CommandScheduler.getInstance().reset();
         robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.AUTO);
         clawSubsystem = new ClawSubsystem(this.robotMap);
         armSubsystem = new ArmSubsystem(this.robotMap);
@@ -139,7 +143,7 @@ public class ControlTest extends CommandOpMode {
             robotMap.getTelemetry()
         );
 
-        drive = new SampleMecanumDrive(hardwareMap);
+        drive = new SampleMecanumDrive(robotMap);
         drive.setPoseEstimate(new Pose2d(0, 0, Math.toRadians(90)));
         init_controllers(drive);
     }
@@ -165,7 +169,6 @@ public class ControlTest extends CommandOpMode {
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
         //
         drive.deactivate();
-        robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.TELEOP);
         //
         temp = activateDistanceCalibration();
         temp.schedule();

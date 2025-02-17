@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Auto.trajectorysequence.TrajectorySequenceBuilder;
+import org.firstinspires.ftc.teamcode.RobotMap;
 
 import java.util.function.DoubleSupplier;
 
@@ -26,6 +27,7 @@ public class Red_Right_Speciments extends CommandOpMode {
     private SampleMecanumDrive drive;
     private volatile Pose2d current_pose;
     private DoubleSupplier extendo_length;
+    private RobotMap robotMap;
 
     /**
      * Poses
@@ -149,7 +151,8 @@ public class Red_Right_Speciments extends CommandOpMode {
      */
     @Override
     public void initialize() {
-        drive = new SampleMecanumDrive(hardwareMap);
+        robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.AUTO);
+        drive = new SampleMecanumDrive(robotMap);
         drive.setPoseEstimate(startPose);
     }
 

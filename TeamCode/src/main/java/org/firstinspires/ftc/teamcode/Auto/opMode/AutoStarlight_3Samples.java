@@ -125,7 +125,7 @@ public class AutoStarlight_3Samples extends CommandOpMode {
     }
     public void init_toParking() {
         toParking = drive.trajectorySequenceBuilder(current_pose)
-            .splineTo(parking.vec(), Math.toRadians(0));
+            .splineTo(parking.vec(), Math.toRadians(45));
     }
 
     /**
@@ -134,9 +134,9 @@ public class AutoStarlight_3Samples extends CommandOpMode {
     @Override
     public void initialize() {
         CommandScheduler.getInstance().reset();
-        drive = new SampleMecanumDrive(hardwareMap);
-        drive.setPoseEstimate(startPose);
         robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.AUTO);
+        drive = new SampleMecanumDrive(robotMap);
+        drive.setPoseEstimate(startPose);
         opCommon = new OpCommon(robotMap, RobotEx.Alliance.RED);
         timer = new Timing.Timer(3000, TimeUnit.MILLISECONDS);
     }
@@ -178,7 +178,7 @@ public class AutoStarlight_3Samples extends CommandOpMode {
         /* -----0----- */
 
         temp = new SequentialCommandGroup(
-            opCommon.extendo(0.5),
+            opCommon.extendo(0.8),
             opCommon.sample_intake()
         );
         temp.schedule();
@@ -228,7 +228,7 @@ public class AutoStarlight_3Samples extends CommandOpMode {
 
         temp = new SequentialCommandGroup(
             new WaitCommand(500),
-            opCommon.extendo(0.5),
+            opCommon.extendo(0.8),
             opCommon.sample_intake()
         );
         temp.schedule();
@@ -284,8 +284,8 @@ public class AutoStarlight_3Samples extends CommandOpMode {
 
         /*-- 2 --*/
         temp = new SequentialCommandGroup(
-            new WaitCommand(2000),
-            opCommon.extendo3dSample(0.4),
+            new WaitCommand(1000),
+            opCommon.extendo3dSample(0.6),
             opCommon.sample_intake()
         );
         temp.schedule();

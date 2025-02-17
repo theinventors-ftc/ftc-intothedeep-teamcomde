@@ -13,7 +13,7 @@ public class ForwardControllerSubsystem extends SubsystemBase {
     private DoubleSupplier distValue;
     private double target = 0;
     private boolean enabled = false;
-    public static double kP = 0.06, kI = 0, kD = 0.003, A = 0.2;
+    public static double kP = 0.03, kI = 0, kD = 0.003, A = 0.2;
     PIDFControllerEx controller;
     private Telemetry telemetry;
 

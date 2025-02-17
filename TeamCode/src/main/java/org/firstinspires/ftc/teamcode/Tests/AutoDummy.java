@@ -43,8 +43,8 @@ public class AutoDummy extends CommandOpMode {
      */
     @Override
     public void initialize() {
-        drive = new SampleMecanumDrive(hardwareMap);
         robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.AUTO);
+        drive = new SampleMecanumDrive(robotMap);
         opCommon = new OpCommon(robotMap, RobotEx.Alliance.RED);
     }
 

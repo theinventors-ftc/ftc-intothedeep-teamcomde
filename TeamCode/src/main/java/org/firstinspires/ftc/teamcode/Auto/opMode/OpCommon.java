@@ -75,30 +75,6 @@ public class OpCommon {
             this.robotMap,
             robotMap.getTelemetry()
         );
-
-        //Auto release speciment
-        new Trigger(
-                () -> distanceSensorsSubsystem.getDistances()[0] <=
-                        (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ? 6.7 : 11) &&
-                        (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ||
-                                armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_HIGH)
-        ).whenActive(new ConditionalCommand(
-                new SequentialCommandGroup(
-                        new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
-                        new WaitCommand(150),
-                        new InstantCommand(
-                                () -> armSubsystem.setArmState(ArmSubsystem.ArmState.PERP) //TODO
-                        )
-                ),
-                new SequentialCommandGroup(
-                        new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
-                        new WaitCommand(150),
-                        new InstantCommand(
-                                () -> armSubsystem.setArmState(ArmSubsystem.ArmState.INTAKE_B) //TODO
-                        )
-                ),
-                () -> armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_HIGH
-        ));
     }
 
     public void init_controllers(SampleMecanumDrive drive) {
@@ -185,31 +161,23 @@ public class OpCommon {
                         IntakeCommand.COLOR.RED_YELLOW : IntakeCommand.COLOR.BLUE_YELLOW)
                 )
             ),
-            new ConditionalCommand(
-                new SequentialCommandGroup(
-                    new InstantCommand(() -> extendoSubsystem.blockManual(true)),
-                    new InstantCommand(
-                        () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
-                    ),
-                    new InstantCommand(() -> extendoSubsystem.set_MAX_POWER(1)),
-                    new InstantCommand(() -> extendoSubsystem.setTargetPosition(90), extendoSubsystem),
-                    // Push Sample (Align to Parrot)
-                    new InstantCommand(intakeSubsystem::run),
-                    new WaitCommand(120),
-                    new InstantCommand(intakeSubsystem::stop),
-                    new InstantCommand(intakeSubsystem::raise, intakeSubsystem),
-                    new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
-                    new WaitUntilCommand(() -> elevatorSubsystem.atTarget()),
-                    new InstantCommand(clawSubsystem::grab),
-                    new WaitCommand(60),
-                    // Disengage Sample from the Intake/Parrot
-                    new InstantCommand(
-                        () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.PARK2)
-                    ),
-                    new InstantCommand(() -> extendoSubsystem.blockManual(false))
+            new SequentialCommandGroup(
+                new InstantCommand(() -> extendoSubsystem.blockManual(true)),
+                new InstantCommand(
+                    () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
                 ),
-                discard_sample(),
-                () -> intakeSubsystem.check_color(alliance)
+                new InstantCommand(() -> extendoSubsystem.set_MAX_POWER(1)),
+                new InstantCommand(() -> extendoSubsystem.setTargetPosition(90), extendoSubsystem),
+                // Push Sample (Align to Parrot)
+                new InstantCommand(intakeSubsystem::run),
+                new WaitCommand(120),
+                new InstantCommand(intakeSubsystem::stop),
+                new InstantCommand(intakeSubsystem::raise, intakeSubsystem),
+                new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
+                new WaitUntilCommand(() -> elevatorSubsystem.atTarget()),
+                new InstantCommand(clawSubsystem::grab),
+                new WaitCommand(60),
+                new InstantCommand(() -> extendoSubsystem.blockManual(false))
             )
         );
     }

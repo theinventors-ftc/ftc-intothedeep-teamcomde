@@ -20,7 +20,7 @@ public class HeadingControllerSubsystem extends SubsystemBase {
     private boolean enabled = false;
     private boolean findClosestTarget;
 
-    public static double kP = 0.06, kI = 0, kD = 0.003, A = 0.2;
+    public static double kP = 0.025, kI = 0, kD = 0.003, A = 0.2;
 
     PIDFControllerEx controller;
 
@@ -29,7 +29,7 @@ public class HeadingControllerSubsystem extends SubsystemBase {
     public HeadingControllerSubsystem(DoubleSupplier gyroValue,
                                       IntSupplier closestOrientationTarget,
                                       Telemetry telemetry) {
-        controller = new PIDFControllerEx(kP, kI, kD, 0, A, 1.5, 0, 0);
+        controller = new PIDFControllerEx(kP, kI, kD, 0, A, 0.35, 0, 0);
         this.gyroValue = gyroValue;
         this.closestOrientationTarget = closestOrientationTarget;
 
