@@ -53,7 +53,7 @@ public class AutoDummy extends CommandOpMode {
         initialize();
         waitForStart();
 
-        temp = opCommon.raise_high_chamber();
+        temp = opCommon.specimenIntake();
         temp.schedule();
         init_traj();
         drive.followTrajectorySequenceAsync(traj.build());

@@ -143,7 +143,7 @@ public class Red_Left_Samples extends CommandOpMode {
         initialize();
         waitForStart();
 
-        temp = opCommon.raise_high_chamber();
+        temp = opCommon.specimenIntake();
         temp.schedule();
         init_toPreload();
         drive.followTrajectorySequenceAsync(toPreload.build());
@@ -202,11 +202,11 @@ public class Red_Left_Samples extends CommandOpMode {
 //        drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
 //        current_pose = drive.getPoseEstimate();
 
-        temp = new SequentialCommandGroup(
-            new InstantCommand(opCommon::activateDistanceCalibration),
-            new WaitCommand(10000)
-        );
-        temp.schedule();
+//        temp = new SequentialCommandGroup(
+//            new InstantCommand(opCommon::activateDistanceCalibration),
+//            new WaitCommand(10000)
+//        );
+//        temp.schedule();
 
         double[] vels = new double[4];
 

@@ -205,15 +205,6 @@ public class AutoStarlight_3Samples extends CommandOpMode {
             run();
         }
 
-//        //distance sensor here
-//        double value_1 = 5;
-//        double value_2 = 5;
-//
-//        drive.setPoseEstimate(new Pose2d(
-//            calculateReal2dLocation(current_pose, value_1, value_2), Math.toRadians(current_pose.getHeading())
-//        ));
-//        current_pose = drive.getPoseEstimate();
-
         temp = opCommon.release_sample();
         temp.schedule();
         while (
@@ -319,13 +310,6 @@ public class AutoStarlight_3Samples extends CommandOpMode {
         }
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
         current_pose = drive.getPoseEstimate();
-
-        //distance sensor here
-//
-//        drive.setPoseEstimate(new Pose2d(
-//            calculateReal2dLocation(current_pose, value_1, value_2), Math.toRadians(current_pose.getHeading())
-//        ));
-//        current_pose = drive.getPoseEstimate();
 
         init_toBasket_1();
         drive.followTrajectorySequenceAsync(toBasket_1.build());

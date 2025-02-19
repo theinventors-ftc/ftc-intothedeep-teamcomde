@@ -56,23 +56,21 @@ public class IntoTheDeepRobot extends RobotEx {
                 new InstantCommand(
                         () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
                 ),
+                new InstantCommand(() -> armSubsystem.setWristState(
+                    ArmSubsystem.WristState.INTAKE
+                )),
+                new WaitCommand(120),
+                new InstantCommand(() -> armSubsystem.setArmState(
+                    ArmSubsystem.ArmState.INTAKE
+                )),
                 new ConditionalCommand(
-                        new InstantCommand(() -> extendoSubsystem.setTargetPosition(200), extendoSubsystem),
+                        new InstantCommand(() -> extendoSubsystem.setTargetPosition(350), extendoSubsystem),
                         new InstantCommand(),
-                        () -> extendoSubsystem.getExtension() < 200
+                        () -> extendoSubsystem.getExtension() < 350
                 ),
                 new ParallelCommandGroup(
-                        new SequentialCommandGroup(
-                                new InstantCommand(() -> armSubsystem.setWristState(
-                                        ArmSubsystem.WristState.INTAKE
-                                )),
-                                new InstantCommand(clawSubsystem::goNormal, clawSubsystem),
-                                new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
-                                new WaitCommand(120),
-                                new InstantCommand(() -> armSubsystem.setArmState(
-                                        ArmSubsystem.ArmState.INTAKE
-                                ))
-                        ),
+                        new InstantCommand(clawSubsystem::goNormal),
+                        new InstantCommand(clawSubsystem::justOpen),
                         // Intake Procedure
                         new IntakeCommand(
                                 intakeSubsystem,

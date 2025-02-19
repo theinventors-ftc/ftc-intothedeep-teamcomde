@@ -78,7 +78,7 @@ public class Red_Right_Preload extends CommandOpMode {
         initialize();
         waitForStart();
 
-        temp = opCommon.raise_high_chamber();
+        temp = opCommon.specimenIntake();
         temp.schedule();
         init_toPreload();
         drive.followTrajectorySequenceAsync(toPreload.build());
