@@ -42,13 +42,13 @@ public class SensorLocalizerTest extends CommandOpMode {
         distances = distanceSensorsSubsystem.getDistances();
 
         telemetry.addData("Distance Sensor Value Rear", distances[0]);
-        telemetry.addData("Distance Sensor Value Left", distances[1]);
+        telemetry.addData("Distance Sensor Value Left", distances[2]);
 
         realPose = new Pose2d(
             calculateReal2dLocation(
                 rrPose,
                 distances[0],
-                distances[1]),
+                distances[2]),
             drive.getPoseEstimate().getHeading());
 
         telemetry.addData("RR - X", rrPose.getX());

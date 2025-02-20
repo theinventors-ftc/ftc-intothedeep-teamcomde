@@ -266,6 +266,30 @@ public class OpCommon {
         );
     }
 
+    public SequentialCommandGroup specimenAimObservSpecial() {
+        return new SequentialCommandGroup(
+            new InstantCommand(() -> elevatorSubsystem.setLevel(
+                ElevatorSubsystem.Level.PARK)
+            ),
+            new WaitCommand(250),
+            new InstantCommand(clawSubsystem::goFlipped, clawSubsystem),
+            new InstantCommand(() -> armSubsystem.setWristState(
+                ArmSubsystem.WristState.SPECIMENT_INTAKE
+            )),
+            new WaitCommand(120),
+            new InstantCommand(() -> armSubsystem.setArmState(
+                ArmSubsystem.ArmState.SPECIMENT_INTAKE
+            )),
+            new WaitCommand(200),
+            new InstantCommand(() -> elevatorSubsystem.setLevel(
+                ElevatorSubsystem.Level.INTAKE
+            )),
+            new WaitCommand(500),
+            new InstantCommand(clawSubsystem::release)
+        );
+    }
+
+
     public SequentialCommandGroup specimenIntake() {
         return new SequentialCommandGroup(
             new InstantCommand(clawSubsystem::grab),
@@ -294,7 +318,7 @@ public class OpCommon {
         );
     }
 
-    public SequentialCommandGroup releaseSpecimnt() {
+    public SequentialCommandGroup releaseSpecimen() {
         return new SequentialCommandGroup(
             new InstantCommand(clawSubsystem::release),
             new WaitCommand(100)

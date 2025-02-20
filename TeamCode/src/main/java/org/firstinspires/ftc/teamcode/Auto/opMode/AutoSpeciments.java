@@ -11,19 +11,23 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
+import com.arcrobotics.ftclib.trajectory.constraint.TrajectoryConstraint;
+import com.arcrobotics.ftclib.util.Timing;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
+import org.firstinspires.ftc.teamcode.Auto.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Auto.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.RobotEx;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleSupplier;
 
-@Disabled
 @Autonomous(name = "AutoSpeciments")
 public class AutoSpeciments extends CommandOpMode {
 
@@ -32,8 +36,9 @@ public class AutoSpeciments extends CommandOpMode {
     private OpCommon opCommon;
     private RobotMap robotMap;
     private SequentialCommandGroup temp;
+    private Timing.Timer timer;
 
-    private double[] pidaTargets = {44.615, 10, 75};
+    private final double[] pidaTargets = {41, 68.5, 90};
 
     /**
      * Poses
@@ -45,27 +50,27 @@ public class AutoSpeciments extends CommandOpMode {
         ),
 
         preload = new Pose2d(
-            0.25 * Tile , -Tile - (robotY/2) + 1.5, Math.toRadians(90)
+            3 , -Tile - (robotY/2) + 1.5, Math.toRadians(90)
         ),
 
         chambers = new Pose2d(
-            0 , -Tile - (robotY/2), Math.toRadians(270)
+            0 , -Tile - (robotY/2), Math.toRadians(90)
         ),
 
         observationZone = new Pose2d(
-            1.5 * Tile, -2.5 * Tile, Math.toRadians(90)
+            1.5 * Tile, -3 * Tile + (robotY/2) + 17, Math.toRadians(90)
         ),
 
         allianceSampleLeft = new Pose2d(
-            2 * Tile, -Tile/2, Math.toRadians(90)
+            2 * Tile, -Tile - 2, Math.toRadians(90)
         ),
 
         allianceSampleMid = new Pose2d(
-            2.5 * Tile, -Tile/2, Math.toRadians(90)
+            2.5 * Tile - 2, -Tile/2, Math.toRadians(90)
         ),
 
         allianceSampleRight = new Pose2d(
-            3 * Tile - 3, -Tile/2, Math.toRadians(90)
+            2.5 * Tile, -Tile/2, Math.toRadians(90)
         ),
 
         parking = new Pose2d(
@@ -86,21 +91,22 @@ public class AutoSpeciments extends CommandOpMode {
     public void init_toPreload() {
         toPreload = drive.trajectorySequenceBuilder(startPose)
             .waitSeconds(0.5)
-            .strafeTo(preload.vec())
-            .forward(3);
+            .strafeTo(preload.vec());
     }
 
     public void init_toAllianceSamples() {
         toAllianceSamples = drive.trajectorySequenceBuilder(current_pose)
-            .setTangent(315)
-            .splineToSplineHeading(allianceSampleLeft, Math.toRadians(0))
-            .lineToConstantHeading(new Vector2d(current_pose.getX(), -2.6 * Tile))
-            .lineToLinearHeading(allianceSampleLeft)
-            .splineToConstantHeading(allianceSampleMid.vec(), Math.toRadians(0))
-            .lineToConstantHeading(new Vector2d(current_pose.getX(), -2.6 * Tile))
-            .lineToLinearHeading(allianceSampleMid)
-            .splineToConstantHeading(allianceSampleRight.vec(), Math.toRadians(0))
-            .lineToConstantHeading(new Vector2d(current_pose.getX(), -2.6 * Tile));
+            .setTangent(Math.toRadians(315))
+//            .splineToConstantHeading(new Vector2d(Tile + 5, -1.7 * Tile), Math.toRadians(45))
+            .splineToConstantHeading(allianceSampleLeft.vec(), Math.toRadians(90))
+            .strafeTo(new Vector2d(allianceSampleLeft.getX(), (-2.5 * Tile) + (robotY/2) + 15))
+//            .lineToConstantHeading(new Vector2d(allianceSampleLeft.getX(),
+//                                                (-2.5 * Tile) + (robotY/2)))
+            .strafeTo(new Vector2d(allianceSampleMid.getX() + 1.5, (-2.1 * Tile) + (robotY/2)));
+//            .lineToLinearHeading(allianceSampleLeft)
+//            .splineToConstantHeading(allianceSampleMid.vec(), Math.toRadians(0))
+//            .lineToConstantHeading(new Vector2d(allianceSampleMid.getX(),
+//                                                (-2.5 * Tile) + (robotY/2)));
     }
 
     public void init_toObservationZone() {
@@ -111,12 +117,21 @@ public class AutoSpeciments extends CommandOpMode {
 
     public void init_smallLeft() {
         smallLeft = drive.trajectorySequenceBuilder(current_pose)
-            .strafeLeft(2);
+            .strafeRight(3);
     }
 
     public void init_toScoreSpeciment() {
         toScoreSpeciment = drive.trajectorySequenceBuilder(current_pose)
-            .lineToLinearHeading(chambers)
+//            .lineToLinearHeading(chambers,
+//                                 SampleMecanumDrive.getVelocityConstraint(60,
+//                                                                                    DriveConstants.MAX_ANG_VEL,
+//                                                                                    DriveConstants.TRACK_WIDTH),
+//                                 SampleMecanumDrive.getAccelerationConstraint(55))
+            .splineTo(chambers.vec(), Math.toRadians(90),
+                      SampleMecanumDrive.getVelocityConstraint(60,
+                                                               DriveConstants.MAX_ANG_VEL,
+                                                               DriveConstants.TRACK_WIDTH),
+                      SampleMecanumDrive.getAccelerationConstraint(55))
             .forward(3);
     }
 
@@ -136,6 +151,7 @@ public class AutoSpeciments extends CommandOpMode {
         drive.setPoseEstimate(startPose);
         opCommon = new OpCommon(robotMap, RobotEx.Alliance.RED);
         opCommon.init_controllers(drive);
+        timer = new Timing.Timer(500, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -156,7 +172,6 @@ public class AutoSpeciments extends CommandOpMode {
             drive.update();
             run();
         }
-        drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
         drive.setPoseEstimate(new Pose2d(
             drive.getPoseEstimate().getX(),
             -Tile - (robotY/2) + 1.5,
@@ -166,7 +181,7 @@ public class AutoSpeciments extends CommandOpMode {
 
         temp = new SequentialCommandGroup(
             opCommon.scoreSpeciment(),
-            opCommon.releaseSpecimnt()
+            opCommon.releaseSpecimen()
         );
         temp.schedule();
         while (
@@ -177,7 +192,13 @@ public class AutoSpeciments extends CommandOpMode {
             run();
         }
 
-        temp = opCommon.reset_elevator();
+        temp = new SequentialCommandGroup(
+            new WaitCommand(600),
+            opCommon.sample_intake(),
+            new InstantCommand(()-> opCommon.extendoSubsystem.setTargetPosition(300)),
+            opCommon.specimenAimObservSpecial(),
+            new InstantCommand(()-> opCommon.extendoSubsystem.setTargetPosition(90))
+        );
         temp.schedule();
         init_toAllianceSamples();
         drive.followTrajectorySequenceAsync(toAllianceSamples.build());
@@ -190,8 +211,23 @@ public class AutoSpeciments extends CommandOpMode {
             drive.update();
             run();
         }
-        drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
         current_pose = drive.getPoseEstimate();
+
+        temp = new SequentialCommandGroup(
+            opCommon.extendo(0.65),
+            opCommon.sample_intake(),
+            new InstantCommand(()-> opCommon.extendoSubsystem.setTargetPosition(300)),
+            opCommon.specimenAimObservSpecial(),
+            new InstantCommand(()-> opCommon.extendoSubsystem.setTargetPosition(90))
+        );
+        temp.schedule();
+        while (
+            !isStopRequested()
+                && opModeIsActive()
+                && CommandScheduler.getInstance().isScheduled(temp)
+        ) {
+            run();
+        }
 
         for(int i = 0; i < 3; i++) {
 
@@ -211,46 +247,49 @@ public class AutoSpeciments extends CommandOpMode {
                 drive.update();
                 run();
             }
-            drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
+//            drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
             current_pose = drive.getPoseEstimate();
 
             /* -- PID Correction -- */
-//            drive.deactivate();
-//
-//            temp = opCommon.activateDistanceCalibration(pidaTargets);
-//            temp.schedule();
-//            while (
-//                !isStopRequested()
-//                    && opModeIsActive()
-//                //                && !(distanceSensorsSubsystem.getDistances()[0] <= 46
-//                //                && distanceSensorsSubsystem.getDistances()[0] >= 42)
-//                //                && !(distanceSensorsSubsystem.getDistances()[1] <= 4)
-//                //                && !(-gyroFollow.calculateTurn() <= 80
-//                //                && -gyroFollow.calculateTurn() >= 70)
-//            ) {
-//                opCommon.robotCentricMovement(
-//                    opCommon.drivetrainStrafe(),
-//                    opCommon.drivetrainForward(),
-//                    opCommon.drivetrainTurn());
-//
-//                drive.update();
-//                run();
-//            }
-//
-//            temp = opCommon.deactivateDistanceCalibration();
-//            temp.schedule();
-//            while (
-//                !isStopRequested()
-//                    && opModeIsActive()
-//                    && CommandScheduler.getInstance().isScheduled(temp)
-//            ) {
-//                run();
-//            }
-//
-//            drive.setPoseEstimate(new Pose2d(
-//                1.5 * Tile, -3 * Tile + (robotY/2) + 15.5 + 0.75, Math.toRadians(90)
-//            ));
-//            drive.activate();
+            drive.deactivate();
+
+            temp = opCommon.activateDistanceCalibration(pidaTargets);
+            temp.schedule();
+            timer.start();
+            while (
+                !isStopRequested()
+                    && !timer.done()
+                    && opModeIsActive()
+                    && !(opCommon.distanceSensorsSubsystem.getDistances()[0] <= 42
+                    && opCommon.distanceSensorsSubsystem.getDistances()[0] >= 40)
+                    && !(opCommon.distanceSensorsSubsystem.getDistances()[2] <= 69
+                    && opCommon.distanceSensorsSubsystem.getDistances()[2] >= 67)
+                    && !(-opCommon.gyroFollow.calculateTurn() <= 92
+                    && -opCommon.gyroFollow.calculateTurn() >= 88)
+            ) {
+                opCommon.robotCentricMovement(
+                    opCommon.drivetrainStrafe(),
+                    opCommon.drivetrainForward(),
+                    opCommon.drivetrainTurn());
+
+                drive.update();
+                run();
+            }
+
+            temp = opCommon.deactivateDistanceCalibration();
+            temp.schedule();
+            while (
+                !isStopRequested()
+                    && opModeIsActive()
+                    && CommandScheduler.getInstance().isScheduled(temp)
+            ) {
+                run();
+            }
+
+            drive.setPoseEstimate(new Pose2d(
+                1.5 * Tile, -3 * Tile + (robotY/2) + 15.5 + 0.75, Math.toRadians(90)
+            ));
+            drive.activate();
             /* -- PID Correction -- */
 
             temp = opCommon.specimenIntake();
@@ -266,7 +305,6 @@ public class AutoSpeciments extends CommandOpMode {
                 drive.update();
                 run();
             }
-            drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
             drive.setPoseEstimate(new Pose2d(
                 drive.getPoseEstimate().getX(),
                 -Tile - (robotY/2) + 1.5,
@@ -294,7 +332,7 @@ public class AutoSpeciments extends CommandOpMode {
                 drive.update();
             }
 
-            temp = opCommon.releaseSpecimnt();
+            temp = opCommon.releaseSpecimen();
             temp.schedule();
             while (
                 !isStopRequested()
