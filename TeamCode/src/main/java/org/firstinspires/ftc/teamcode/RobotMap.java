@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -12,11 +13,15 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.inventors.ftc.robotbase.RobotMapInterface;
 import org.inventors.ftc.robotbase.hardware.Battery;
 import org.inventors.ftc.robotbase.hardware.ColorSensor;
 import org.inventors.ftc.robotbase.hardware.GamepadExEx;
 import org.inventors.ftc.robotbase.hardware.MotorExEx;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 public class RobotMap implements RobotMapInterface {
@@ -31,7 +36,7 @@ public class RobotMap implements RobotMapInterface {
     private MotorExEx frontLeft, frontRight, rearLeft, rearRight;
 
     private IMU imu;
-    private OpenCvWebcam webcam;
+    private OpenCvWebcam rearCamera, frontCamera;
     private Battery battery;
 
     //// ------------------------------------- Mechanisms ------------------------------------- ////
@@ -90,6 +95,33 @@ public class RobotMap implements RobotMapInterface {
 
         this.telemetry = telemetry;
         battery = new Battery(hm);
+
+        // Camera
+        int cameraMonitorViewId = hm.appContext.getResources()
+                .getIdentifier("cameraMonitorViewId", "id", hm.appContext.getPackageName());
+        rearCamera =  OpenCvCameraFactory.getInstance().createWebcam(hm.get(WebcamName.class,
+                "rear_camera"), cameraMonitorViewId);
+
+        FtcDashboard.getInstance().startCameraStream(rearCamera, 0);
+        rearCamera.setMillisecondsPermissionTimeout(2500);
+        rearCamera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                rearCamera.startStreaming(
+                        320, // 320
+                        180, //180
+                        OpenCvCameraRotation.UPSIDE_DOWN,
+                        OpenCvWebcam.StreamFormat.MJPEG
+                );
+            }
+
+            @Override
+            public void onError(int errorCode) {
+                /*
+                 * This will be called if the camera could not be opened
+                 */
+            }
+        });
 
         //// ----------------------------------- Mechanisms ----------------------------------- ////
         // ---------------------------------------- Claw ---------------------------------------- //
@@ -170,7 +202,11 @@ public class RobotMap implements RobotMapInterface {
     // ------------------------------------------ Sensors --------------------------------------- //
     @Override
     public OpenCvWebcam getCamera() {
-        return webcam;
+        return rearCamera;
+    }
+
+    public OpenCvWebcam getRearCamera() {
+        return rearCamera;
     }
 
     @Override
