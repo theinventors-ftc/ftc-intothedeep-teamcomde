@@ -16,6 +16,12 @@ public class DistanceSensorsSubsystem extends SubsystemBase {
 
     private AnalogInput sensors[];
     private double[] distances = {0.0, 0.0, 0.0};
+    private double[] distances_fix = {0.0, 0.0, 0.0};
+    private double[][] tuning = { // {measured_15_cm_distance, measured_150_cm_distance}
+            {15.0, 150.0},
+            {15.0, 150.0},
+            {15.0, 150.0}
+    };
     private double[] filt_distances = {0.0, 0.0, 0.0};
     private IIRSubsystem iirSubsystem[];
     private double A = 0;
@@ -30,9 +36,9 @@ public class DistanceSensorsSubsystem extends SubsystemBase {
         };
 
         iirSubsystem = new IIRSubsystem[]{
-                new IIRSubsystem(A, ()->distances[0]),
-                new IIRSubsystem(A, ()->distances[1]),
-                new IIRSubsystem(A, ()->distances[2])
+                new IIRSubsystem(A, ()->distances_fix[0]),
+                new IIRSubsystem(A, ()->distances_fix[1]),
+                new IIRSubsystem(A, ()->distances_fix[2])
         };
 
         this.telemetry = telemetry;
@@ -41,6 +47,13 @@ public class DistanceSensorsSubsystem extends SubsystemBase {
     public void periodic() {
         for (int i = 0; i < 3; i++) {
             distances[i] = (sensors[i].getVoltage()/3.3) * 500;
+            distances_fix[i] = mapping(
+                    distances[i],
+                    tuning[i][0],
+                    tuning[i][1],
+                    15.0,
+                    150.0
+            );
             filt_distances[i] = iirSubsystem[i].get();
         }
 
@@ -49,8 +62,12 @@ public class DistanceSensorsSubsystem extends SubsystemBase {
 //        telemetry.addData("Right Distance", distances[2]);
     }
 
+    public double mapping(double x, double in_min, double in_max, double out_min, double out_max) {
+        return (x-in_min) * (out_max-out_min) / (in_max - in_min) + out_min;
+    }
+
     public double[] getDistances() {
-        return distances;
+        return distances_fix;
     }
 
     public double[] getFilteredDistances() {
