@@ -213,7 +213,7 @@ public class IntoTheDeepRobot extends RobotEx {
 
         // Coupler Engage/Disengage Toggle
         new Trigger(
-                () -> toolOp.getGamepadButton(GamepadKeys.Button.START).get() &&
+                () -> toolOp.getGamepadButton(GamepadKeys.Button.BACK).get() &&
                         toolOp.getGamepadButton(GamepadKeys.Button.RIGHT_STICK_BUTTON).get())
                 .whenActive(new ConditionalCommand(
                         new InstantCommand(couplersSubsystem::disengage),
@@ -391,7 +391,7 @@ public class IntoTheDeepRobot extends RobotEx {
                                 () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.HANGING)
                         ),
                         new InstantCommand(extendoSubsystem::returnToZero, extendoSubsystem),
-                        new InstantCommand(intakeSubsystem::raise, intakeSubsystem),
+                        new InstantCommand(intakeSubsystem::hang, intakeSubsystem),
                         new InstantCommand(() -> this.drive_setEnabled(false)),
                         new WaitUntilCommand(
                                 () -> elevatorSubsystem.getHeight() < 350
@@ -399,7 +399,7 @@ public class IntoTheDeepRobot extends RobotEx {
                         new InstantCommand(couplersSubsystem::engage, couplersSubsystem),
                         new InstantCommand(()->elevatorSubsystem.setCoupled(true)),
                         new WaitUntilCommand(
-                                () -> elevatorSubsystem.getHeight() < 80
+                                () -> elevatorSubsystem.getHeight() < 70
                         ),
                         new InstantCommand(hangingSubsystem::release, hangingSubsystem),
                         new WaitCommand(1500),

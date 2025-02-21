@@ -22,7 +22,7 @@ import java.util.function.DoubleSupplier;
 public class ElevatorSubsystem extends SubsystemBase {
     private MotorExEx elevatorMotor, elevatorMotorFollow, couplingMotor;
     private final double MAX_ELEVATOR_POWER = 1.0;
-    private final int MAX_ELEVATOR_HEIGHT = 2100;
+    private final int MAX_ELEVATOR_HEIGHT = 2300;
     private DoubleSupplier power;
 
     private ElevatorFeedforward ff = new ElevatorFeedforward(
@@ -78,7 +78,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }};
 
     public static int target_height = 0;
-    private int springs_off = 30;
+    private int springs_off = 15;
 
     // Zeroing
     public boolean isStalled = false;
@@ -163,7 +163,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public int getHeight() {
-        return elevatorMotor.getCurrentPosition()-springs_off;
+        return (int)((elevatorMotor.getCurrentPosition()-springs_off)*22.0/20.0);
     }
 
     public Level getLevel() {

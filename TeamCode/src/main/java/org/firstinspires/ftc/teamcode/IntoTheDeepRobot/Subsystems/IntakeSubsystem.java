@@ -27,7 +27,8 @@ public class IntakeSubsystem extends SubsystemBase {
     // Raise States
     public enum RaiseState {
         RAISED,
-        LOWERED
+        LOWERED,
+        HANGING
     }
 
     private RaiseState raiseState;
@@ -35,11 +36,13 @@ public class IntakeSubsystem extends SubsystemBase {
     private final HashMap<RaiseState, Double> raise_positionsL = new HashMap<RaiseState, Double>() {{
         put(RaiseState.RAISED, 0.07);
         put(RaiseState.LOWERED, 0.24);
+        put(RaiseState.HANGING, 0.0);
     }};
 
     private final HashMap<RaiseState, Double> raise_positionsR = new HashMap<RaiseState, Double>() {{
         put(RaiseState.RAISED, 0.07);
         put(RaiseState.LOWERED, 0.24);
+        put(RaiseState.HANGING, 0.0);
     }};
 
     // Intake States
@@ -92,6 +95,12 @@ public class IntakeSubsystem extends SubsystemBase {
         raiseState = RaiseState.LOWERED;
         raiseServoL.setPosition((double)raise_positionsL.get(RaiseState.LOWERED));
         raiseServoR.setPosition((double)raise_positionsR.get(RaiseState.LOWERED));
+    }
+
+    public void hang() {
+        raiseState = RaiseState.HANGING;
+        raiseServoL.setPosition((double)raise_positionsL.get(RaiseState.HANGING));
+        raiseServoR.setPosition((double)raise_positionsR.get(RaiseState.HANGING));
     }
 
     // Intake
