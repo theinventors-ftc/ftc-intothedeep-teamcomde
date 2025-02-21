@@ -13,6 +13,8 @@ import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Commands.IntakeCommand;
+import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.SpecimenAlignmentSubsystem;
+import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Pipelines.SpecimenDetectionPipeline;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ArmSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.CouplersSubsystem;
@@ -27,6 +29,11 @@ import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.StrafeControl
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.RobotEx;
 import org.inventors.ftc.robotbase.drive.DriveConstants;
+import org.inventors.ftc.robotbase.hardware.Camera;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvWebcam;
+
+import java.nio.charset.CharacterCodingException;
 
 public class IntoTheDeepRobot extends RobotEx {
     protected RobotMap robotMap;
@@ -39,10 +46,13 @@ public class IntoTheDeepRobot extends RobotEx {
     protected HangingSubsystem hangingSubsystem;
     protected CouplersSubsystem couplersSubsystem;
     protected DistanceSensorsSubsystem distanceSensorsSubsystem;
+    protected OpenCvWebcam rear_camera;
+    protected SpecimenDetectionPipeline specimenPipeline;
 
     // ---------------------------------- Initialize Controllers -------------------------------- //
 //    protected ForwardControllerSubsystem forwardController;
     protected StrafeControllerSubsystem strafeControllerSubsystem;
+    protected SpecimenAlignmentSubsystem specimenAlignmentSubsystem;
     protected HeadingControllerSubsystem gyroFollow;
 
     public IntoTheDeepRobot(RobotMap robotMap, DriveConstants RobotConstants,
@@ -143,6 +153,13 @@ public class IntoTheDeepRobot extends RobotEx {
         couplersSubsystem = new CouplersSubsystem(this.robotMap);
         distanceSensorsSubsystem = new DistanceSensorsSubsystem(this.robotMap, telemetry);
 
+        rear_camera = robotMap.getRearCamera();
+        specimenPipeline = new SpecimenDetectionPipeline(
+                telemetry,
+                SpecimenDetectionPipeline.SpecimenColor.RED
+        );
+        rear_camera.setPipeline(specimenPipeline);
+
 //        forwardController = new ForwardControllerSubsystem(
 //                () -> distanceSensorsSubsystem.getDistances()[0],
 //                dashboard.getTelemetry()
@@ -150,6 +167,11 @@ public class IntoTheDeepRobot extends RobotEx {
 
         strafeControllerSubsystem = new StrafeControllerSubsystem(
                 () -> distanceSensorsSubsystem.getDistances()[2],
+                dashboard.getTelemetry()
+        );
+
+        specimenAlignmentSubsystem = new SpecimenAlignmentSubsystem(
+                () -> specimenPipeline.getPrioritySpecimenX(),
                 dashboard.getTelemetry()
         );
 
@@ -474,12 +496,14 @@ public class IntoTheDeepRobot extends RobotEx {
     public double drivetrainStrafe() {
 //        if (strafeControllerSubsystem.isEnabled()) return strafeControllerSubsystem.calculatePower();
 
-        return super.drivetrainStrafe();
+        return specimenAlignmentSubsystem.calculatePower();
+
+//        return super.drivetrainStrafe();
     }
 
     @Override
     public double drivetrainTurn() {
-//        if (gyroFollow.isEnabled()) return -gyroFollow.calculateTurn();
+        if (gyroFollow.isEnabled()) return -gyroFollow.calculateTurn();
 
         return super.drivetrainTurn();
     }
