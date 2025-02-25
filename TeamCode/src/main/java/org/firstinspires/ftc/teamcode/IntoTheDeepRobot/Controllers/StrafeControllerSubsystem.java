@@ -14,7 +14,7 @@ public class StrafeControllerSubsystem extends SubsystemBase {
     private DoubleSupplier distValue;
     private double target = 0;
     private boolean enabled = false;
-    public static double kP = 0.06, kI = 0, kD = 0.006, A = 0, ALPHA = 0.05;
+    public static double kP = 0.04, kI = 0, kD = 0.006, A = 0, ALPHA = 0.05;
     PIDFControllerEx controller;
     private Telemetry telemetry;
 

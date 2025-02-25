@@ -38,7 +38,7 @@ public class ControlTest extends CommandOpMode {
     private RobotMap robotMap;
     private FtcDashboard dashboard;
 
-    private double[] pidaTargets = {44.615, 10, 75};
+    private double[] pidaTargets = {44.615, 50, 90};
 
     /*--Subsystems--*/
     //    protected HardwareMap hardwareMap;

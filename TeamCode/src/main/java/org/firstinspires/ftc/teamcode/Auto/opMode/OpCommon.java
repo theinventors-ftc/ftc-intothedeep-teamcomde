@@ -326,7 +326,7 @@ public class OpCommon {
     }
 
     public double drivetrainStrafe() {
-        return strafeControllerSubsystem.calculatePower();
+        return -strafeControllerSubsystem.calculatePower();
     }
 
     public double drivetrainForward() {
@@ -335,6 +335,10 @@ public class OpCommon {
 
     public double drivetrainTurn() {
         return -gyroFollow.calculateTurn();
+    }
+
+    public boolean isInThreshold(double current, double target, double threshold) {
+        return current <= target + threshold && current >= target - threshold;
     }
 
     public void robotCentricMovement(double x, double y, double t) {

@@ -102,7 +102,6 @@ public class SampleMecanumDrive extends MecanumDrive {
         rightRear = robotMap.getRearRightMotor();
         rightFront = robotMap.getFrontRightMotor();
 
-
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
         if (RUN_USING_ENCODER) {
