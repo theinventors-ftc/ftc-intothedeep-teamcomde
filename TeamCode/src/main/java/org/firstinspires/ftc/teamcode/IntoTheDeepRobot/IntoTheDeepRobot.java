@@ -11,6 +11,7 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.SpecimenAlignmentSubsystem;
@@ -52,15 +53,21 @@ public class IntoTheDeepRobot extends RobotEx {
     // ---------------------------------- Initialize Controllers -------------------------------- //
 //    protected ForwardControllerSubsystem forwardController;
     protected StrafeControllerSubsystem strafeControllerSubsystem;
-    protected SpecimenAlignmentSubsystem specimenAlignmentSubsystem;
+//    protected SpecimenAlignmentSubsystem specimenAlignmentSubsystem;
     protected HeadingControllerSubsystem gyroFollow;
+
+    private boolean hasInit = false;
 
     public IntoTheDeepRobot(RobotMap robotMap, DriveConstants RobotConstants,
                             OpModeType opModeType, Alliance alliance, boolean init_camera,
                             Pose2d startingPose) {
         super(robotMap, RobotConstants, opModeType, alliance, init_camera, startingPose);
         this.robotMap = robotMap;
-        this.initMechanismsTeleOp();
+
+        new Trigger(() -> (Math.abs(drivetrainForward()) > 0.1 ||
+                Math.abs(drivetrainStrafe()) > 0.1 ||
+                Math.abs(drivetrainTurn()) > 0.1) && !hasInit)
+                .whenActive(new InstantCommand(this::initMechanismsTeleOp));
     }
 
     public SequentialCommandGroup intake_sample() {
@@ -133,6 +140,8 @@ public class IntoTheDeepRobot extends RobotEx {
 
     @Override
     public void initMechanismsTeleOp() {
+        hasInit = true;
+
         clawSubsystem = new ClawSubsystem(this.robotMap);
         armSubsystem = new ArmSubsystem(this.robotMap);
         intakeSubsystem = new IntakeSubsystem(this.robotMap);
@@ -141,13 +150,13 @@ public class IntoTheDeepRobot extends RobotEx {
                 () -> -toolOp.getRightY(),
                 robotMap.getRearLeftMotor(),
                 telemetry,
-                true
+                false // TODO: These are wrong
         );
         extendoSubsystem = new ExtendoSubsystem(
                 this.robotMap,
                 () -> toolOp.getLeftY(),
                 telemetry,
-                true
+                false // TODO: These are wrong
         );
         hangingSubsystem = new HangingSubsystem(this.robotMap);
         couplersSubsystem = new CouplersSubsystem(this.robotMap);
@@ -170,10 +179,10 @@ public class IntoTheDeepRobot extends RobotEx {
                 dashboard.getTelemetry()
         );
 
-        specimenAlignmentSubsystem = new SpecimenAlignmentSubsystem(
-                () -> specimenPipeline.getPrioritySpecimenX(),
-                dashboard.getTelemetry()
-        );
+//        specimenAlignmentSubsystem = new SpecimenAlignmentSubsystem(
+//                () -> specimenPipeline.getPrioritySpecimenX(),
+//                dashboard.getTelemetry()
+//        );
 
         gyroFollow = new HeadingControllerSubsystem(
                 this::getContinuousHeading,
@@ -487,23 +496,24 @@ public class IntoTheDeepRobot extends RobotEx {
                 ));
     }
 
-//    @Override
-//    public double drivetrainForward() {
+    @Override
+    public double drivetrainForward() {
 //        return strafeControllerSubsystem.calculatePower();
-//    }
+
+        return super.drivetrainForward();
+    }
 
     @Override
     public double drivetrainStrafe() {
 //        if (strafeControllerSubsystem.isEnabled()) return strafeControllerSubsystem.calculatePower();
+//        return specimenAlignmentSubsystem.calculatePower();
 
-        return specimenAlignmentSubsystem.calculatePower();
-
-//        return super.drivetrainStrafe();
+        return super.drivetrainStrafe();
     }
 
     @Override
     public double drivetrainTurn() {
-        if (gyroFollow.isEnabled()) return -gyroFollow.calculateTurn();
+        if (gyroFollow != null && gyroFollow.isEnabled()) return -gyroFollow.calculateTurn();
 
         return super.drivetrainTurn();
     }
