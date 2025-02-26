@@ -39,7 +39,7 @@ public class ClawSubsystem extends SubsystemBase {
         clawRotServo = robotMap.getClawRotServo();
 
         goNormal();
-        grab();
+        justOpen();
     }
 
     // ---------------------------------------- Actuators --------------------------------------- //

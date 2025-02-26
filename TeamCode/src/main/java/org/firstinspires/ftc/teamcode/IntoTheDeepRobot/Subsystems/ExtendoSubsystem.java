@@ -14,6 +14,7 @@ import org.inventors.ftc.robotbase.controllers.PIDFControllerEx;
 import org.inventors.ftc.robotbase.hardware.MotorExEx;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 @Config
