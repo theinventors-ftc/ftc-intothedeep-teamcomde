@@ -67,8 +67,8 @@ public class IntakeCommand extends CommandBase {
     @Override
     public boolean isFinished() {
         return (intake.isSample()
-                &&
-                check_color(intake.getSampleColor())
+//                &&
+//                check_color(intake.getSampleColor())
                 &&
                 intake.getSampleColor() != IntakeSubsystem.COLOR.NONE)
                 || timer.done();

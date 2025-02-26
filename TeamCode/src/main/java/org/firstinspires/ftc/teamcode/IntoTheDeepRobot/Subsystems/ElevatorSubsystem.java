@@ -22,18 +22,18 @@ import java.util.function.DoubleSupplier;
 public class ElevatorSubsystem extends SubsystemBase {
     private MotorExEx elevatorMotor, elevatorMotorFollow, couplingMotor;
     private final double MAX_ELEVATOR_POWER = 1.0;
-    private final int MAX_ELEVATOR_HEIGHT = 2100;
+    private final int MAX_ELEVATOR_HEIGHT = 2300;
     private DoubleSupplier power;
 
     private ElevatorFeedforward ff = new ElevatorFeedforward(
-            0.1,
+            0.08,
             0.16,
             1.0,
             0.0
     );
     private PIDFControllerEx pid = new PIDFControllerEx(
             0.008,
-            0.0, // 0.008
+            0.008, // 0.008
             0.0002,
             0.0,
             0,
@@ -45,6 +45,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public enum Level {
         INTAKE,
         SPECIMEN_DISLOCATE,
+        PARK0,
         PARK,
         PARK2,
         LOW_BASKET,
@@ -54,6 +55,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         HANGING_AIM,
         HANGING,
         HANGING_RELEASE,
+        HIGH_CHAMBER_RELEASE,
         MANUAL
     }
 
@@ -62,12 +64,14 @@ public class ElevatorSubsystem extends SubsystemBase {
     HashMap<Level, Integer> levelMap = new HashMap<Level, Integer>() {{
         put(Level.INTAKE, 0);
         put(Level.SPECIMEN_DISLOCATE, 137);
+        put(Level.PARK0, 80);
         put(Level.PARK, 230);
         put(Level.PARK2, 450);
         put(Level.LOW_BASKET, 680);
         put(Level.HIGH_BASKET, 2058);
         put(Level.LOW_CHAMBER, 0);
         put(Level.HIGH_CHAMBER, 518);
+        put(Level.HIGH_CHAMBER_RELEASE, 0);
         put(Level.HANGING_AIM, 917);
         put(Level.HANGING, -165);
         put(Level.HANGING_RELEASE, -10); // TODO Go intake in auto hang
@@ -78,7 +82,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     // Zeroing
     public boolean isStalled = false;
-    public double ampThreshold = 4.5;
+    public double ampThreshold = 4;
     private final Timing.Timer timer;
     private boolean found_zero = false, attempt_Zero = false;
 
@@ -159,7 +163,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public int getHeight() {
-        return elevatorMotor.getCurrentPosition()-springs_off;
+        return (int)((elevatorMotor.getCurrentPosition()-springs_off)*(22.0/20.0));
     }
 
     public Level getLevel() {

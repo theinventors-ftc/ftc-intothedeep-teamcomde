@@ -29,7 +29,7 @@ public class SensorLocalizerTest extends CommandOpMode {
     public void initialize() {
         robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.TELEOP);
         distanceSensorsSubsystem = new DistanceSensorsSubsystem(this.robotMap, telemetry);
-        drive = new SampleMecanumDrive(hardwareMap);
+        drive = new SampleMecanumDrive(robotMap);
         drive.setPoseEstimate(new Pose2d(-2 * 24, -2 * 24, Math.toRadians(90)));
     }
 
@@ -42,13 +42,13 @@ public class SensorLocalizerTest extends CommandOpMode {
         distances = distanceSensorsSubsystem.getDistances();
 
         telemetry.addData("Distance Sensor Value Rear", distances[0]);
-        telemetry.addData("Distance Sensor Value Left", distances[1]);
+        telemetry.addData("Distance Sensor Value Left", distances[2]);
 
         realPose = new Pose2d(
             calculateReal2dLocation(
                 rrPose,
                 distances[0],
-                distances[1]),
+                distances[2]),
             drive.getPoseEstimate().getHeading());
 
         telemetry.addData("RR - X", rrPose.getX());

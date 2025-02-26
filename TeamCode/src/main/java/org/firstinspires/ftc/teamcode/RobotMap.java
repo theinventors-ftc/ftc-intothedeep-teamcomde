@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServoImplEx;
@@ -17,6 +18,7 @@ import org.inventors.ftc.robotbase.hardware.Battery;
 import org.inventors.ftc.robotbase.hardware.ColorSensor;
 import org.inventors.ftc.robotbase.hardware.GamepadExEx;
 import org.inventors.ftc.robotbase.hardware.MotorExEx;
+import org.jetbrains.annotations.NotNull;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 public class RobotMap implements RobotMapInterface {
@@ -25,6 +27,8 @@ public class RobotMap implements RobotMapInterface {
         TELEOP
     }
     private OpMode opMode;
+
+    private HardwareMap hardwareMap;
 
     private Telemetry telemetry;
     private GamepadExEx driverOp, toolOp;
@@ -62,78 +66,84 @@ public class RobotMap implements RobotMapInterface {
     // -------------------------------------- Distance Sensors ---------------------------------- //
     private AnalogInput rear_dist, left_dist, right_dist;
 
-    public RobotMap(HardwareMap hm, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2,
+    public RobotMap(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2,
                     OpMode opMode) {
         this.opMode = opMode;
+        this.hardwareMap = hardwareMap;
         if(opMode == OpMode.TELEOP) {
-            frontLeft = new MotorExEx(hm, "front_left", Motor.GoBILDA.RPM_435);
-            frontRight = new MotorExEx(hm, "front_right", Motor.GoBILDA.RPM_435);
-            rearLeft = new MotorExEx(hm, "rear_left", Motor.GoBILDA.RPM_435);
-            rearRight = new MotorExEx(hm, "rear_right", Motor.GoBILDA.RPM_435);
-            frontLeft.setRunMode(Motor.RunMode.RawPower);
-            frontRight.setRunMode(Motor.RunMode.RawPower);
-            rearLeft.setRunMode(Motor.RunMode.RawPower);
-            rearRight.setRunMode(Motor.RunMode.RawPower);
-
-            imu = hm.get(IMU.class, "external_imu");
-            IMU.Parameters imuParameters = new IMU.Parameters(
-                new RevHubOrientationOnRobot(
-                    RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD,
-                    RevHubOrientationOnRobot.UsbFacingDirection.DOWN
-                )
-            );
-            imu.initialize(imuParameters);
-
             driverOp = new GamepadExEx(gamepad1);
             toolOp = new GamepadExEx(gamepad2);
         }
+        // ------------------------------------- Drivetrain ------------------------------------- //
+        frontLeft = new MotorExEx(hardwareMap, "front_left", Motor.GoBILDA.RPM_435);
+        frontRight = new MotorExEx(hardwareMap, "front_right", Motor.GoBILDA.RPM_435);
+        rearLeft = new MotorExEx(hardwareMap, "rear_left", Motor.GoBILDA.RPM_435);
+        rearRight = new MotorExEx(hardwareMap, "rear_right", Motor.GoBILDA.RPM_435);
+        frontLeft.setRunMode(Motor.RunMode.RawPower);
+        frontRight.setRunMode(Motor.RunMode.RawPower);
+        rearLeft.setRunMode(Motor.RunMode.RawPower);
+        rearRight.setRunMode(Motor.RunMode.RawPower);
+
+        imu = hardwareMap.get(IMU.class, "external_imu");
+        IMU.Parameters imuParameters = new IMU.Parameters(
+            new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD,
+                RevHubOrientationOnRobot.UsbFacingDirection.DOWN
+            )
+        );
+        imu.initialize(imuParameters);
+
+        // ---------------------------------------- Util ---------------------------------------- //
+        for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
 
         this.telemetry = telemetry;
-        battery = new Battery(hm);
+        battery = new Battery(hardwareMap);
 
         //// ----------------------------------- Mechanisms ----------------------------------- ////
         // ---------------------------------------- Claw ---------------------------------------- //
-        clawServo = hm.get(ServoImplEx.class, "claw");
-        clawRotServo = hm.get(ServoImplEx.class, "claw_rot");
+        clawServo = hardwareMap.get(ServoImplEx.class, "claw");
+        clawRotServo = hardwareMap.get(ServoImplEx.class, "claw_rot");
 
         // ---------------------------------------- Arm ----------------------------------------- //
-        armLeftServo = hm.get(ServoImplEx.class, "arm_left");
-        armRightServo = hm.get(ServoImplEx.class, "arm_right");
+        armLeftServo = hardwareMap.get(ServoImplEx.class, "arm_left");
+        armRightServo = hardwareMap.get(ServoImplEx.class, "arm_right");
         armLeftServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
         armRightServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
-        armWristServo = hm.get(ServoImplEx.class, "wrist_tilt");
+        armWristServo = hardwareMap.get(ServoImplEx.class, "wrist_tilt");
 
         // --------------------------------------- Intake --------------------------------------- //
-        intakeRaiseServoL = hm.get(ServoImplEx.class, "intake_raise_left");
-        intakeRaiseServoR = hm.get(ServoImplEx.class, "intake_raise_right");
+        intakeRaiseServoL = hardwareMap.get(ServoImplEx.class, "intake_raise_left");
+        intakeRaiseServoR = hardwareMap.get(ServoImplEx.class, "intake_raise_right");
 
-        leftIntakeServo = hm.get(CRServoImplEx.class, "intake_left_wheel");
-        rightIntakeServo = hm.get(CRServoImplEx.class, "intake_right_wheel");
+        leftIntakeServo = hardwareMap.get(CRServoImplEx.class, "intake_left_wheel");
+        rightIntakeServo = hardwareMap.get(CRServoImplEx.class, "intake_right_wheel");
 
-        colorSensor = new ColorSensor(hm, "intake_color");
+        colorSensor = new ColorSensor(hardwareMap, "intake_color");
         colorSensor.setGain(100);
 
-        sampleLimitSwitch = hm.get(DigitalChannel.class, "intake_sample_switch");
+        sampleLimitSwitch = hardwareMap.get(DigitalChannel.class, "intake_sample_switch");
 //        raiseLimitSwitch = hm.get(DigitalChannel.class, "raise_switch");
 
         // ---------------------------------------- Slider -------------------------------------- //
-        sliderMotor = new MotorExEx(hm, "slider", 383.6, 435);
-        sliderFollow = new MotorExEx(hm, "slider2", 383.6, 435);
+        sliderMotor = new MotorExEx(hardwareMap, "slider", 383.6, 435);
+        sliderFollow = new MotorExEx(hardwareMap, "slider2", 383.6, 435);
 
         // ---------------------------------------- Extendo ------------------------------------- //
-        extendoMotor = new MotorExEx(hm, "extendo", Motor.GoBILDA.RPM_435);
+        extendoMotor = new MotorExEx(hardwareMap, "extendo", Motor.GoBILDA.RPM_435);
 
         // ---------------------------------------- Hanging ------------------------------------- //
-        hangingReleaseServo1 = hm.get(ServoImplEx.class, "release1");
-        hangingReleaseServo2 = hm.get(ServoImplEx.class, "release2");
+        hangingReleaseServo1 = hardwareMap.get(ServoImplEx.class, "release1");
+        hangingReleaseServo2 = hardwareMap.get(ServoImplEx.class, "release2");
 
         // --------------------------------------- Couplers ------------------------------------- //
-        coupler_servo = hm.get(ServoImplEx.class, "coupler");
+        coupler_servo = hardwareMap.get(ServoImplEx.class, "coupler");
 
         // ------------------------------------ Distance Sensors -------------------------------- //
-        rear_dist = hm.get(AnalogInput.class, "rear_dist");
-        left_dist = hm.get(AnalogInput.class, "left_dist");
-        right_dist = hm.get(AnalogInput.class, "right_dist");
+        rear_dist = hardwareMap.get(AnalogInput.class, "rear_dist");
+        left_dist = hardwareMap.get(AnalogInput.class, "left_dist");
+        right_dist = hardwareMap.get(AnalogInput.class, "right_dist");
     }
 
     public OpMode getOpMode() {
@@ -141,6 +151,11 @@ public class RobotMap implements RobotMapInterface {
     }
 
     // ------------------------------------ Drivetrain Motors ----------------------------------- //
+    @NotNull
+    public HardwareMap getHardwareMap() {
+        return hardwareMap;
+    }
+
     @Override
     public MotorExEx getFrontLeftMotor() {
         return frontLeft;

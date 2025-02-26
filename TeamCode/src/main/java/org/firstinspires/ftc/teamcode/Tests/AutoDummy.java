@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.Auto.opMode.OpCommon;
 import org.firstinspires.ftc.teamcode.Auto.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.PoseStorage;
 import org.firstinspires.ftc.teamcode.RobotMap;
+import org.inventors.ftc.robotbase.RobotEx;
 
 @Autonomous(name = "Auto Dummy", group = "Tests")
 public class AutoDummy extends CommandOpMode {
@@ -42,9 +43,9 @@ public class AutoDummy extends CommandOpMode {
      */
     @Override
     public void initialize() {
-        drive = new SampleMecanumDrive(hardwareMap);
         robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.AUTO);
-        opCommon = new OpCommon(robotMap);
+        drive = new SampleMecanumDrive(robotMap);
+        opCommon = new OpCommon(robotMap, RobotEx.Alliance.RED);
     }
 
     @Override
@@ -52,7 +53,7 @@ public class AutoDummy extends CommandOpMode {
         initialize();
         waitForStart();
 
-        temp = opCommon.raise_high_chamber();
+        temp = opCommon.specimenIntake();
         temp.schedule();
         init_traj();
         drive.followTrajectorySequenceAsync(traj.build());
