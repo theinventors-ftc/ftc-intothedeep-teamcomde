@@ -260,7 +260,7 @@ public class AutoSpeciments extends CommandOpMode {
         //            drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
         current_pose = drive.getPoseEstimate();
 
-        for(int i = 0; i < 3; i++) {
+        for(int i = 0; i < 3; ++i) {
 
             /* -- PID Correction -- */
             drive.deactivate();
