@@ -3,33 +3,27 @@ package org.firstinspires.ftc.teamcode.Auto.opMode;
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.Tile;
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robotX;
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robotY;
-import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.tipPoseTransfer;
-import static org.firstinspires.ftc.teamcode.Auto.features.DistanceSensorLocalizer.calculateReal2dLocation;
-import static org.firstinspires.ftc.teamcode.Auto.features.DistanceSensorLocalizer.calculateRealYLocation;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
-import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
-import com.arcrobotics.ftclib.trajectory.constraint.TrajectoryConstraint;
 import com.arcrobotics.ftclib.util.Timing;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.Auto.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Auto.trajectorysequence.TrajectorySequenceBuilder;
+import org.firstinspires.ftc.teamcode.PoseStorage;
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.RobotEx;
 
 import java.util.concurrent.TimeUnit;
-import java.util.function.DoubleSupplier;
 
-@Autonomous(name = "AutoSpeciments")
-public class AutoSpeciments extends CommandOpMode {
+@Autonomous(name = "Auto - 4 Speciments - RAW ")
+public class Auto4Speciments_RAW extends CommandOpMode {
 
     private SampleMecanumDrive drive;
     private volatile Pose2d current_pose;
@@ -62,7 +56,7 @@ public class AutoSpeciments extends CommandOpMode {
         ),
 
         observationZone = new Pose2d(
-            1.5 * Tile, -3 * Tile + (robotY/2) + 17, Math.toRadians(90)
+            1.5 * Tile + 1.5, -3 * Tile + (robotY/2) + 17, Math.toRadians(90)
         ),
 
         allianceSampleLeft = new Pose2d(
@@ -78,7 +72,7 @@ public class AutoSpeciments extends CommandOpMode {
         ),
 
         parking = new Pose2d(
-            2 * Tile, -2.75 * Tile, Math.toRadians(315)
+            2 * Tile, -2.4 * Tile, Math.toRadians(315)
         );
 
     /**
@@ -130,9 +124,6 @@ public class AutoSpeciments extends CommandOpMode {
                                                                             DriveConstants.TRACK_WIDTH),
                                    SampleMecanumDrive.getAccelerationConstraint(45)
             );
-
-//            .strafeTo(new Vector2d(allianceSampleLeft.getX(), (-2.5 * Tile) + (robotY/2) + 15))
-//            .strafeTo(new Vector2d(allianceSampleMid.getX() + 1.5, (-2.1 * Tile) + (robotY/2)));
     }
 
     public void init_toHumanPlayer() {
@@ -148,18 +139,8 @@ public class AutoSpeciments extends CommandOpMode {
             .splineToConstantHeading(observationZone.vec(), Math.toRadians(270));
     }
 
-//    public void init_smallLeft() {
-//        smallLeft = drive.trajectorySequenceBuilder(current_pose)
-//            .strafeLeft(3);
-//    }
-
     public void init_toScoreSpeciment() {
         toScoreSpeciment = drive.trajectorySequenceBuilder(current_pose)
-//            .lineToLinearHeading(chambers,
-//                                 SampleMecanumDrive.getVelocityConstraint(60,
-//                                                                            DriveConstants.MAX_ANG_VEL,
-//                                                                            DriveConstants.TRACK_WIDTH),
-//                                 SampleMecanumDrive.getAccelerationConstraint(55))
             .setTangent(135)
             .splineToSplineHeading(chambers, Math.toRadians(90),
                       SampleMecanumDrive.getVelocityConstraint(60,
@@ -174,6 +155,8 @@ public class AutoSpeciments extends CommandOpMode {
 
     public void init_toParking() {
         toParking = drive.trajectorySequenceBuilder(current_pose)
+            .setReversed(true)
+            .setTangent(Math.toRadians(315))
             .splineTo(parking.vec(), Math.toRadians(parking.getHeading()));
     }
 
@@ -260,61 +243,9 @@ public class AutoSpeciments extends CommandOpMode {
             drive.update();
             run();
         }
-        //            drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
         current_pose = drive.getPoseEstimate();
 
-        for(int i = 0; i < 2; ++i) {
-
-            /* -- PID Correction -- */
-//            drive.deactivate();
-//
-//            temp = opCommon.activateDistanceCalibration(pidaTargets);
-//            temp.schedule();
-//            timer.start();
-//            while (
-//                !isStopRequested()
-//                    && !timer.done()
-//                    && opModeIsActive()
-//                    && !opCommon.isInThreshold(
-//                        opCommon.distanceSensorsSubsystem.getDistances()[0],
-//                        pidaTargets[0],
-//                        transPIDTolerance
-//                )
-//                    && !opCommon.isInThreshold(
-//                        opCommon.distanceSensorsSubsystem.getDistances()[2],
-//                        pidaTargets[1],
-//                        transPIDTolerance)
-//
-//                    && !opCommon.isInThreshold(
-//                        -opCommon.gyroFollow.calculateTurn(),
-//                        pidaTargets[2],
-//                        headPIDTolerance
-//                )
-//            ) {
-//                opCommon.robotCentricMovement(
-//                    opCommon.drivetrainStrafe(),
-//                    opCommon.drivetrainForward(),
-//                    opCommon.drivetrainTurn());
-//
-//                drive.update();
-//                run();
-//            }
-//
-//            temp = opCommon.deactivateDistanceCalibration();
-//            temp.schedule();
-//            while (
-//                !isStopRequested()
-//                    && opModeIsActive()
-//                    && CommandScheduler.getInstance().isScheduled(temp)
-//            ) {
-//                run();
-//            }
-//
-//            drive.setPoseEstimate(new Pose2d(
-//                1.5 * Tile, -3 * Tile + (robotY/2) + 15.5 + 0.75, Math.toRadians(90)
-//            ));
-//            drive.activate();
-//            /* -- PID Correction -- */
+        for(int i = 0; i < 3; ++i) {
 
             temp = opCommon.specimenIntake();
             temp.schedule();
@@ -349,16 +280,6 @@ public class AutoSpeciments extends CommandOpMode {
                 run();
             }
 
-//            init_smallLeft();
-//            drive.followTrajectorySequenceAsync(smallLeft.build());
-//            while(
-//                !isStopRequested()
-//                    && opModeIsActive()
-//                    && drive.isBusy()
-//            ) {
-//                drive.update();
-//            }
-
             temp = opCommon.releaseSpecimen();
             temp.schedule();
             while (
@@ -368,6 +289,8 @@ public class AutoSpeciments extends CommandOpMode {
             ) {
                 run();
             }
+
+            if (i == 2) break;
 
             temp = new SequentialCommandGroup(
                 new WaitCommand(100),
@@ -385,7 +308,6 @@ public class AutoSpeciments extends CommandOpMode {
                 drive.update();
                 run();
             }
-            //            drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
             current_pose = drive.getPoseEstimate();
         }
 
@@ -405,6 +327,6 @@ public class AutoSpeciments extends CommandOpMode {
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
         current_pose = drive.getPoseEstimate();
 
-//        PoseStorage.currentPose = drive.getPoseEstimate();
+        PoseStorage.currentPose = drive.getPoseEstimate();
     }
 }
