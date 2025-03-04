@@ -44,7 +44,7 @@ public class IntoTheDeepRobot extends RobotEx {
     // ---------------------------------- Initialize Controllers -------------------------------- //
 //    protected ForwardControllerSubsystem forwardController;
     protected StrafeControllerSubsystem strafeControllerSubsystem;
-//    protected SpecimenAlignmentSubsystem specimenAlignmentSubsystem;
+    //    protected SpecimenAlignmentSubsystem specimenAlignmentSubsystem;
     protected HeadingControllerSubsystem gyroFollow;
 
     private boolean hasInit = false;
@@ -246,12 +246,12 @@ public class IntoTheDeepRobot extends RobotEx {
         toolOp.getGamepadButton(GamepadKeys.Button.START).whenPressed(new SequentialCommandGroup(
                 new InstantCommand(() -> this.drive_setEnabled(false)),
                 new InstantCommand(hangingSubsystem::ascend
-        ))
+                ))
         ).whenReleased(
-            new SequentialCommandGroup(
-                new InstantCommand(() -> this.drive_setEnabled(true)),
-                new InstantCommand(hangingSubsystem::stop)
-            )
+                new SequentialCommandGroup(
+                        new InstantCommand(() -> this.drive_setEnabled(true)),
+                        new InstantCommand(hangingSubsystem::stop)
+                )
         );
 
         // ------------------------------------ Automatations ----------------------------------- //
@@ -297,51 +297,51 @@ public class IntoTheDeepRobot extends RobotEx {
         // Low Basket
         toolOp.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(
                 new SequentialCommandGroup(
-                    new InstantCommand(
-                            () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.LOW_BASKET)
-                    ),
-                    new WaitCommand(200),
-                    new InstantCommand(() -> armSubsystem.setWristState(
-                            ArmSubsystem.WristState.BASKET_OUTTAKE
-                    )),
-                    new WaitCommand(120),
-                    new InstantCommand(() -> armSubsystem.setArmState(
-                            ArmSubsystem.ArmState.BASKET_OUTTAKE
-                    ))
+                        new InstantCommand(
+                                () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.LOW_BASKET)
+                        ),
+                        new WaitCommand(200),
+                        new InstantCommand(() -> armSubsystem.setWristState(
+                                ArmSubsystem.WristState.BASKET_OUTTAKE
+                        )),
+                        new WaitCommand(120),
+                        new InstantCommand(() -> armSubsystem.setArmState(
+                                ArmSubsystem.ArmState.BASKET_OUTTAKE
+                        ))
                 )
         );
 
         // High Basket
         toolOp.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).whenPressed(
                 new SequentialCommandGroup(
-                    new InstantCommand(
-                            () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.HIGH_BASKET)
-                    ),
-                    new WaitCommand(200),
-                    new InstantCommand(() -> armSubsystem.setWristState(
-                            ArmSubsystem.WristState.BASKET_OUTTAKE
-                    )),
-                    new WaitCommand(120),
-                    new InstantCommand(() -> armSubsystem.setArmState(
-                            ArmSubsystem.ArmState.BASKET_OUTTAKE
-                    ))
+                        new InstantCommand(
+                                () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.HIGH_BASKET)
+                        ),
+                        new WaitCommand(200),
+                        new InstantCommand(() -> armSubsystem.setWristState(
+                                ArmSubsystem.WristState.BASKET_OUTTAKE
+                        )),
+                        new WaitCommand(120),
+                        new InstantCommand(() -> armSubsystem.setArmState(
+                                ArmSubsystem.ArmState.BASKET_OUTTAKE
+                        ))
                 )
         );
 
         // Low Chamber
         toolOp.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whenPressed(
                 new SequentialCommandGroup(
-                    new InstantCommand(
-                            () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.LOW_CHAMBER)
-                    ),
-                    new WaitCommand(50),
-                    new InstantCommand(() -> armSubsystem.setWristState(
-                            ArmSubsystem.WristState.SPECIMENT_OUTTAKE_LOW
-                    )),
-                    new WaitCommand(120),
-                    new InstantCommand(() -> armSubsystem.setArmState(
-                            ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW
-                    ))
+                        new InstantCommand(
+                                () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.LOW_CHAMBER)
+                        ),
+                        new WaitCommand(50),
+                        new InstantCommand(() -> armSubsystem.setWristState(
+                                ArmSubsystem.WristState.SPECIMENT_OUTTAKE_LOW
+                        )),
+                        new WaitCommand(120),
+                        new InstantCommand(() -> armSubsystem.setArmState(
+                                ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW
+                        ))
                 )
         );
 
@@ -369,14 +369,19 @@ public class IntoTheDeepRobot extends RobotEx {
                         new InstantCommand(clawSubsystem::release),
                         new WaitCommand(1200),
                         new InstantCommand(() -> armSubsystem.setWristState(
-                                ArmSubsystem.WristState.PARK
+                                ArmSubsystem.WristState.INTAKE
                         )),
                         new WaitCommand(120),
                         new InstantCommand(
-                                () -> armSubsystem.setArmState(ArmSubsystem.ArmState.PARK)
+                                () -> armSubsystem.setArmState(ArmSubsystem.ArmState.INTAKE)
                         ),
                         new InstantCommand(
-                                () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.PARK)
+                                () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
+                        ),
+                        new ConditionalCommand(
+                                new InstantCommand(() -> extendoSubsystem.setTargetPosition(200), extendoSubsystem),
+                                new InstantCommand(),
+                                () -> extendoSubsystem.getExtension() < 200
                         )
                 ));
 
@@ -464,8 +469,8 @@ public class IntoTheDeepRobot extends RobotEx {
         driverOp.getGamepadButton(GamepadKeys.Button.A)
                 .whenPressed(
                         new SequentialCommandGroup(
-                            new InstantCommand(gyroFollow::enable),
-                            new InstantCommand(() -> gyroFollow.setGyroTarget(180))
+                                new InstantCommand(gyroFollow::enable),
+                                new InstantCommand(() -> gyroFollow.setGyroTarget(180))
                         )
                 ).whenReleased(
                         new InstantCommand(gyroFollow::disable)
