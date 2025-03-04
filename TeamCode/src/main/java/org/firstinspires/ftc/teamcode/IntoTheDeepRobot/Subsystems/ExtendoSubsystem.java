@@ -21,7 +21,7 @@ import java.util.function.DoubleSupplier;
 public class ExtendoSubsystem extends SubsystemBase {
     private MotorExEx extendoMotor;
     private double MAX_EXTENDO_POWER = 1.0;
-    private int MAX_EXTENSION = 1800; // Allowed: 1200, Max: 1800
+    private int MAX_EXTENSION = 1850; // Allowed: 1200, Max: 1800
     private DoubleSupplier power;
 
     private SimpleMotorFeedforward ff = new SimpleMotorFeedforward(
@@ -86,12 +86,13 @@ public class ExtendoSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (!found_zero) {
-            searchZero();
-            return;
-        }
+//        if (!found_zero) {
+//            searchZero();
+//            return;
+//        }
 
-        pid.setSetPoint(Range.clip(targetPosition, 90, MAX_EXTENSION));
+        pid.setSetPoint(targetPosition);
+//        pid.setSetPoint(Range.clip(targetPosition, 90, MAX_EXTENSION));
 
         telemetry.addData("Extendo Position", getExtension());
 

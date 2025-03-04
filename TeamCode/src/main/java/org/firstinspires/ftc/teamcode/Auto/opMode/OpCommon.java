@@ -136,7 +136,8 @@ public class OpCommon {
                 new IntakeCommand(
                     intakeSubsystem,
                     (alliance == RobotEx.Alliance.RED ?
-                        IntakeCommand.COLOR.RED_YELLOW : IntakeCommand.COLOR.BLUE_YELLOW)
+                        IntakeCommand.COLOR.RED_YELLOW : IntakeCommand.COLOR.BLUE_YELLOW),
+                        extendoSubsystem
                 )
             ),
             new ConditionalCommand(

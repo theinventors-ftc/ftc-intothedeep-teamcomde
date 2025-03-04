@@ -42,7 +42,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     private final HashMap<ArmState, Double> arm_positions = new HashMap<ArmState, Double>() {{
         put(ArmState.INTAKE, 0.16); // 0.075
-        put(ArmState.PARK, 0.25);
+        put(ArmState.PARK, 0.18);
         put(ArmState.PERP, 0.75);
         put(ArmState.SPECIMENT_INTAKE, 0.77);
         put(ArmState.INTAKE_B_ABOVE, 0.88);

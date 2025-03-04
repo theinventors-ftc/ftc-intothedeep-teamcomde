@@ -3,12 +3,14 @@ package org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Commands;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.util.Timing;
 
+import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ExtendoSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.IntakeSubsystem;
 
 import java.util.concurrent.TimeUnit;
 
 public class IntakeCommand extends CommandBase {
     private final IntakeSubsystem intake;
+    private final ExtendoSubsystem extendo;
 
     public enum COLOR {
         BLUE,
@@ -21,17 +23,21 @@ public class IntakeCommand extends CommandBase {
     private final COLOR color_preference;
     private Timing.Timer timer;
 
-    public IntakeCommand(IntakeSubsystem intakeSubsystem, COLOR color_preference, long MAX_ms) {
+    public IntakeCommand(IntakeSubsystem intakeSubsystem, COLOR color_preference, long MAX_ms,
+                         ExtendoSubsystem extendo) {
         this.intake = intakeSubsystem;
         this.color_preference = color_preference;
         this.timer = new Timing.Timer(MAX_ms, TimeUnit.MILLISECONDS);
-        addRequirements(intakeSubsystem);
+        this.extendo = extendo;
+        addRequirements(intakeSubsystem, extendo);
     }
 
-    public IntakeCommand(IntakeSubsystem intakeSubsystem, COLOR color_preference) {
+    public IntakeCommand(IntakeSubsystem intakeSubsystem, COLOR color_preference, ExtendoSubsystem extendo) {
         this.intake = intakeSubsystem;
         this.color_preference = color_preference;
         this.timer = new Timing.Timer(125000, TimeUnit.MILLISECONDS);
+        this.extendo = extendo;
+
         addRequirements(intakeSubsystem);
     }
 
@@ -61,6 +67,7 @@ public class IntakeCommand extends CommandBase {
     public void end(boolean interrupted) {
         if(interrupted) {
             intake.stop();
+            extendo.blockManual(false);
         }
     }
 

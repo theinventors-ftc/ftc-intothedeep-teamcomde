@@ -68,9 +68,9 @@ public class IntoTheDeepRobot extends RobotEx {
                         () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
                 ),
                 new ConditionalCommand(
-                        new InstantCommand(() -> extendoSubsystem.setTargetPosition(200), extendoSubsystem),
+                        new InstantCommand(() -> extendoSubsystem.setTargetPosition(350), extendoSubsystem),
                         new InstantCommand(),
-                        () -> extendoSubsystem.getExtension() < 200
+                        () -> extendoSubsystem.getExtension() < 350
                 ),
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
@@ -88,7 +88,8 @@ public class IntoTheDeepRobot extends RobotEx {
                         new IntakeCommand(
                                 intakeSubsystem,
                                 (this.getAlliance() == Alliance.RED ?
-                                        IntakeCommand.COLOR.RED_YELLOW : IntakeCommand.COLOR.BLUE_YELLOW)
+                                        IntakeCommand.COLOR.RED_YELLOW : IntakeCommand.COLOR.BLUE_YELLOW),
+                                extendoSubsystem
                         )
                 ),
                 new ConditionalCommand(
@@ -97,7 +98,7 @@ public class IntoTheDeepRobot extends RobotEx {
                                 new InstantCommand(
                                         () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
                                 ),
-                                new InstantCommand(() -> extendoSubsystem.setTargetPosition(90), extendoSubsystem),
+                                new InstantCommand(() -> extendoSubsystem.setTargetPosition(70), extendoSubsystem),
                                 // Push Sample (Align to Parrot)
                                 new InstantCommand(intakeSubsystem::run),
                                 new WaitCommand(120),
@@ -297,6 +298,11 @@ public class IntoTheDeepRobot extends RobotEx {
         // Low Basket
         toolOp.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(
                 new SequentialCommandGroup(
+                        new ConditionalCommand(
+                                new InstantCommand(() -> extendoSubsystem.setTargetPosition(400), extendoSubsystem),
+                                new InstantCommand(),
+                                () -> extendoSubsystem.getExtension() < 400
+                        ),
                         new InstantCommand(
                                 () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.LOW_BASKET)
                         ),
@@ -314,6 +320,11 @@ public class IntoTheDeepRobot extends RobotEx {
         // High Basket
         toolOp.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).whenPressed(
                 new SequentialCommandGroup(
+                        new ConditionalCommand(
+                                new InstantCommand(() -> extendoSubsystem.setTargetPosition(400), extendoSubsystem),
+                                new InstantCommand(),
+                                () -> extendoSubsystem.getExtension() < 400
+                        ),
                         new InstantCommand(
                                 () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.HIGH_BASKET)
                         ),

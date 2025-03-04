@@ -22,7 +22,7 @@ import java.util.function.DoubleSupplier;
 public class ElevatorSubsystem extends SubsystemBase {
     private MotorExEx elevatorMotor, elevatorMotorFollow, couplingMotor;
     private final double MAX_ELEVATOR_POWER = 1.0;
-    private final int MAX_ELEVATOR_HEIGHT = 2300;
+    private final int MAX_ELEVATOR_HEIGHT = 2350;
     private DoubleSupplier power;
 
     private ElevatorFeedforward ff = new ElevatorFeedforward(
@@ -62,7 +62,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private Level level;
 
     HashMap<Level, Integer> levelMap = new HashMap<Level, Integer>() {{
-        put(Level.INTAKE, 0);
+        put(Level.INTAKE, 5);
         put(Level.SPECIMEN_DISLOCATE, 137);
         put(Level.PARK0, 80);
         put(Level.PARK, 230);
@@ -139,10 +139,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (!found_zero) {
-            searchZero();
-            return;
-        }
+//        if (!found_zero) {
+//            searchZero();
+//            return;
+//        }
 
         pid.setSetPoint(Range.clip(target_height, -250, MAX_ELEVATOR_HEIGHT));
 //        pid.setSetPoint(target_height);

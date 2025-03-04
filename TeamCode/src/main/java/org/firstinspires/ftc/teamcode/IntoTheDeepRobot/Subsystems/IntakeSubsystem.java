@@ -34,7 +34,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private RaiseState raiseState;
 
     private final HashMap<RaiseState, Double> raise_positionsL = new HashMap<RaiseState, Double>() {{
-        put(RaiseState.RAISED, 0.07);
+        put(RaiseState.RAISED, 0.04);
         put(RaiseState.LOWERED, 0.24);
         put(RaiseState.HANGING, 0.0);
     }};
