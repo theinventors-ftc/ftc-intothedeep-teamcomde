@@ -17,7 +17,7 @@ public class HeadingControllerSubsystem extends SubsystemBase {
     private double target = 0;
     public static double TARGET = 0;
 
-    private boolean enabled = true;
+    private boolean enabled = false;
     private boolean findClosestTarget;
 
     public static double kP = 0.025, kI = 0, kD = 0.003, A = 0.2;

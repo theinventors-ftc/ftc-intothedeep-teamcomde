@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<Robot type="FirstInspires-FTC">
+    <LynxUsbDevice name="Control Hub Portal" serialNumber="(embedded)" parentModuleAddress="173">
+        <LynxModule name="Expansion Hub 2" port="2">
+            <goBILDA5202SeriesMotor name="slider" port="0" />
+            <goBILDA5202SeriesMotor name="slider2" port="1" />
+            <goBILDA5202SeriesMotor name="extendo" port="2" />
+            <Servo name="intake_raise_left" port="0" />
+            <Servo name="intake_raise_right" port="1" />
+            <ContinuousRotationServo name="intake_left_wheel" port="2" />
+            <ContinuousRotationServo name="intake_right_wheel" port="3" />
+            <Servo name="release1" port="4" />
+            <Servo name="release2" port="5" />
+            <AnalogInput name="right_dist" port="0" />
+            <DigitalDevice name="intake_sample_switch" port="0" />
+            <RevColorSensorV3 name="intake_color" port="0" bus="0" />
+        </LynxModule>
+        <LynxModule name="Control Hub" port="173">
+            <goBILDA5202SeriesMotor name="front_left" port="0" />
+            <goBILDA5202SeriesMotor name="front_right" port="1" />
+            <goBILDA5202SeriesMotor name="rear_left" port="2" />
+            <goBILDA5202SeriesMotor name="rear_right" port="3" />
+            <Servo name="coupler" port="0" />
+            <Servo name="arm_left" port="1" />
+            <Servo name="arm_right" port="2" />
+            <Servo name="claw" port="3" />
+            <Servo name="claw_rot" port="4" />
+            <Servo name="wrist_tilt" port="5" />
+            <AnalogInput name="rear_dist" port="0" />
+            <AnalogInput name="left_dist" port="2" />
+            <LynxEmbeddedIMU name="imu" port="0" bus="0" />
+            <AdafruitBNO055IMU name="external_imu" port="1" bus="1" />
+        </LynxModule>
+    </LynxUsbDevice>
+    <Webcam name="rear_camera" serialNumber="VendorProduct:vendor=0x046d|product=0x08e5|connection=" />
+</Robot>
