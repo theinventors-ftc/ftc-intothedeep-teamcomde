@@ -16,6 +16,7 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
@@ -28,6 +29,7 @@ import org.inventors.ftc.robotbase.RobotEx;
 
 import java.util.function.DoubleSupplier;
 
+@Disabled
 @Autonomous(name = "Red Left Samples", group = "RED")
 public class Red_Left_Samples extends CommandOpMode {
 

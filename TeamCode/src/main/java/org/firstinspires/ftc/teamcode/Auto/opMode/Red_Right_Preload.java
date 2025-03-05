@@ -9,6 +9,7 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Auto.trajectorysequence.TrajectorySequenceBuilder;
@@ -17,6 +18,7 @@ import org.inventors.ftc.robotbase.RobotEx;
 
 import java.util.function.DoubleSupplier;
 
+@Disabled
 @Autonomous(name = "Red Right Preload")
 public class Red_Right_Preload extends CommandOpMode {
 

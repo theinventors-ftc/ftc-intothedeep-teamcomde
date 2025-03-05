@@ -11,6 +11,7 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.RamseteController;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
@@ -30,6 +31,7 @@ import org.inventors.ftc.robotbase.drive.DriveConstants;
 import org.inventors.ftc.robotbase.drive.MecanumDriveCommand;
 import org.inventors.ftc.robotbase.drive.MecanumDriveSubsystem;
 
+@Disabled
 @Autonomous(name = "Control Test", group = "Tests")
 public class ControlTest extends CommandOpMode {
 

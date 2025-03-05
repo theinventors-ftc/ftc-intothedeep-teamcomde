@@ -10,6 +10,7 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Auto.opMode.OpCommon;
@@ -18,6 +19,7 @@ import org.firstinspires.ftc.teamcode.PoseStorage;
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.RobotEx;
 
+@Disabled
 @Autonomous(name = "Auto Dummy", group = "Tests")
 public class AutoDummy extends CommandOpMode {
 

@@ -28,6 +28,7 @@ import org.inventors.ftc.robotbase.RobotEx;
 import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleSupplier;
 
+@Disabled
 @Autonomous(name = "AutoSpeciments")
 public class AutoSpeciments extends CommandOpMode {
 

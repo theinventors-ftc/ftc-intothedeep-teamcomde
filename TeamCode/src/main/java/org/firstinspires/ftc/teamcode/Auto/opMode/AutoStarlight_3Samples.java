@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robo
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.tipPoseTransfer;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
@@ -15,13 +16,14 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Auto.trajectorysequence.TrajectorySequenceBuilder;
+import org.firstinspires.ftc.teamcode.PoseStorage;
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.RobotEx;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleSupplier;
 
-@Autonomous(name = "AutoStarlight_v2", group = "Special")
+@Autonomous(name = "AutoStarlight", group = "Special")
 public class AutoStarlight_3Samples extends CommandOpMode {
 
     private SampleMecanumDrive drive;
@@ -58,11 +60,11 @@ public class AutoStarlight_3Samples extends CommandOpMode {
         ), extendo_length.getAsDouble()),
 
         neutralSampleLeft = new Pose2d(
-            -2.3 * Tile, -1.5 * Tile - 2, Math.toRadians(143)
+            -2.3 * Tile, -1.5 * Tile + 1.8, Math.toRadians(159) // PEOS
         ),
 
         parking = new Pose2d(
-            -1.25 * Tile, -0.5 * Tile, Math.toRadians(0)
+            -1.25 * Tile+2, -0.5 * Tile-3, Math.toRadians(0)
         );
 
     /**
@@ -178,7 +180,7 @@ public class AutoStarlight_3Samples extends CommandOpMode {
         /* -----0----- */
 
         temp = new SequentialCommandGroup(
-            opCommon.extendo(0.8),
+            opCommon.extendo(0.6),
             opCommon.sample_intake()
         );
         temp.schedule();
@@ -219,7 +221,7 @@ public class AutoStarlight_3Samples extends CommandOpMode {
 
         temp = new SequentialCommandGroup(
             new WaitCommand(500),
-            opCommon.extendo(0.8),
+            opCommon.extendo(0.6),
             opCommon.sample_intake()
         );
         temp.schedule();
@@ -276,7 +278,7 @@ public class AutoStarlight_3Samples extends CommandOpMode {
         /*-- 2 --*/
         temp = new SequentialCommandGroup(
             new WaitCommand(1000),
-            opCommon.extendo3dSample(0.6),
+            opCommon.extendo3dSample(0.4),
             opCommon.sample_intake()
         );
         temp.schedule();
@@ -347,6 +349,6 @@ public class AutoStarlight_3Samples extends CommandOpMode {
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
         current_pose = drive.getPoseEstimate();
 
-//        PoseStorage.currentPose = drive.getPoseEstimate();
+        PoseStorage.currentPose = drive.getPoseEstimate();
     }
 }
