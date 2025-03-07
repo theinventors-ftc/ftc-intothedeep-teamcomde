@@ -100,8 +100,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         elevatorMotor.setRunMode(MotorExEx.RunMode.RawPower);
         elevatorMotor.setInverted(true);
         elevatorMotorFollow.setRunMode(MotorExEx.RunMode.RawPower);
-        elevatorMotor.resetEncoder();
-        elevatorMotorFollow.resetEncoder();
+        reset_encoder();
         this.couplingMotor = couplingMotor;
 
         this.power = power;
@@ -135,6 +134,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void setLevel(Level level) {
         this.level = level;
         target_height = (int)(levelMap.get(level));
+    }
+
+    public void set_target_height(int height) {
+        target_height = height;
     }
 
     @Override
@@ -176,9 +179,17 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     // ----------------------------------------- Zeroing ---------------------------------------- //
 
+    public void lower() {
+        set(-0.6);
+    }
+
+    public void stop() {
+        set(0);
+    }
+
     public void searchZero() {
         if (!isSliderBottom()) {
-            set(-0.6);
+            lower();
 
             if(getCurrent() > ampThreshold && !timer.isTimerOn()) {
                 timer.start();
@@ -188,9 +199,8 @@ public class ElevatorSubsystem extends SubsystemBase {
                 isStalled = true;
             }
         } else {
-            set(0);
-            elevatorMotor.resetEncoder();
-            elevatorMotorFollow.resetEncoder();
+            stop();
+            reset_encoder();
             found_zero = true;
         }
     }
@@ -212,5 +222,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 //        elevatorMotorFollow.disable();
 //        couplingMotor.disable();
         setLevel(Level.HANGING_RELEASE);
+    }
+
+    public void reset_encoder() {
+        elevatorMotor.resetEncoder();
+        elevatorMotorFollow.resetEncoder();
     }
 }

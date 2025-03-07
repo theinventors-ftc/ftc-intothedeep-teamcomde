@@ -145,6 +145,7 @@ public class RobotMap implements RobotMapInterface {
         armLeftServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
         armRightServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
         armWristServo = hardwareMap.get(ServoImplEx.class, "wrist_tilt");
+        armWristServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
         // --------------------------------------- Intake --------------------------------------- //
         intakeRaiseServoL = hardwareMap.get(ServoImplEx.class, "intake_raise_left");

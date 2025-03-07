@@ -113,6 +113,68 @@ public class OpCommon {
         );
     }
 
+    public SequentialCommandGroup deep_intake() {
+        return new SequentialCommandGroup(
+                new InstantCommand(() -> extendoSubsystem.setTargetPosition(500), extendoSubsystem),
+                new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
+                new InstantCommand(intakeSubsystem::lower),
+                new InstantCommand(
+                        () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
+                ),
+                new InstantCommand(() -> armSubsystem.setWristState(
+                        ArmSubsystem.WristState.INTAKE
+                )),
+                new InstantCommand(clawSubsystem::goNormal, clawSubsystem),
+                new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
+                new WaitCommand(120),
+                new InstantCommand(() -> armSubsystem.setArmState(
+                        ArmSubsystem.ArmState.INTAKE
+                )),
+                // Clear Way
+                new InstantCommand(() -> extendoSubsystem.set_MAX_POWER(0.6)),
+                new InstantCommand(() -> extendoSubsystem.setTargetPosition(750)),
+                new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
+                new InstantCommand(() -> extendoSubsystem.set_MAX_POWER(1)),
+                new InstantCommand(() -> extendoSubsystem.setTargetPosition(480)),
+                new WaitUntilCommand(() -> extendoSubsystem.atTarget())
+        );
+    }
+
+    public SequentialCommandGroup submersible_intake() {
+        return new SequentialCommandGroup(
+                // Go to Park State: Elevator, Arm, Wrist, Claw
+                new InstantCommand(()-> extendoSubsystem.set_MAX_POWER(0.4)),
+                new InstantCommand(()-> extendoSubsystem.setTargetPosition(1600)),
+                // Intake Procedure
+                new IntakeCommand(
+                        intakeSubsystem,
+                        (alliance == RobotEx.Alliance.RED ?
+                                IntakeCommand.COLOR.RED_YELLOW : IntakeCommand.COLOR.BLUE_YELLOW),
+                        extendoSubsystem
+                ),
+                new ConditionalCommand(
+                        new SequentialCommandGroup(
+                                new InstantCommand(
+                                        () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
+                                ),
+                                new InstantCommand(() -> extendoSubsystem.set_MAX_POWER(1)),
+                                new InstantCommand(() -> extendoSubsystem.setTargetPosition(90), extendoSubsystem),
+                                // Push Sample (Align to Parrot)
+                                new InstantCommand(intakeSubsystem::run),
+                                new WaitCommand(120),
+                                new InstantCommand(intakeSubsystem::stop),
+                                new InstantCommand(intakeSubsystem::raise, intakeSubsystem),
+                                new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
+                                new WaitUntilCommand(() -> elevatorSubsystem.atTarget()),
+                                new InstantCommand(clawSubsystem::grab),
+                                new WaitCommand(60)
+                        ),
+                        discard_sample(),
+                        () -> intakeSubsystem.check_color(alliance)
+                )
+        );
+    }
+
     public SequentialCommandGroup sample_intake() {
         return new SequentialCommandGroup(
             // Go to Park State: Elevator, Arm, Wrist, Claw
@@ -142,7 +204,6 @@ public class OpCommon {
             ),
             new ConditionalCommand(
                 new SequentialCommandGroup(
-                    new InstantCommand(() -> extendoSubsystem.blockManual(true)),
                     new InstantCommand(
                         () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
                     ),
@@ -156,8 +217,7 @@ public class OpCommon {
                     new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
                     new WaitUntilCommand(() -> elevatorSubsystem.atTarget()),
                     new InstantCommand(clawSubsystem::grab),
-                    new WaitCommand(60),
-                    new InstantCommand(() -> extendoSubsystem.blockManual(false))
+                    new WaitCommand(60)
                 ),
                 discard_sample(),
                 () -> intakeSubsystem.check_color(alliance)

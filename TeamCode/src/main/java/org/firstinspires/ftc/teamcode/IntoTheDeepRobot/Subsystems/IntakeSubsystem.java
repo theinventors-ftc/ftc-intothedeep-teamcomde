@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.RobotEx;
 import org.inventors.ftc.robotbase.hardware.ColorSensor;
@@ -130,9 +131,9 @@ public class IntakeSubsystem extends SubsystemBase {
 
     // ---------------------------------------- Sensors ----------------------------------------- //
     private COLOR predict(double r, double g, double b) {
-        if(b < 60 && r > 90 && g > 90) return COLOR.YELLOW;
-        if(b > 70 && r < 50 && g < 60) return COLOR.BLUE;
-        if(b < 40 && g < 65 && r > 65) return COLOR.RED;
+        if(b < 45 && r > 50 && g > 90) return COLOR.YELLOW;
+        if(b > 45 && r < 35 && g < 35) return COLOR.BLUE;
+        if(b < 35 && g < 35 && r > 35) return COLOR.RED;
         return COLOR.NONE;
     }
 
@@ -164,5 +165,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public boolean isSample() {
         telemetry.addData("Intake has Sample?: ", limitSwitch.getState());
         return limitSwitch.getState();
+//        telemetry.addData("Intake has Sample?: ", limitSwitch.getState());
+//        return colorSensor.getDistance(DistanceUnit.MM) < 30;
     }
 }

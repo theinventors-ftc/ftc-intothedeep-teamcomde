@@ -4,6 +4,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
+import com.arcrobotics.ftclib.command.PerpetualCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
@@ -281,8 +282,16 @@ public class IntoTheDeepRobot extends RobotEx {
                         new SequentialCommandGroup(
                                 new InstantCommand(clawSubsystem::grab),
                                 new WaitCommand(200),
+                                new InstantCommand(clawSubsystem::goNormal),
                                 new InstantCommand(() -> elevatorSubsystem.setLevel(
-                                        ElevatorSubsystem.Level.SPECIMEN_DISLOCATE
+                                        ElevatorSubsystem.Level.HIGH_CHAMBER
+                                )),
+                                new InstantCommand(() -> armSubsystem.setWristState(
+                                        ArmSubsystem.WristState.SPECIMEN_OUTTAKE
+                                )),
+                                new WaitCommand(100),
+                                new InstantCommand(() -> armSubsystem.setArmState(
+                                        ArmSubsystem.ArmState.SPECIMEN_OUTTAKE
                                 ))
                         ),
                         () -> armSubsystem.getArmState() != ArmSubsystem.ArmState.SPECIMENT_INTAKE
@@ -501,6 +510,13 @@ public class IntoTheDeepRobot extends RobotEx {
                         new InstantCommand(gyroFollow::disable),
                         new InstantCommand(strafeControllerSubsystem::disable)
                 ));
+
+        toolOp.getGamepadButton(GamepadKeys.Button.BACK).whenPressed(new PerpetualCommand(
+                new SequentialCommandGroup(
+                        new InstantCommand(elevatorSubsystem::lower, elevatorSubsystem),
+                        new InstantCommand(elevatorSubsystem::reset_encoder)
+                )
+        )).whenReleased(new InstantCommand(elevatorSubsystem::stop));
     }
 
     @Override
