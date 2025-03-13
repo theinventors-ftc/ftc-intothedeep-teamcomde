@@ -170,7 +170,7 @@ public class OpCommon {
                                 new WaitCommand(60)
                         ),
                         discard_sample(),
-                        () -> intakeSubsystem.check_color(alliance)
+                        () -> intakeSubsystem.check_color(alliance, true)
                 )
         );
     }
@@ -199,7 +199,9 @@ public class OpCommon {
                     intakeSubsystem,
                     (alliance == RobotEx.Alliance.RED ?
                         IntakeCommand.COLOR.RED_YELLOW : IntakeCommand.COLOR.BLUE_YELLOW),
-                        extendoSubsystem
+                        extendoSubsystem,
+                        0.7,
+                        2500
                 )
             ),
             new ConditionalCommand(
@@ -220,7 +222,7 @@ public class OpCommon {
                     new WaitCommand(60)
                 ),
                 discard_sample(),
-                () -> intakeSubsystem.check_color(alliance)
+                () -> intakeSubsystem.check_color(alliance, true)
             )
         );
     }
@@ -240,15 +242,15 @@ public class OpCommon {
             new InstantCommand(
                 () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.HIGH_BASKET)
             ),
-            new WaitCommand(200),
-            new InstantCommand(() -> armSubsystem.setWristState(
-                ArmSubsystem.WristState.BASKET_OUTTAKE
-            )),
-            new WaitCommand(120),
+            new WaitCommand(100),
             new InstantCommand(() -> armSubsystem.setArmState(
                 ArmSubsystem.ArmState.BASKET_OUTTAKE
             )),
-            new WaitUntilCommand(() -> elevatorSubsystem.atTarget())
+            new WaitUntilCommand(() -> elevatorSubsystem.atTarget()),
+            new InstantCommand(() -> armSubsystem.setWristState(
+                    ArmSubsystem.WristState.BASKET_OUTTAKE
+            )),
+            new WaitCommand(50)
         );
     }
 
@@ -256,7 +258,7 @@ public class OpCommon {
         return new SequentialCommandGroup(
             new WaitCommand(250),
             new InstantCommand(clawSubsystem::release),
-            new WaitCommand(400),
+            new WaitCommand(500),
             new InstantCommand(() -> armSubsystem.setWristState(
                 ArmSubsystem.WristState.PARK
             )),
@@ -315,11 +317,11 @@ public class OpCommon {
             new InstantCommand(() -> armSubsystem.setWristState(
                 ArmSubsystem.WristState.SPECIMENT_INTAKE
             )),
-            new WaitCommand(120),
+            new WaitCommand(60),
             new InstantCommand(() -> armSubsystem.setArmState(
                 ArmSubsystem.ArmState.SPECIMENT_INTAKE
             )),
-            new WaitCommand(200),
+            new WaitCommand(160),
             new InstantCommand(() -> elevatorSubsystem.setLevel(
                 ElevatorSubsystem.Level.INTAKE
             )),
@@ -327,28 +329,28 @@ public class OpCommon {
         );
     }
 
-    public SequentialCommandGroup specimenAimObservSpecial() {
-        return new SequentialCommandGroup(
-            new InstantCommand(() -> elevatorSubsystem.setLevel(
-                ElevatorSubsystem.Level.PARK)
-            ),
-            new WaitCommand(250),
-            new InstantCommand(clawSubsystem::goFlipped, clawSubsystem),
-            new InstantCommand(() -> armSubsystem.setWristState(
-                ArmSubsystem.WristState.SPECIMENT_INTAKE
-            )),
-            new WaitCommand(120),
-            new InstantCommand(() -> armSubsystem.setArmState(
-                ArmSubsystem.ArmState.SPECIMENT_INTAKE
-            )),
-            new WaitCommand(200),
-            new InstantCommand(() -> elevatorSubsystem.setLevel(
-                ElevatorSubsystem.Level.INTAKE
-            )),
-            new WaitCommand(500),
-            new InstantCommand(clawSubsystem::release)
-        );
-    }
+//    public SequentialCommandGroup specimenAimObservSpecial() {
+//        return new SequentialCommandGroup(
+//            new InstantCommand(() -> elevatorSubsystem.setLevel(
+//                ElevatorSubsystem.Level.PARK)
+//            ),
+//            new WaitCommand(250),
+//            new InstantCommand(clawSubsystem::goFlipped, clawSubsystem),
+//            new InstantCommand(() -> armSubsystem.setWristState(
+//                ArmSubsystem.WristState.SPECIMENT_INTAKE
+//            )),
+//            new WaitCommand(120),
+//            new InstantCommand(() -> armSubsystem.setArmState(
+//                ArmSubsystem.ArmState.SPECIMENT_INTAKE
+//            )),
+//            new WaitCommand(200),
+//            new InstantCommand(() -> elevatorSubsystem.setLevel(
+//                ElevatorSubsystem.Level.INTAKE
+//            )),
+//            new WaitCommand(500),
+//            new InstantCommand(clawSubsystem::release)
+//        );
+//    }
 
 
     public SequentialCommandGroup specimenIntake() {

@@ -23,20 +23,24 @@ public class IntakeCommand extends CommandBase {
     private final COLOR color_preference;
     private Timing.Timer timer;
 
-    public IntakeCommand(IntakeSubsystem intakeSubsystem, COLOR color_preference, long MAX_ms,
-                         ExtendoSubsystem extendo) {
-        this.intake = intakeSubsystem;
-        this.color_preference = color_preference;
-        this.timer = new Timing.Timer(MAX_ms, TimeUnit.MILLISECONDS);
-        this.extendo = extendo;
-        addRequirements(intakeSubsystem, extendo);
-    }
+    private double speed = 1.0;
 
     public IntakeCommand(IntakeSubsystem intakeSubsystem, COLOR color_preference, ExtendoSubsystem extendo) {
         this.intake = intakeSubsystem;
         this.color_preference = color_preference;
         this.timer = new Timing.Timer(125000, TimeUnit.MILLISECONDS);
         this.extendo = extendo;
+
+        addRequirements(intakeSubsystem);
+    }
+
+    public IntakeCommand(IntakeSubsystem intakeSubsystem, COLOR color_preference,
+                         ExtendoSubsystem extendo, double intake_speed, long MAX_ms) {
+        this.intake = intakeSubsystem;
+        this.color_preference = color_preference;
+        this.timer = new Timing.Timer(MAX_ms, TimeUnit.MILLISECONDS);
+        this.extendo = extendo;
+        this.speed = intake_speed;
 
         addRequirements(intakeSubsystem);
     }
@@ -67,6 +71,7 @@ public class IntakeCommand extends CommandBase {
     public void end(boolean interrupted) {
         if(interrupted) {
             intake.stop();
+            intake.raise();
             extendo.blockManual(false);
         }
     }

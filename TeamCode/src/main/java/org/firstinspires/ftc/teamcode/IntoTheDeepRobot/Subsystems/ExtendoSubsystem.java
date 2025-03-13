@@ -95,20 +95,23 @@ public class ExtendoSubsystem extends SubsystemBase {
 //        pid.setSetPoint(Range.clip(targetPosition, 90, MAX_EXTENSION));
 
         telemetry.addData("Extendo Position", getExtension());
+        telemetry.addData("Extendo Target", targetPosition);
+        telemetry.addData("Extendo Power: ", power.getAsDouble());
+        telemetry.update();
 
         if(Math.abs(power.getAsDouble()) > 0.05 && !block_manual){ // Manual
             set(Range.clip(
                     power.getAsDouble(),
                     getExtension() > 90 ? -1 : 0.0,
                     getExtension() < MAX_EXTENSION ? 1 : 0.0));
-            targetPosition = Range.clip(getExtension(), 90, MAX_EXTENSION);
+            targetPosition = getExtension();
         } else { // Auto
             set(pid.calculate(getExtension()));
         }
     }
 
     public void setTargetPosition(int position) {
-        targetPosition = Range.clip(position, 90, MAX_EXTENSION);
+        targetPosition = position;
     }
 
     public void returnToZero() {

@@ -9,13 +9,19 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
+import com.arcrobotics.ftclib.command.PerpetualCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
+import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.util.Timing;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.teamcode.Auto.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.Auto.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.Auto.trajectorysequence.TrajectorySequenceBuilder;
+import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ArmSubsystem;
 import org.firstinspires.ftc.teamcode.PoseStorage;
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.RobotEx;
@@ -60,7 +66,7 @@ public class AutoStarlight_5Samples extends CommandOpMode {
         ), extendo_length.getAsDouble()),
 
         neutralSampleLeft = new Pose2d(
-            -2.3 * Tile, -1.5 * Tile + 1.8, Math.toRadians(159) // PEOS
+            -2.3 * Tile, -1.5 * Tile + 2.3, Math.toRadians(159) // PEOS
         ),
 
         submersible = new Pose2d(
@@ -81,7 +87,7 @@ public class AutoStarlight_5Samples extends CommandOpMode {
         toNeutral_2,
         toBasketExtra,
         toBasketFinal,
-            toBasketBlind,
+        toBasketBlind,
         toBasket_0,
         toBasket_1,
         toSubmersible,
@@ -90,17 +96,17 @@ public class AutoStarlight_5Samples extends CommandOpMode {
     public void init_toPreload() {
         toPreload = drive.trajectorySequenceBuilder(startPose)
             .setReversed(true)
-            .setTangent(Math.toRadians(100))
-            .splineToSplineHeading(new Pose2d(basket.getX() + 1, basket.getY(),
-                                              Math.toRadians(75)), Math.toRadians(200));
+            .setTangent(Math.toRadians(135))
+            .splineToSplineHeading(new Pose2d(basket.getX() + 3.5, basket.getY(),
+                                              Math.toRadians(68)), Math.toRadians(200));
     }
     public void init_toNeutral_0() {
         toNeutral_0 = drive.trajectorySequenceBuilder(current_pose)
-                .lineToLinearHeading(new Pose2d(current_pose.getX() + 3, current_pose.getY(), Math.toRadians(60)));
+                .lineToLinearHeading(new Pose2d(basket.getX() + 3.5, basket.getY(), Math.toRadians(68)));
     }
     public void init_toNeutral_1() {
         toNeutral_1 = drive.trajectorySequenceBuilder(current_pose)
-            .lineToLinearHeading(new Pose2d(basket.getX(), basket.getY() + 2, Math.toRadians(85)));
+            .lineToLinearHeading(new Pose2d(basket.getX()-0.5, basket.getY() + 2, Math.toRadians(83)));
     }
     public void init_toNeutral_2() {
         toNeutral_2 = drive.trajectorySequenceBuilder(current_pose)
@@ -128,7 +134,7 @@ public class AutoStarlight_5Samples extends CommandOpMode {
     public void init_toBasketFinal() {
         toBasketFinal = drive.trajectorySequenceBuilder(current_pose)
                 .setReversed(true)
-                .lineToLinearHeading(new Pose2d(basket.getX()-1, basket.getY() + 2,//5
+                .lineToLinearHeading(new Pose2d(basket.getX()-2, basket.getY() + 1,//5
                         Math.toRadians(70)));
     }
 
@@ -142,13 +148,24 @@ public class AutoStarlight_5Samples extends CommandOpMode {
 
     public void init_toSubmersible() {
         toSubmersible = drive.trajectorySequenceBuilder(current_pose)
-                .splineTo(submersible.vec(), Math.toRadians(0));
+                .splineTo(submersible.vec(), Math.toRadians(0),
+                        SampleMecanumDrive.getVelocityConstraint(70,
+                                DriveConstants.MAX_ANG_VEL,
+                                DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(55)
+                )
+                .forward(1.5);
 //                .splineToLinearHeading(submersible, Math.toRadians(0));
     }
 
     public void init_toParking() {
         toParking = drive.trajectorySequenceBuilder(current_pose)
-            .splineTo(parking.vec(), Math.toRadians(45));
+            .splineTo(parking.vec(), Math.toRadians(45),
+                    SampleMecanumDrive.getVelocityConstraint(70,
+                            DriveConstants.MAX_ANG_VEL,
+                            DriveConstants.TRACK_WIDTH),
+                    SampleMecanumDrive.getAccelerationConstraint(55)
+            );
     }
 
     /**
@@ -161,7 +178,7 @@ public class AutoStarlight_5Samples extends CommandOpMode {
         drive = new SampleMecanumDrive(robotMap);
         drive.setPoseEstimate(startPose);
         opCommon = new OpCommon(robotMap, RobotEx.Alliance.RED);
-        timer = new Timing.Timer(3000, TimeUnit.MILLISECONDS);
+        timer = new Timing.Timer(30000, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -171,6 +188,8 @@ public class AutoStarlight_5Samples extends CommandOpMode {
 
         temp = new SequentialCommandGroup(
                 new WaitCommand(2000),
+                new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
+                new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(400)), // Prep Extendo
                 opCommon.basket_scoring()
         );
         temp.schedule();
@@ -218,17 +237,13 @@ public class AutoStarlight_5Samples extends CommandOpMode {
         }
         current_pose = drive.getPoseEstimate();
 
-        temp = opCommon.basket_scoring();
-        temp.schedule();
-        while (
-            !isStopRequested()
-            && opModeIsActive()
-            && CommandScheduler.getInstance().isScheduled(temp)
-        ) {
-            run();
-        }
-
-        temp = opCommon.release_sample();
+        temp = new SequentialCommandGroup(
+                new InstantCommand(() -> opCommon.elevatorSubsystem.set_target_height(150)),
+                new WaitCommand(200),
+                new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
+                new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(350)), // Prep Extendo
+                opCommon.basket_scoring()
+        );
         temp.schedule();
         while (
             !isStopRequested()
@@ -241,8 +256,9 @@ public class AutoStarlight_5Samples extends CommandOpMode {
         /* -----1----- */
 
         temp = new SequentialCommandGroup(
-            new WaitCommand(300),
-            opCommon.extendo(0.5),
+            opCommon.release_sample(),
+            new WaitCommand(1000),
+            opCommon.extendo(0.4),
             opCommon.sample_intake()
         );
         temp.schedule();
@@ -261,7 +277,10 @@ public class AutoStarlight_5Samples extends CommandOpMode {
         current_pose = drive.getPoseEstimate();
 
         temp = new SequentialCommandGroup(
-                new WaitCommand(250),
+                new InstantCommand(() -> opCommon.elevatorSubsystem.set_target_height(150)),
+                new WaitCommand(200),
+                new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
+                new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(400)), // Prep Extendo
                 opCommon.basket_scoring(),
                 opCommon.release_sample()
         );
@@ -300,7 +319,7 @@ public class AutoStarlight_5Samples extends CommandOpMode {
         /*-- 2 --*/
         temp = new SequentialCommandGroup(
             new WaitCommand(1000),
-            opCommon.extendo3dSample(0.4),
+            opCommon.extendo3dSample(0.35),
             opCommon.sample_intake()
         );
         temp.schedule();
@@ -318,7 +337,13 @@ public class AutoStarlight_5Samples extends CommandOpMode {
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
         current_pose = drive.getPoseEstimate();
 
-        temp = opCommon.basket_scoring();
+        temp = new SequentialCommandGroup(
+                new InstantCommand(() -> opCommon.elevatorSubsystem.set_target_height(150)),
+                new WaitCommand(200),
+                new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
+                new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(400)), // Prep Extendo
+                opCommon.basket_scoring()
+        );
         temp.schedule();
         basket = new Pose2d(basket.getX() + 5, basket.getY(), Math.toRadians(75));
         init_toBasketFinal();
@@ -345,7 +370,11 @@ public class AutoStarlight_5Samples extends CommandOpMode {
             run();
         }
         /* -----S----- */
-        temp = opCommon.reset_elevator();
+        temp = new SequentialCommandGroup(
+                new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
+                new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(500)), // Prep Extendo
+                opCommon.reset_elevator()
+        );
         temp.schedule();
         init_toSubmersible();
         drive.followTrajectorySequenceAsync(toSubmersible.build());
@@ -358,7 +387,7 @@ public class AutoStarlight_5Samples extends CommandOpMode {
             drive.update();
             run();
         }
-        drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
+        drive.setPoseEstimate(new Pose2d(-14.3, drive.getPoseEstimate().getY(), Math.toRadians(0)));
         current_pose = drive.getPoseEstimate();
 
         temp = new SequentialCommandGroup(
@@ -366,37 +395,49 @@ public class AutoStarlight_5Samples extends CommandOpMode {
                 opCommon.submersible_intake()
         );
         temp.schedule();
+        timer.start();
+
+        boolean sub_sample_taken = true;
         while (
                 !isStopRequested()
                         && opModeIsActive()
                         && CommandScheduler.getInstance().isScheduled(temp)
         ) {
             run();
+
+            if (timer.elapsedTime() >= 4000) {
+                sub_sample_taken = false;
+                break;
+            }
         }
 
         // Blind Sample
-        basket = new Pose2d(
-                -2.1 * Tile + 2, -2.3 * Tile + 2, Math.toRadians(42)
-        );
-
-        temp = new SequentialCommandGroup(
-                new InstantCommand(() -> opCommon.intakeSubsystem.reverse()),
-                new WaitCommand(150),
-                new InstantCommand(() -> opCommon.intakeSubsystem.stop()),
-                opCommon.basket_scoring()
-        );
-        temp.schedule();
-        init_toBasketBlind();
-        drive.followTrajectorySequenceAsync(toBasketBlind.build());
-        while (!isStopRequested()
-                && opModeIsActive()
-                && (drive.isBusy()
-                || CommandScheduler.getInstance().isScheduled(temp))) {
-            drive.update();
-            run();
-        }
-        drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = drive.getPoseEstimate();
+        if (sub_sample_taken) {
+            temp = new SequentialCommandGroup(
+                    new InstantCommand(() -> opCommon.intakeSubsystem.reverse()),
+                    new WaitCommand(150),
+                    new InstantCommand(() -> opCommon.intakeSubsystem.stop()),
+                    new ParallelCommandGroup(
+                            opCommon.basket_scoring(),
+                            new SequentialCommandGroup(
+                                    new WaitCommand(500),
+                                    new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
+                                    new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(500)) // Prep Extendo
+                            )
+                    )
+            );
+            temp.schedule();
+            init_toBasketBlind();
+            drive.followTrajectorySequenceAsync(toBasketBlind.build());
+            while (!isStopRequested()
+                    && opModeIsActive()
+                    && (drive.isBusy()
+                    || CommandScheduler.getInstance().isScheduled(temp))) {
+                drive.update();
+                run();
+            }
+            drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
+            current_pose = drive.getPoseEstimate();
 
 //        init_toBasket_1();
 //        drive.followTrajectorySequenceAsync(toBasket_1.build());
@@ -407,40 +448,65 @@ public class AutoStarlight_5Samples extends CommandOpMode {
 //        drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
 //        current_pose = drive.getPoseEstimate();
 
-        temp = new SequentialCommandGroup(
-                opCommon.release_sample(),
-                opCommon.reset_elevator()
-        );
-        temp.schedule();
-        while (
-                !isStopRequested()
-                        && opModeIsActive()
-                        && CommandScheduler.getInstance().isScheduled(temp)
-        ) {
-            run();
+            temp = new SequentialCommandGroup(
+                    opCommon.release_sample(),
+                    opCommon.reset_elevator()
+            );
+            temp.schedule();
+            while (
+                    !isStopRequested()
+                            && opModeIsActive()
+                            && CommandScheduler.getInstance().isScheduled(temp)
+            ) {
+                run();
+            }
+
+
+            /* -----P----- */
+
+            temp = new SequentialCommandGroup(
+                    new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(-50)),
+                    new InstantCommand(() -> opCommon.elevatorSubsystem.set_target_height(-50))
+            );
+            temp.schedule();
+            init_toParking();
+            drive.followTrajectorySequenceAsync(toParking.build());
+            while (
+                    !isStopRequested()
+                            && opModeIsActive()
+                            && (drive.isBusy()
+                            || CommandScheduler.getInstance().isScheduled(temp))
+            ) {
+                drive.update();
+                run();
+            }
+            drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
+            current_pose = drive.getPoseEstimate();
+        } else {
+            temp = new SequentialCommandGroup(
+                    new InstantCommand(opCommon.intakeSubsystem::raise),
+                    new InstantCommand(opCommon.intakeSubsystem::stop),
+                    new InstantCommand(() -> opCommon.armSubsystem.setArmState(
+                            ArmSubsystem.ArmState.PARK
+                    )),
+                    new InstantCommand(() -> opCommon.armSubsystem.setWristState(
+                            ArmSubsystem.WristState.PARK
+                    )),
+                    new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
+                    new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(-50)),
+                    new InstantCommand(() -> opCommon.elevatorSubsystem.set_target_height(-50)),
+                    new WaitUntilCommand(() -> opCommon.elevatorSubsystem.atTarget()),
+                    new WaitUntilCommand(() -> opCommon.extendoSubsystem.atTarget())
+            );
+            temp.schedule();
+            while (
+                    !isStopRequested()
+                            && opModeIsActive()
+                            && CommandScheduler.getInstance().isScheduled(temp)
+            ) {
+                run();
+            }
         }
-
-
-        /* -----P----- */
-
-        temp = new SequentialCommandGroup(
-                new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(-50)),
-                new InstantCommand(() -> opCommon.elevatorSubsystem.set_target_height(-50))
-        );
-        temp.schedule();
-        init_toParking();
-        drive.followTrajectorySequenceAsync(toParking.build());
-        while (
-                !isStopRequested()
-                        && opModeIsActive()
-                        && (drive.isBusy()
-                        || CommandScheduler.getInstance().isScheduled(temp))
-        ) {
-            drive.update();
-            run();
-        }
-        drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-        current_pose = drive.getPoseEstimate();
 
         PoseStorage.currentPose = drive.getPoseEstimate();
     }

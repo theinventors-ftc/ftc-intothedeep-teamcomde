@@ -44,13 +44,13 @@ public class ArmSubsystem extends SubsystemBase {
         put(ArmState.INTAKE, 0.16); // 0.075
         put(ArmState.PARK, 0.18);
         put(ArmState.PERP, 0.75);
-        put(ArmState.SPECIMENT_INTAKE, 0.77);
+        put(ArmState.SPECIMENT_INTAKE, 0.79);
         put(ArmState.INTAKE_B_ABOVE, 0.88);
         put(ArmState.INTAKE_B, 0.91);
         put(ArmState.BASKET_OUTTAKE, 0.46);
         put(ArmState.SPECIMENT_OUTTAKE_HIGH, 0.71);
         put(ArmState.SPECIMENT_OUTTAKE_LOW, 0.86);
-        put(ArmState.HUMAN_PLAYER, 0.88);
+        put(ArmState.HUMAN_PLAYER, 0.7);
         put(ArmState.SPECIMEN_OUTTAKE, 0.33);
     }};
 
@@ -58,7 +58,7 @@ public class ArmSubsystem extends SubsystemBase {
         put(WristState.INTAKE, 0.1);
         put(WristState.PARK, 0.0);
         put(WristState.PERP, 0.48);
-        put(WristState.SPECIMENT_INTAKE, 0.47);
+        put(WristState.SPECIMENT_INTAKE, 0.46);
         put(WristState.INTAKE_B_ABOVE, 0.70);
         put(WristState.INTAKE_B, 0.67);
         put(WristState.BASKET_OUTTAKE, 0.78);

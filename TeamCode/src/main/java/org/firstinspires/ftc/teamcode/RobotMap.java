@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Bitmap;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -14,7 +17,16 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.function.Consumer;
+import org.firstinspires.ftc.robotcore.external.function.Continuation;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.CameraControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.FocusControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.PtzControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.WhiteBalanceControl;
+import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibrationIdentity;
 import org.inventors.ftc.robotbase.RobotMapInterface;
 import org.inventors.ftc.robotbase.hardware.Battery;
 import org.inventors.ftc.robotbase.hardware.ColorSensor;
@@ -24,7 +36,9 @@ import org.jetbrains.annotations.NotNull;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
+import org.openftc.easyopencv.PipelineRecordingParameters;
 
 public class RobotMap implements RobotMapInterface {
     public enum OpMode {
@@ -40,7 +54,7 @@ public class RobotMap implements RobotMapInterface {
     private MotorExEx frontLeft, frontRight, rearLeft, rearRight;
 
     private IMU imu;
-    private OpenCvWebcam rearCamera, frontCamera;
+    private OpenCvWebcam frontCamera;
     private Battery battery;
 
     //// ------------------------------------- Mechanisms ------------------------------------- ////
@@ -70,6 +84,8 @@ public class RobotMap implements RobotMapInterface {
 
     // -------------------------------------- Distance Sensors ---------------------------------- //
     private AnalogInput rear_dist, left_dist, right_dist;
+
+    private Limelight3A limelight;
 
     public RobotMap(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2,
                     OpMode opMode) {
@@ -107,31 +123,34 @@ public class RobotMap implements RobotMapInterface {
         battery = new Battery(hardwareMap);
 
         // Camera
-        int cameraMonitorViewId = hardwareMap.appContext.getResources()
-                .getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        rearCamera =  OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class,
-                "rear_camera"), cameraMonitorViewId);
-
-        FtcDashboard.getInstance().startCameraStream(rearCamera, 0);
-        rearCamera.setMillisecondsPermissionTimeout(2500);
-        rearCamera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                rearCamera.startStreaming(
-                        320, // 320
-                        180, //180
-                        OpenCvCameraRotation.UPSIDE_DOWN,
-                        OpenCvWebcam.StreamFormat.MJPEG
-                );
-            }
-
-            @Override
-            public void onError(int errorCode) {
-                /*
-                 * This will be called if the camera could not be opened
-                 */
-            }
-        });
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(0);
+        telemetry.setMsTransmissionInterval(11);
+//        int cameraMonitorViewId = hardwareMap.appContext.getResources()
+//                .getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+//        rearCamera =  OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class,
+//                "rear_camera"), cameraMonitorViewId);
+//
+//        FtcDashboard.getInstance().startCameraStream(rearCamera, 0);
+//        rearCamera.setMillisecondsPermissionTimeout(2500);
+//        rearCamera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+//            @Override
+//            public void onOpened() {
+//                rearCamera.startStreaming(
+//                        320, // 320
+//                        180, //180
+//                        OpenCvCameraRotation.UPSIDE_DOWN,
+//                        OpenCvWebcam.StreamFormat.MJPEG
+//                );
+//            }
+//
+//            @Override
+//            public void onError(int errorCode) {
+//                /*
+//                 * This will be called if the camera could not be opened
+//                 */
+//            }
+//        });
 
 
         //// ----------------------------------- Mechanisms ----------------------------------- ////
@@ -219,11 +238,166 @@ public class RobotMap implements RobotMapInterface {
     // ------------------------------------------ Sensors --------------------------------------- //
     @Override
     public OpenCvWebcam getCamera() {
-        return rearCamera;
+        return new OpenCvWebcam() {
+            @Override
+            public void setMillisecondsPermissionTimeout(int ms) {
+
+            }
+
+            @Override
+            public void startStreaming(int width, int height, OpenCvCameraRotation rotation, StreamFormat streamFormat) {
+
+            }
+
+            @Override
+            public ExposureControl getExposureControl() {
+                return null;
+            }
+
+            @Override
+            public FocusControl getFocusControl() {
+                return null;
+            }
+
+            @Override
+            public PtzControl getPtzControl() {
+                return null;
+            }
+
+            @Override
+            public GainControl getGainControl() {
+                return null;
+            }
+
+            @Override
+            public WhiteBalanceControl getWhiteBalanceControl() {
+                return null;
+            }
+
+            @Override
+            public <T extends CameraControl> T getControl(Class<T> controlType) {
+                return null;
+            }
+
+            @Override
+            public CameraCalibrationIdentity getCalibrationIdentity() {
+                return null;
+            }
+
+            @Override
+            public int openCameraDevice() {
+                return 0;
+            }
+
+            @Override
+            public void openCameraDeviceAsync(AsyncCameraOpenListener cameraOpenListener) {
+
+            }
+
+            @Override
+            public void closeCameraDevice() {
+
+            }
+
+            @Override
+            public void closeCameraDeviceAsync(AsyncCameraCloseListener cameraCloseListener) {
+
+            }
+
+            @Override
+            public void showFpsMeterOnViewport(boolean show) {
+
+            }
+
+            @Override
+            public void pauseViewport() {
+
+            }
+
+            @Override
+            public void resumeViewport() {
+
+            }
+
+            @Override
+            public void setViewportRenderingPolicy(ViewportRenderingPolicy policy) {
+
+            }
+
+            @Override
+            public void setViewportRenderer(ViewportRenderer renderer) {
+
+            }
+
+            @Override
+            public void startStreaming(int width, int height) {
+
+            }
+
+            @Override
+            public void startStreaming(int width, int height, OpenCvCameraRotation rotation) {
+
+            }
+
+            @Override
+            public void stopStreaming() {
+
+            }
+
+            @Override
+            public void setPipeline(OpenCvPipeline pipeline) {
+
+            }
+
+            @Override
+            public int getFrameCount() {
+                return 0;
+            }
+
+            @Override
+            public float getFps() {
+                return 0;
+            }
+
+            @Override
+            public int getPipelineTimeMs() {
+                return 0;
+            }
+
+            @Override
+            public int getOverheadTimeMs() {
+                return 0;
+            }
+
+            @Override
+            public int getTotalFrameTimeMs() {
+                return 0;
+            }
+
+            @Override
+            public int getCurrentPipelineMaxFps() {
+                return 0;
+            }
+
+            @Override
+            public void startRecordingPipeline(PipelineRecordingParameters parameters) {
+
+            }
+
+            @Override
+            public void stopRecordingPipeline() {
+
+            }
+
+            @Override
+            public void getFrameBitmap(Continuation<? extends Consumer<Bitmap>> continuation) {
+
+            }
+        };
     }
 
-    public OpenCvWebcam getRearCamera() {
-        return rearCamera;
+    public Limelight3A getRearLimelight() {
+        return limelight;
     }
 
     @Override

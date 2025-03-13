@@ -156,10 +156,16 @@ public class IntakeSubsystem extends SubsystemBase {
         return predict(colors[0], colors[1], colors[2]);
     }
 
-    public boolean check_color(RobotEx.Alliance alliance) {
+    public boolean check_color(RobotEx.Alliance alliance, boolean for_basket) {
+        if (!for_basket) return (getSampleColor() == (alliance == RobotEx.Alliance.RED ? COLOR.RED : COLOR.BLUE))
+                ||
+                getSampleColor() == COLOR.NONE;
+
         return (getSampleColor() == (alliance == RobotEx.Alliance.RED ? COLOR.RED : COLOR.BLUE))
                 ||
-                getSampleColor() == COLOR.YELLOW;
+                getSampleColor() == COLOR.YELLOW
+                ||
+                getSampleColor() == COLOR.NONE;
     }
 
     public boolean isSample() {

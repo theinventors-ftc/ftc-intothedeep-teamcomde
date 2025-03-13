@@ -32,6 +32,9 @@ public class Auto4Speciments_RAW extends CommandOpMode {
     private SequentialCommandGroup temp;
     private Timing.Timer timer;
 
+    private double
+            prevError = 0,
+            error = 0;
     private final double[] pidaTargets = {40, 66, 90};
 
     private final double
@@ -232,6 +235,9 @@ public class Auto4Speciments_RAW extends CommandOpMode {
             opCommon.specimenAim()
         );
         temp.schedule();
+
+        observationZone = new Pose2d(observationZone.getX(), observationZone.getY() + 0.2, observationZone.getHeading());
+
         init_toHumanPlayer();
         drive.followTrajectorySequenceAsync(toHumanPlayer.build());
         while (
@@ -244,6 +250,8 @@ public class Auto4Speciments_RAW extends CommandOpMode {
             run();
         }
         current_pose = drive.getPoseEstimate();
+
+        observationZone = new Pose2d(observationZone.getX(), observationZone.getY() - 0.6, observationZone.getHeading());
 
         for(int i = 0; i < 3; ++i) {
 
@@ -259,9 +267,18 @@ public class Auto4Speciments_RAW extends CommandOpMode {
             ) {
                 drive.update();
                 run();
+                telemetry.addData("Heading", Math.toDegrees(drive.getPoseEstimate().getHeading()));
+                error = Math.abs(90 - Math.toDegrees(drive.getPoseEstimate().getHeading()));
+                telemetry.addData("Max Error", Math.max(error, prevError));
+                prevError = error;
             }
 
             chambers = new Pose2d(chambers.getX() - 2, chambers.getY(), chambers.getHeading());
+            current_pose = drive.getPoseEstimate();
+
+            if (Math.abs(90 - Math.toDegrees(drive.getPoseEstimate().getHeading())) >= 2) {
+                break;
+            }
 
             drive.setPoseEstimate(new Pose2d(
                 drive.getPoseEstimate().getX(),

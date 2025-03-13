@@ -62,7 +62,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private Level level;
 
     HashMap<Level, Integer> levelMap = new HashMap<Level, Integer>() {{
-        put(Level.INTAKE, 5);
+        put(Level.INTAKE, 0);
         put(Level.SPECIMEN_DISLOCATE, 137);
         put(Level.PARK0, 80);
         put(Level.PARK, 230);
@@ -70,11 +70,11 @@ public class ElevatorSubsystem extends SubsystemBase {
         put(Level.LOW_BASKET, 680);
         put(Level.HIGH_BASKET, 2058);
         put(Level.LOW_CHAMBER, 0);
-        put(Level.HIGH_CHAMBER, 518);
+        put(Level.HIGH_CHAMBER, 555);
         put(Level.HIGH_CHAMBER_RELEASE, 0);
         put(Level.HANGING_AIM, 917);
-        put(Level.HANGING, -165);
-        put(Level.HANGING_RELEASE, -10); // TODO Go intake in auto hang
+        put(Level.HANGING, -150);
+        put(Level.HANGING_RELEASE, 0); // TODO Go intake in auto hang
     }};
 
     public static int target_height = 0;
@@ -152,7 +152,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         telemetry.addData("Cur Height: ", getHeight());
         telemetry.addData("Target Height: ", target_height);
-        telemetry.addData("Power: ", power.getAsDouble());
 
 
 
