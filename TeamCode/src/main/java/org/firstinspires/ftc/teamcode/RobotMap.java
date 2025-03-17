@@ -156,6 +156,7 @@ public class RobotMap implements RobotMapInterface {
         //// ----------------------------------- Mechanisms ----------------------------------- ////
         // ---------------------------------------- Claw ---------------------------------------- //
         clawServo = hardwareMap.get(ServoImplEx.class, "claw");
+        clawServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
         clawRotServo = hardwareMap.get(ServoImplEx.class, "claw_rot");
 
         // ---------------------------------------- Arm ----------------------------------------- //

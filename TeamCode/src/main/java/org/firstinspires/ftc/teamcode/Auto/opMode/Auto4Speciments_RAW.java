@@ -63,7 +63,7 @@ public class Auto4Speciments_RAW extends CommandOpMode {
         ),
 
         allianceSampleLeft = new Pose2d(
-            2 * Tile + 2, -Tile + (robotY/2) + 3, Math.toRadians(90)
+            2 * Tile + 2, -Tile + (robotY/2) + 5, Math.toRadians(90)
         ),
 
         allianceSampleMid = new Pose2d(
@@ -113,7 +113,7 @@ public class Auto4Speciments_RAW extends CommandOpMode {
                                                                             DriveConstants.TRACK_WIDTH),
                                    SampleMecanumDrive.getAccelerationConstraint(55)
             )
-            .lineToConstantHeading(allianceSampleLeft.vec(),
+            .lineToConstantHeading(new Vector2d(allianceSampleLeft.getX() - 4, allianceSampleLeft.getY()),
                                    SampleMecanumDrive.getVelocityConstraint(60,
                                                                             DriveConstants.MAX_ANG_VEL,
                                                                             DriveConstants.TRACK_WIDTH),
@@ -140,6 +140,10 @@ public class Auto4Speciments_RAW extends CommandOpMode {
             .setReversed(true)
             .setTangent(Math.toRadians(315))
             .splineToConstantHeading(observationZone.vec(), Math.toRadians(270));
+//                    SampleMecanumDrive.getVelocityConstraint(60,
+//                            DriveConstants.MAX_ANG_VEL,
+//                            DriveConstants.TRACK_WIDTH),
+//                    SampleMecanumDrive.getAccelerationConstraint(45));
     }
 
     public void init_toScoreSpeciment() {
@@ -236,7 +240,7 @@ public class Auto4Speciments_RAW extends CommandOpMode {
         );
         temp.schedule();
 
-        observationZone = new Pose2d(observationZone.getX(), observationZone.getY() + 0.2, observationZone.getHeading());
+        observationZone = new Pose2d(observationZone.getX(), observationZone.getY() - 0.3, observationZone.getHeading());
 
         init_toHumanPlayer();
         drive.followTrajectorySequenceAsync(toHumanPlayer.build());
@@ -251,7 +255,7 @@ public class Auto4Speciments_RAW extends CommandOpMode {
         }
         current_pose = drive.getPoseEstimate();
 
-        observationZone = new Pose2d(observationZone.getX(), observationZone.getY() - 0.6, observationZone.getHeading());
+        observationZone = new Pose2d(observationZone.getX(), observationZone.getY(), observationZone.getHeading());
 
         for(int i = 0; i < 3; ++i) {
 

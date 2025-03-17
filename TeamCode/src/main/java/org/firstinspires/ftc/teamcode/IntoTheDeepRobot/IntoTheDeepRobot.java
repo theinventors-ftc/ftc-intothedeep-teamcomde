@@ -123,9 +123,9 @@ public class IntoTheDeepRobot extends RobotEx {
                         () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
                 ),
                 new ConditionalCommand(
-                        new InstantCommand(() -> extendoSubsystem.setTargetPosition(100), extendoSubsystem),
+                        new InstantCommand(() -> extendoSubsystem.setTargetPosition(250), extendoSubsystem),
                         new InstantCommand(),
-                        () -> extendoSubsystem.getExtension() < 100
+                        () -> extendoSubsystem.getExtension() < 250
                 ),
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
@@ -281,14 +281,14 @@ public class IntoTheDeepRobot extends RobotEx {
         ));
 
         // Coupler Engage/Disengage Toggle
-        new Trigger(
-                () -> toolOp.getGamepadButton(GamepadKeys.Button.START).get() &&
-                        toolOp.getGamepadButton(GamepadKeys.Button.RIGHT_STICK_BUTTON).get())
-                .whenActive(new ConditionalCommand(
-                        new InstantCommand(couplersSubsystem::disengage),
-                        new InstantCommand(couplersSubsystem::engage),
-                        () -> couplersSubsystem.getState() == CouplersSubsystem.CouplerState.ENGAGED
-                ));
+//        new Trigger(
+//                () -> toolOp.getGamepadButton(GamepadKeys.Button.START).get() &&
+//                        toolOp.getGamepadButton(GamepadKeys.Button.RIGHT_STICK_BUTTON).get())
+//                .whenActive(new ConditionalCommand(
+//                        new InstantCommand(couplersSubsystem::disengage),
+//                        new InstantCommand(couplersSubsystem::engage),
+//                        () -> couplersSubsystem.getState() == CouplersSubsystem.CouplerState.ENGAGED
+//                ));
 
         toolOp.getGamepadButton(GamepadKeys.Button.START).whenPressed(new SequentialCommandGroup(
                 new InstantCommand(() -> this.drive_setEnabled(false)),
@@ -310,7 +310,7 @@ public class IntoTheDeepRobot extends RobotEx {
                                         ElevatorSubsystem.Level.PARK)
                                 ),
                                 new WaitCommand(250),
-                                new InstantCommand(clawSubsystem::goNormal, clawSubsystem),
+                                new InstantCommand(clawSubsystem::goFlipped, clawSubsystem),
                                 new InstantCommand(() -> armSubsystem.setWristState(
                                         ArmSubsystem.WristState.SPECIMENT_INTAKE
                                 )),
@@ -327,7 +327,7 @@ public class IntoTheDeepRobot extends RobotEx {
                         new SequentialCommandGroup(
                                 new InstantCommand(clawSubsystem::grab),
                                 new WaitCommand(200),
-                                new InstantCommand(clawSubsystem::goFlipped),
+                                new InstantCommand(clawSubsystem::goNormal),
                                 new InstantCommand(() -> elevatorSubsystem.setLevel(
                                         ElevatorSubsystem.Level.HIGH_CHAMBER
                                 )),
@@ -506,29 +506,34 @@ public class IntoTheDeepRobot extends RobotEx {
                 () -> elevatorSubsystem.getLevel() != ElevatorSubsystem.Level.HANGING_AIM
         ));
 
-        // Specimen Outtake Automation with Distance Sensor (6.3, 13)
-        new Trigger(
-                () -> distanceSensorsSubsystem.getDistances()[0] <=
-                        (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ? 6.7 : 13) &&
-                        (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ||
-                                armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_HIGH)
-        ).whenActive(new ConditionalCommand(
-                new SequentialCommandGroup(
-                        new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
-                        new WaitCommand(150),
-                        new InstantCommand(
-                                () -> armSubsystem.setArmState(ArmSubsystem.ArmState.PERP)
-                        )
-                ),
-                new SequentialCommandGroup(
-                        new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
-                        new WaitCommand(150),
-                        new InstantCommand(
-                                () -> armSubsystem.setArmState(ArmSubsystem.ArmState.INTAKE_B)
-                        )
-                ),
-                () -> armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_HIGH
+        toolOp.getGamepadButton(GamepadKeys.Button.BACK).whenPressed(new SequentialCommandGroup(
+                new InstantCommand(elevatorSubsystem::reset_encoder, elevatorSubsystem),
+                new InstantCommand(extendoSubsystem::reset_encoder, extendoSubsystem)
         ));
+
+        // Specimen Outtake Automation with Distance Sensor (6.3, 13)
+//        new Trigger(
+//                () -> distanceSensorsSubsystem.getDistances()[0] <=
+//                        (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ? 6.7 : 13) &&
+//                        (armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_LOW ||
+//                                armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_HIGH)
+//        ).whenActive(new ConditionalCommand(
+//                new SequentialCommandGroup(
+//                        new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
+//                        new WaitCommand(150),
+//                        new InstantCommand(
+//                                () -> armSubsystem.setArmState(ArmSubsystem.ArmState.PERP)
+//                        )
+//                ),
+//                new SequentialCommandGroup(
+//                        new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
+//                        new WaitCommand(150),
+//                        new InstantCommand(
+//                                () -> armSubsystem.setArmState(ArmSubsystem.ArmState.INTAKE_B)
+//                        )
+//                ),
+//                () -> armSubsystem.getArmState() == ArmSubsystem.ArmState.SPECIMENT_OUTTAKE_HIGH
+//        ));
 
         // ------------------------------------ Drive Commands ---------------------------------- //
         driverOp.getGamepadButton(GamepadKeys.Button.A)

@@ -174,4 +174,8 @@ public class IntakeSubsystem extends SubsystemBase {
 //        telemetry.addData("Intake has Sample?: ", limitSwitch.getState());
 //        return colorSensor.getDistance(DistanceUnit.MM) < 30;
     }
+
+    public ColorSensor getColorSensor() {
+        return colorSensor;
+    }
 }

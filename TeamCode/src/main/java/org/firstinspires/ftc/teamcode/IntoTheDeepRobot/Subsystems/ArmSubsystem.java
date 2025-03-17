@@ -22,7 +22,8 @@ public class ArmSubsystem extends SubsystemBase {
         SPECIMENT_OUTTAKE_HIGH,
         SPECIMENT_OUTTAKE_LOW,
         HUMAN_PLAYER,
-        SPECIMEN_OUTTAKE
+        SPECIMEN_OUTTAKE,
+        LVL1_ASCENT
     }
     public enum WristState {
         INTAKE,
@@ -35,7 +36,8 @@ public class ArmSubsystem extends SubsystemBase {
         SPECIMENT_OUTTAKE_HIGH, // old
         SPECIMENT_OUTTAKE_LOW, // old
         HUMAN_PLAYER,
-        SPECIMEN_OUTTAKE
+        SPECIMEN_OUTTAKE,
+        LVL1_ASCENT
     }
     private ArmState armState;
     private WristState wristState;
@@ -44,7 +46,7 @@ public class ArmSubsystem extends SubsystemBase {
         put(ArmState.INTAKE, 0.16); // 0.075
         put(ArmState.PARK, 0.18);
         put(ArmState.PERP, 0.75);
-        put(ArmState.SPECIMENT_INTAKE, 0.79);
+        put(ArmState.SPECIMENT_INTAKE, 0.775);
         put(ArmState.INTAKE_B_ABOVE, 0.88);
         put(ArmState.INTAKE_B, 0.91);
         put(ArmState.BASKET_OUTTAKE, 0.46);
@@ -52,6 +54,7 @@ public class ArmSubsystem extends SubsystemBase {
         put(ArmState.SPECIMENT_OUTTAKE_LOW, 0.86);
         put(ArmState.HUMAN_PLAYER, 0.7);
         put(ArmState.SPECIMEN_OUTTAKE, 0.33);
+        put(ArmState.LVL1_ASCENT, 0.5);
     }};
 
     private final HashMap<WristState, Double> wrist_positions = new HashMap<WristState, Double>() {{
@@ -66,6 +69,7 @@ public class ArmSubsystem extends SubsystemBase {
         put(WristState.SPECIMENT_OUTTAKE_LOW, 0.0);
         put(WristState.HUMAN_PLAYER, 0.69);
         put(WristState.SPECIMEN_OUTTAKE, 0.28);
+        put(WristState.LVL1_ASCENT, 0.78);
     }};
 
     public ArmSubsystem(RobotMap robotMap) {

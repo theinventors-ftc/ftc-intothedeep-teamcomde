@@ -131,8 +131,14 @@ public class OpCommon {
                         ArmSubsystem.ArmState.INTAKE
                 )),
                 // Clear Way
-                new InstantCommand(() -> extendoSubsystem.set_MAX_POWER(0.6)),
-                new InstantCommand(() -> extendoSubsystem.setTargetPosition(750)),
+                new InstantCommand(() -> extendoSubsystem.set_MAX_POWER(0.8)),
+                new InstantCommand(() -> extendoSubsystem.setTargetPosition(850)),
+                new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
+                new InstantCommand(() -> extendoSubsystem.set_MAX_POWER(1)),
+                new InstantCommand(() -> extendoSubsystem.setTargetPosition(480)),
+                new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
+                new InstantCommand(() -> extendoSubsystem.set_MAX_POWER(0.8)),
+                new InstantCommand(() -> extendoSubsystem.setTargetPosition(650)),
                 new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
                 new InstantCommand(() -> extendoSubsystem.set_MAX_POWER(1)),
                 new InstantCommand(() -> extendoSubsystem.setTargetPosition(480)),
@@ -232,8 +238,7 @@ public class OpCommon {
             new InstantCommand(intakeSubsystem::raise),
             new InstantCommand(intakeSubsystem::reverse),
             new WaitCommand(1000),
-            new InstantCommand(intakeSubsystem::stop),
-            new InstantCommand(intakeSubsystem::lower)
+            new InstantCommand(intakeSubsystem::stop)
         );
     }
 
@@ -284,7 +289,7 @@ public class OpCommon {
         return new SequentialCommandGroup(
             new InstantCommand(intakeSubsystem::lower),
             new InstantCommand(()-> extendoSubsystem.set_MAX_POWER(power)),
-            new InstantCommand(()-> extendoSubsystem.setTargetPosition(700))
+            new InstantCommand(()-> extendoSubsystem.setTargetPosition(800))
         );
     }
 
@@ -419,5 +424,12 @@ public class OpCommon {
         robotMap.getRearLeftMotor().set(backLeftPower);
         robotMap.getFrontRightMotor().set(frontRightPower);
         robotMap.getRearRightMotor().set(backRightPower);
+    }
+
+    public SequentialCommandGroup parking() {
+        return new SequentialCommandGroup(
+                new InstantCommand(()-> armSubsystem.setArmState(ArmSubsystem.ArmState.LVL1_ASCENT)),
+                new InstantCommand(()-> armSubsystem.setWristState(ArmSubsystem.WristState.LVL1_ASCENT))
+        );
     }
 }

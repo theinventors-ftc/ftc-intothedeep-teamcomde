@@ -16,6 +16,7 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.util.Timing;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.Auto.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
@@ -29,6 +30,7 @@ import org.inventors.ftc.robotbase.RobotEx;
 import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleSupplier;
 
+@Disabled
 @Autonomous(name = "Auto5Samples", group = "Special")
 public class AutoStarlight_5Samples extends CommandOpMode {
 
@@ -40,13 +42,15 @@ public class AutoStarlight_5Samples extends CommandOpMode {
     private SequentialCommandGroup temp;
     private Timing.Timer timer;
 
+    private RobotEx.Alliance alliance = RobotEx.Alliance.RED;
+
     /**
      * Poses
      */
     private Pose2d
 
         startPose = new Pose2d(
-            -Tile + robotX/2, (-3 * Tile) + robotY/2, Math.toRadians(270)
+            -Tile + robotX/2, (-3 * Tile) + robotY/2 + 1, Math.toRadians(270)
         ),
 
         chambers = new Pose2d(
@@ -66,15 +70,15 @@ public class AutoStarlight_5Samples extends CommandOpMode {
         ), extendo_length.getAsDouble()),
 
         neutralSampleLeft = new Pose2d(
-            -2.3 * Tile, -1.5 * Tile + 2.3, Math.toRadians(159) // PEOS
+            -2.2 * Tile, -1.6 * Tile + 2.3, Math.toRadians(150) // PEOS
         ),
 
         submersible = new Pose2d(
-                -Tile+2.5, -0.5 * Tile, Math.toRadians(0)
+                -Tile, -0.5 * Tile, Math.toRadians(0)
         ),
 
         parking = new Pose2d(
-            -1.25 * Tile+2, -0.5 * Tile-3, Math.toRadians(0)
+                -Tile/2, -0.5 * Tile, Math.toRadians(180)
         );
 
     /**
@@ -102,11 +106,11 @@ public class AutoStarlight_5Samples extends CommandOpMode {
     }
     public void init_toNeutral_0() {
         toNeutral_0 = drive.trajectorySequenceBuilder(current_pose)
-                .lineToLinearHeading(new Pose2d(basket.getX() + 3.5, basket.getY(), Math.toRadians(68)));
+                .lineToLinearHeading(new Pose2d(basket.getX() + 3.5, basket.getY(), Math.toRadians(63)));
     }
     public void init_toNeutral_1() {
         toNeutral_1 = drive.trajectorySequenceBuilder(current_pose)
-            .lineToLinearHeading(new Pose2d(basket.getX()-0.5, basket.getY() + 2, Math.toRadians(83)));
+            .lineToLinearHeading(new Pose2d(basket.getX()-0.5, basket.getY() + 2, Math.toRadians(75)));
     }
     public void init_toNeutral_2() {
         toNeutral_2 = drive.trajectorySequenceBuilder(current_pose)
@@ -134,7 +138,7 @@ public class AutoStarlight_5Samples extends CommandOpMode {
     public void init_toBasketFinal() {
         toBasketFinal = drive.trajectorySequenceBuilder(current_pose)
                 .setReversed(true)
-                .lineToLinearHeading(new Pose2d(basket.getX()-2, basket.getY() + 1,//5
+                .lineToLinearHeading(new Pose2d(basket.getX()-2, basket.getY() + 1.5,//5
                         Math.toRadians(70)));
     }
 
@@ -160,12 +164,16 @@ public class AutoStarlight_5Samples extends CommandOpMode {
 
     public void init_toParking() {
         toParking = drive.trajectorySequenceBuilder(current_pose)
-            .splineTo(parking.vec(), Math.toRadians(45),
+            .splineToSplineHeading(parking, Math.toRadians(0),
                     SampleMecanumDrive.getVelocityConstraint(70,
                             DriveConstants.MAX_ANG_VEL,
                             DriveConstants.TRACK_WIDTH),
                     SampleMecanumDrive.getAccelerationConstraint(55)
             );
+    }
+
+    public void setAlliance(RobotEx.Alliance alliance) {
+        this.alliance = alliance;
     }
 
     /**
@@ -177,7 +185,7 @@ public class AutoStarlight_5Samples extends CommandOpMode {
         robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.AUTO);
         drive = new SampleMecanumDrive(robotMap);
         drive.setPoseEstimate(startPose);
-        opCommon = new OpCommon(robotMap, RobotEx.Alliance.RED);
+        opCommon = new OpCommon(robotMap, alliance);
         timer = new Timing.Timer(30000, TimeUnit.MILLISECONDS);
     }
 
@@ -219,6 +227,8 @@ public class AutoStarlight_5Samples extends CommandOpMode {
 
         /* -----0----- */
 
+        basket = new Pose2d(basket.getX() - 1.5, basket.getY(), basket.getHeading());
+
         temp = new SequentialCommandGroup(
             opCommon.extendo(0.6),
             opCommon.sample_intake()
@@ -256,6 +266,7 @@ public class AutoStarlight_5Samples extends CommandOpMode {
         /* -----1----- */
 
         temp = new SequentialCommandGroup(
+            new WaitCommand(50),
             opCommon.release_sample(),
             new WaitCommand(1000),
             opCommon.extendo(0.4),
@@ -282,6 +293,7 @@ public class AutoStarlight_5Samples extends CommandOpMode {
                 new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
                 new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(400)), // Prep Extendo
                 opCommon.basket_scoring(),
+                new WaitCommand(50),
                 opCommon.release_sample()
         );
         temp.schedule();
@@ -316,6 +328,8 @@ public class AutoStarlight_5Samples extends CommandOpMode {
 //            run();
 //        }
 
+        basket = new Pose2d(basket.getX() + 1.5, basket.getY(), basket.getHeading());
+
         /*-- 2 --*/
         temp = new SequentialCommandGroup(
             new WaitCommand(1000),
@@ -341,7 +355,7 @@ public class AutoStarlight_5Samples extends CommandOpMode {
                 new InstantCommand(() -> opCommon.elevatorSubsystem.set_target_height(150)),
                 new WaitCommand(200),
                 new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
-                new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(400)), // Prep Extendo
+                new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(600)), // Prep Extendo
                 opCommon.basket_scoring()
         );
         temp.schedule();
@@ -360,7 +374,10 @@ public class AutoStarlight_5Samples extends CommandOpMode {
         drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
         current_pose = drive.getPoseEstimate();
 
-        temp = opCommon.release_sample();
+        temp = new SequentialCommandGroup(
+                new WaitCommand(100),
+                opCommon.release_sample()
+        );
         temp.schedule();
         while (
             !isStopRequested()
@@ -466,7 +483,8 @@ public class AutoStarlight_5Samples extends CommandOpMode {
 
             temp = new SequentialCommandGroup(
                     new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(-50)),
-                    new InstantCommand(() -> opCommon.elevatorSubsystem.set_target_height(-50))
+                    new InstantCommand(() -> opCommon.elevatorSubsystem.set_target_height(-50)),
+                    opCommon.parking()
             );
             temp.schedule();
             init_toParking();
@@ -486,6 +504,7 @@ public class AutoStarlight_5Samples extends CommandOpMode {
             temp = new SequentialCommandGroup(
                     new InstantCommand(opCommon.intakeSubsystem::raise),
                     new InstantCommand(opCommon.intakeSubsystem::stop),
+                    new InstantCommand(opCommon.intakeSubsystem::reverse),
                     new InstantCommand(() -> opCommon.armSubsystem.setArmState(
                             ArmSubsystem.ArmState.PARK
                     )),
@@ -496,7 +515,8 @@ public class AutoStarlight_5Samples extends CommandOpMode {
                     new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(-50)),
                     new InstantCommand(() -> opCommon.elevatorSubsystem.set_target_height(-50)),
                     new WaitUntilCommand(() -> opCommon.elevatorSubsystem.atTarget()),
-                    new WaitUntilCommand(() -> opCommon.extendoSubsystem.atTarget())
+                    new WaitUntilCommand(() -> opCommon.extendoSubsystem.atTarget()),
+                    new InstantCommand(opCommon.intakeSubsystem::stop)
             );
             temp.schedule();
             while (

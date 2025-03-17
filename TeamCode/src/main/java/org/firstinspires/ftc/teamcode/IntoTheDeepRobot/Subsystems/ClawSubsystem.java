@@ -24,9 +24,9 @@ public class ClawSubsystem extends SubsystemBase {
     private ClawRotState rotState;
 
     private final HashMap<ClawState, Double> claw_positions = new HashMap<ClawState, Double>() {{
-        put(ClawState.CLOSED, 0.95);
-        put(ClawState.JUST_OPENED, 0.78);
-        put(ClawState.OPEN, 0.64);
+        put(ClawState.CLOSED, 0.82);
+        put(ClawState.JUST_OPENED, 0.7);
+        put(ClawState.OPEN, 0.55);
     }};
 
     private final HashMap<ClawRotState, Double> claw_rot_positions = new HashMap<ClawRotState, Double>() {{

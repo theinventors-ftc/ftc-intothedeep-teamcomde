@@ -70,7 +70,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         put(Level.LOW_BASKET, 680);
         put(Level.HIGH_BASKET, 2058);
         put(Level.LOW_CHAMBER, 0);
-        put(Level.HIGH_CHAMBER, 555);
+        put(Level.HIGH_CHAMBER, 570);
         put(Level.HIGH_CHAMBER_RELEASE, 0);
         put(Level.HANGING_AIM, 917);
         put(Level.HANGING, -150);
@@ -147,7 +147,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 //            return;
 //        }
 
-        pid.setSetPoint(Range.clip(target_height, -250, MAX_ELEVATOR_HEIGHT));
+        pid.setSetPoint(Range.clip(target_height, -1000000000, MAX_ELEVATOR_HEIGHT));
 //        pid.setSetPoint(target_height);
 
         telemetry.addData("Cur Height: ", getHeight());
@@ -226,5 +226,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void reset_encoder() {
         elevatorMotor.resetEncoder();
         elevatorMotorFollow.resetEncoder();
+        target_height = 0;
     }
 }

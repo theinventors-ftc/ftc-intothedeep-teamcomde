@@ -21,7 +21,8 @@ import java.util.function.DoubleSupplier;
 public class ExtendoSubsystem extends SubsystemBase {
     private MotorExEx extendoMotor;
     private double MAX_EXTENDO_POWER = 1.0;
-    private int MAX_EXTENSION = 1850; // Allowed: 1200, Max: 1800
+//    private int MAX_EXTENSION = 1850;
+    private int MAX_EXTENSION = 1800;
     private DoubleSupplier power;
 
     private SimpleMotorFeedforward ff = new SimpleMotorFeedforward(
@@ -63,7 +64,7 @@ public class ExtendoSubsystem extends SubsystemBase {
     ) {
         extendoMotor = robotMap.getExtendoMotor();
         extendoMotor.setRunMode(MotorExEx.RunMode.RawPower);
-        extendoMotor.resetEncoder();
+        reset_encoder();
         this.power = power;
 
         this.telemetry = telemetry;
@@ -102,7 +103,8 @@ public class ExtendoSubsystem extends SubsystemBase {
         if(Math.abs(power.getAsDouble()) > 0.05 && !block_manual){ // Manual
             set(Range.clip(
                     power.getAsDouble(),
-                    getExtension() > 90 ? -1 : 0.0,
+                    -1,
+//                    getExtension() > 90 ? -1 : 0.0,
                     getExtension() < MAX_EXTENSION ? 1 : 0.0));
             targetPosition = getExtension();
         } else { // Auto
@@ -124,6 +126,11 @@ public class ExtendoSubsystem extends SubsystemBase {
 
     public int getExtension() {
         return extendoMotor.getCurrentPosition()-springs_off;
+    }
+
+    public void reset_encoder(){
+        extendoMotor.resetEncoder();
+        targetPosition = 0;
     }
 
     // Zeroing
