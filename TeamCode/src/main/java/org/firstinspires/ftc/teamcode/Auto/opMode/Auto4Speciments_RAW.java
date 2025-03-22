@@ -5,9 +5,10 @@ import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robo
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robotY;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.util.Timing;
@@ -51,11 +52,11 @@ public class Auto4Speciments_RAW extends CommandOpMode {
         ),
 
         preload = new Pose2d(
-            3 , -Tile - (robotY/2) + 1.5, Math.toRadians(90)
+            -4 , -Tile - (robotY/2) + 1.5, Math.toRadians(90)
         ),
 
         chambers = new Pose2d(
-            0 , -Tile - (robotY/2) + 1, Math.toRadians(90)
+            -2 , -Tile - (robotY/2) + 1, Math.toRadians(90)
         ),
 
         observationZone = new Pose2d(
@@ -63,11 +64,11 @@ public class Auto4Speciments_RAW extends CommandOpMode {
         ),
 
         allianceSampleLeft = new Pose2d(
-            2 * Tile + 2, -Tile + (robotY/2) + 5, Math.toRadians(90)
+            2 * Tile + 2, -Tile, Math.toRadians(90)
         ),
 
         allianceSampleMid = new Pose2d(
-            2.5 * Tile - 2, -Tile + (robotY/2) + 1, Math.toRadians(90)
+            2.5 * Tile - 2, -Tile, Math.toRadians(90)
         ),
 
         allianceSampleRight = new Pose2d(
@@ -83,7 +84,9 @@ public class Auto4Speciments_RAW extends CommandOpMode {
      */
     private TrajectorySequenceBuilder
         toPreload,
-        toAllianceSamples,
+        toAllianceSamples_0,
+        toAllianceSamples_1,
+        turn,
         toObservationZone,
         toHumanPlayer,
         toScoreSpeciment,
@@ -101,38 +104,63 @@ public class Auto4Speciments_RAW extends CommandOpMode {
             );
     }
 
-    public void init_toAllianceSamples() {
-        toAllianceSamples = drive.trajectorySequenceBuilder(current_pose)
+//    public void init_toAllianceSamples() {
+//        toAllianceSamples = drive.trajectorySequenceBuilder(current_pose)
+//            .setTangent(Math.toRadians(315))
+//            .splineToConstantHeading(new Vector2d(Tile + 5, -1.7 * Tile), Math.toRadians(45))
+//            .splineToConstantHeading(allianceSampleLeft.vec(), Math.toRadians(270))
+//            .lineToConstantHeading(new Vector2d(allianceSampleLeft.getX(),
+//                                                (-2.3 * Tile) + (robotY/2)),
+//                                   SampleMecanumDrive.getVelocityConstraint(60,
+//                                                                            DriveConstants.MAX_ANG_VEL,
+//                                                                            DriveConstants.TRACK_WIDTH),
+//                                   SampleMecanumDrive.getAccelerationConstraint(55)
+//            )
+//            .lineToConstantHeading(new Vector2d(allianceSampleLeft.getX() - 4, allianceSampleLeft.getY()),
+//                                   SampleMecanumDrive.getVelocityConstraint(60,
+//                                                                            DriveConstants.MAX_ANG_VEL,
+//                                                                            DriveConstants.TRACK_WIDTH),
+//                                   SampleMecanumDrive.getAccelerationConstraint(55)
+//            )
+//            .splineToConstantHeading(allianceSampleMid.vec(), Math.toRadians(0))
+//            .lineToConstantHeading(new Vector2d(allianceSampleMid.getX(),
+//                                                (-2.4 * Tile) + (robotY/2)),
+//                                   SampleMecanumDrive.getVelocityConstraint(60,
+//                                                                            DriveConstants.MAX_ANG_VEL,
+//                                                                            DriveConstants.TRACK_WIDTH),
+//                                   SampleMecanumDrive.getAccelerationConstraint(45)
+//            );
+//    }
+
+    public void init_toAllianceSamples_0() {
+        toAllianceSamples_0 = drive.trajectorySequenceBuilder(current_pose)
             .setTangent(Math.toRadians(315))
-            .splineToConstantHeading(new Vector2d(Tile + 5, -1.7 * Tile), Math.toRadians(45))
-            .splineToConstantHeading(allianceSampleLeft.vec(), Math.toRadians(270))
-            .lineToConstantHeading(new Vector2d(allianceSampleLeft.getX(),
-                                                (-2.3 * Tile) + (robotY/2)),
-                                   SampleMecanumDrive.getVelocityConstraint(60,
-                                                                            DriveConstants.MAX_ANG_VEL,
-                                                                            DriveConstants.TRACK_WIDTH),
-                                   SampleMecanumDrive.getAccelerationConstraint(55)
-            )
-            .lineToConstantHeading(new Vector2d(allianceSampleLeft.getX() - 4, allianceSampleLeft.getY()),
-                                   SampleMecanumDrive.getVelocityConstraint(60,
-                                                                            DriveConstants.MAX_ANG_VEL,
-                                                                            DriveConstants.TRACK_WIDTH),
-                                   SampleMecanumDrive.getAccelerationConstraint(55)
-            )
-            .splineToConstantHeading(allianceSampleMid.vec(), Math.toRadians(0))
-            .lineToConstantHeading(new Vector2d(allianceSampleMid.getX(),
-                                                (-2.4 * Tile) + (robotY/2)),
-                                   SampleMecanumDrive.getVelocityConstraint(60,
-                                                                            DriveConstants.MAX_ANG_VEL,
-                                                                            DriveConstants.TRACK_WIDTH),
-                                   SampleMecanumDrive.getAccelerationConstraint(45)
+            .splineToLinearHeading(new Pose2d(
+                allianceSampleLeft.getX() - (21 + robotY/2) * Math.sin(45),
+                allianceSampleLeft.getY() - (21 + robotY/2) * Math.cos(45) - 3,
+                                       Math.toRadians(45)), Math.toRadians(45)
             );
+    }
+
+    public void init_toAllianceSamples_1() {
+        toAllianceSamples_1 = drive.trajectorySequenceBuilder(current_pose)
+            .splineToLinearHeading(new Pose2d(
+                allianceSampleMid.getX() - (21 + robotY/2) * Math.sin(45),
+                allianceSampleMid.getY() - (21 + robotY/2) * Math.cos(45),
+                Math.toRadians(35)), Math.toRadians(45)
+            )
+            .forward(1);
+    }
+
+    public void init_turn() {
+        turn = drive.trajectorySequenceBuilder(current_pose)
+            .turn(Math.toRadians(-90));
     }
 
     public void init_toHumanPlayer() {
         toHumanPlayer = drive.trajectorySequenceBuilder(current_pose)
             .setReversed(true)
-            .lineToConstantHeading(observationZone.vec());
+            .lineToLinearHeading(observationZone);
     }
 
     public void init_toObservationZone() {
@@ -186,7 +214,11 @@ public class Auto4Speciments_RAW extends CommandOpMode {
         initialize();
         waitForStart();
 
-        temp = opCommon.specimenIntake();
+        temp = new SequentialCommandGroup(
+            new InstantCommand(() -> opCommon.elevatorSubsystem.set_target_height(150)),
+            new WaitCommand(200),
+            opCommon.specimenOuttake()
+        );
         temp.schedule();
         init_toPreload();
         drive.followTrajectorySequenceAsync(toPreload.build());
@@ -219,10 +251,15 @@ public class Auto4Speciments_RAW extends CommandOpMode {
             run();
         }
 
-        temp = opCommon.reset_elevator();
+        temp = new SequentialCommandGroup(
+            opCommon.reset_elevator(),
+            new WaitCommand(750),
+            new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
+            opCommon.sample_intake_specimen(1850)
+        );
         temp.schedule();
-        init_toAllianceSamples();
-        drive.followTrajectorySequenceAsync(toAllianceSamples.build());
+        init_toAllianceSamples_0();
+        drive.followTrajectorySequenceAsync(toAllianceSamples_0.build());
         while (
             !isStopRequested()
                 && opModeIsActive()
@@ -234,9 +271,57 @@ public class Auto4Speciments_RAW extends CommandOpMode {
         }
         current_pose = drive.getPoseEstimate();
 
+        init_turn();
+        drive.followTrajectorySequenceAsync(turn.build());
+        while (
+            !isStopRequested()
+                && opModeIsActive()
+                && drive.isBusy()
+        ) {
+            drive.update();
+            run();
+        }
+        current_pose = drive.getPoseEstimate();
+
+        //---//
+
         temp = new SequentialCommandGroup(
-            new WaitCommand(100),
-            opCommon.specimenAim()
+            new InstantCommand(opCommon.intakeSubsystem::raise),
+            new WaitCommand(500),
+            opCommon.sample_intake_specimen(1750)
+        );
+        temp.schedule();
+        init_toAllianceSamples_1();
+        drive.followTrajectorySequenceAsync(toAllianceSamples_1.build());
+        while (
+            !isStopRequested()
+                && opModeIsActive()
+                && (drive.isBusy()
+                || CommandScheduler.getInstance().isScheduled(temp))
+        ) {
+            drive.update();
+            run();
+        }
+        current_pose = drive.getPoseEstimate();
+
+        init_turn();
+        drive.followTrajectorySequenceAsync(turn.build());
+        while (
+            !isStopRequested()
+                && opModeIsActive()
+                && drive.isBusy()
+        ) {
+            drive.update();
+            run();
+        }
+        current_pose = drive.getPoseEstimate();
+
+        temp = new SequentialCommandGroup(
+            new ParallelCommandGroup(
+                new InstantCommand(opCommon.extendoSubsystem::returnToZero),
+                new InstantCommand(opCommon.intakeSubsystem::raise),
+                opCommon.specimenAim()
+            )
         );
         temp.schedule();
 
@@ -257,9 +342,21 @@ public class Auto4Speciments_RAW extends CommandOpMode {
 
         observationZone = new Pose2d(observationZone.getX(), observationZone.getY(), observationZone.getHeading());
 
+//        temp = new SequentialCommandGroup(
+//            new WaitUntilCommand(opCommon.extendoSubsystem::atTarget)
+//        );
+//        temp.schedule();
+//        while (
+//            !isStopRequested()
+//                && opModeIsActive()
+//                && CommandScheduler.getInstance().isScheduled(temp)
+//        ) {
+//            run();
+//        }
+
         for(int i = 0; i < 3; ++i) {
 
-            temp = opCommon.specimenIntake();
+            temp = opCommon.specimenOuttake();
             temp.schedule();
             init_toScoreSpeciment();
             drive.followTrajectorySequenceAsync(toScoreSpeciment.build());
@@ -277,7 +374,7 @@ public class Auto4Speciments_RAW extends CommandOpMode {
                 prevError = error;
             }
 
-            chambers = new Pose2d(chambers.getX() - 2, chambers.getY(), chambers.getHeading());
+            chambers = new Pose2d(chambers.getX() + 2, chambers.getY(), chambers.getHeading());
             current_pose = drive.getPoseEstimate();
 
             if (Math.abs(90 - Math.toDegrees(drive.getPoseEstimate().getHeading())) >= 2) {

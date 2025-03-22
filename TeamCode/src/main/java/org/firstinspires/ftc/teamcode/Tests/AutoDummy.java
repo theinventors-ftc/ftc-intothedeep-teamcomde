@@ -1,13 +1,7 @@
 package org.firstinspires.ftc.teamcode.Tests;
 
-import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.Tile;
-import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robotX;
-import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robotY;
-
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -55,7 +49,7 @@ public class AutoDummy extends CommandOpMode {
         initialize();
         waitForStart();
 
-        temp = opCommon.specimenIntake();
+        temp = opCommon.specimenOuttake();
         temp.schedule();
         init_traj();
         drive.followTrajectorySequenceAsync(traj.build());

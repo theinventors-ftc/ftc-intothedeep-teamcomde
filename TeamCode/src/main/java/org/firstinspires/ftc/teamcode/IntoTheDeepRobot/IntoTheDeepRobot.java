@@ -305,41 +305,32 @@ public class IntoTheDeepRobot extends RobotEx {
         //// Intake Specimen Automation
         toolOp.getGamepadButton(GamepadKeys.Button.B).whenPressed(
                 new ConditionalCommand(
-                        new SequentialCommandGroup(
+                        new SequentialCommandGroup( // PEOS INTAKE AIM
                                 new InstantCommand(() -> elevatorSubsystem.setLevel(
-                                        ElevatorSubsystem.Level.PARK)
+                                        ElevatorSubsystem.Level.SPEC_MIDPOINT)
                                 ),
-                                new WaitCommand(250),
-                                new InstantCommand(clawSubsystem::goFlipped, clawSubsystem),
                                 new InstantCommand(() -> armSubsystem.setWristState(
-                                        ArmSubsystem.WristState.SPECIMENT_INTAKE
+                                        ArmSubsystem.WristState.SPEC_INTAKE_NEW
                                 )),
-                                new WaitCommand(120),
                                 new InstantCommand(() -> armSubsystem.setArmState(
-                                        ArmSubsystem.ArmState.SPECIMENT_INTAKE
-                                )),
-                                new WaitCommand(200),
-                                new InstantCommand(() -> elevatorSubsystem.setLevel(
-                                        ElevatorSubsystem.Level.INTAKE
+                                        ArmSubsystem.ArmState.SPEC_INTAKE_NEW
                                 )),
                                 new InstantCommand(clawSubsystem::release)
                         ),
-                        new SequentialCommandGroup(
+                        new SequentialCommandGroup( // PEOS INTAKE
                                 new InstantCommand(clawSubsystem::grab),
                                 new WaitCommand(200),
-                                new InstantCommand(clawSubsystem::goNormal),
                                 new InstantCommand(() -> elevatorSubsystem.setLevel(
-                                        ElevatorSubsystem.Level.HIGH_CHAMBER
+                                        ElevatorSubsystem.Level.SPEC_MIDPOINT
                                 )),
                                 new InstantCommand(() -> armSubsystem.setWristState(
-                                        ArmSubsystem.WristState.SPECIMEN_OUTTAKE
+                                        ArmSubsystem.WristState.SPEC_OUTTAKE_AIM_NEW
                                 )),
-                                new WaitCommand(100),
                                 new InstantCommand(() -> armSubsystem.setArmState(
-                                        ArmSubsystem.ArmState.SPECIMEN_OUTTAKE
+                                        ArmSubsystem.ArmState.SPEC_OUTTAKE_AIM_NEW
                                 ))
                         ),
-                        () -> armSubsystem.getArmState() != ArmSubsystem.ArmState.SPECIMENT_INTAKE
+                        () -> armSubsystem.getArmState() != ArmSubsystem.ArmState.SPEC_INTAKE_NEW
                 )
         );
         //// Intake Sample Automation
@@ -451,13 +442,16 @@ public class IntoTheDeepRobot extends RobotEx {
                 ));
 
         //// Chamber Outtake Automation
-        new Trigger(() -> toolOp.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.4)
+        new Trigger(() -> toolOp.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.4) // PEOS SCORE
                 .whenActive(new SequentialCommandGroup(
-                        new InstantCommand(() -> elevatorSubsystem.setLevel(
-                                ElevatorSubsystem.Level.HIGH_CHAMBER_RELEASE
-                        )),
-                        new WaitUntilCommand(() -> elevatorSubsystem.atTarget()),
-                        new InstantCommand(clawSubsystem::release)
+                    new InstantCommand(() -> armSubsystem.setArmState(
+                        ArmSubsystem.ArmState.SPEC_OUTTAKE_NEW
+                    )),
+                    new InstantCommand(() -> armSubsystem.setWristState(
+                        ArmSubsystem.WristState.SPEC_OUTTAKE_NEW
+                    )),
+                    new WaitCommand(500),
+                    new InstantCommand(clawSubsystem::release)
                 ));
 
         // Hanging Automation

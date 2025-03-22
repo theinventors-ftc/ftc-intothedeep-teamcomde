@@ -9,8 +9,6 @@ import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
-import com.arcrobotics.ftclib.command.button.Trigger;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
@@ -233,6 +231,16 @@ public class OpCommon {
         );
     }
 
+    public SequentialCommandGroup sample_intake_specimen(int pos) {
+        return new SequentialCommandGroup(
+            new InstantCommand(
+                () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
+            ),
+            new InstantCommand(() -> extendoSubsystem.setTargetPosition(pos), extendoSubsystem),
+            new InstantCommand(intakeSubsystem::lower)
+        );
+    }
+
     public SequentialCommandGroup discard_sample() {
         return new SequentialCommandGroup(
             new InstantCommand(intakeSubsystem::raise),
@@ -313,24 +321,17 @@ public class OpCommon {
     }
 
     public SequentialCommandGroup specimenAim() {
-        return new SequentialCommandGroup(
-            new InstantCommand(() -> elevatorSubsystem.setLevel(
-                ElevatorSubsystem.Level.PARK)
-            ),
-            new WaitCommand(250),
-            new InstantCommand(clawSubsystem::goFlipped, clawSubsystem),
-            new InstantCommand(() -> armSubsystem.setWristState(
-                ArmSubsystem.WristState.SPECIMENT_INTAKE
-            )),
-            new WaitCommand(60),
-            new InstantCommand(() -> armSubsystem.setArmState(
-                ArmSubsystem.ArmState.SPECIMENT_INTAKE
-            )),
-            new WaitCommand(160),
-            new InstantCommand(() -> elevatorSubsystem.setLevel(
-                ElevatorSubsystem.Level.INTAKE
-            )),
-            new InstantCommand(clawSubsystem::release)
+        return new SequentialCommandGroup( // PEOS INTAKE AIM
+           new InstantCommand(() -> elevatorSubsystem.setLevel(
+               ElevatorSubsystem.Level.SPEC_MIDPOINT)
+           ),
+           new InstantCommand(() -> armSubsystem.setWristState(
+               ArmSubsystem.WristState.SPEC_INTAKE_NEW
+           )),
+           new InstantCommand(() -> armSubsystem.setArmState(
+               ArmSubsystem.ArmState.SPEC_INTAKE_NEW
+           )),
+           new InstantCommand(clawSubsystem::release)
         );
     }
 
@@ -357,32 +358,33 @@ public class OpCommon {
 //        );
 //    }
 
-
-    public SequentialCommandGroup specimenIntake() {
-        return new SequentialCommandGroup(
-            new InstantCommand(clawSubsystem::grab),
-            new WaitCommand(200),
-            new InstantCommand(() -> elevatorSubsystem.setLevel(
-                ElevatorSubsystem.Level.HIGH_CHAMBER
-            )),
-            new WaitCommand(150),
-            new InstantCommand(() -> armSubsystem.setWristState(
-                ArmSubsystem.WristState.SPECIMEN_OUTTAKE
-            )),
-            new WaitCommand(100),
-            new InstantCommand(clawSubsystem::goNormal),
-            new InstantCommand(() -> armSubsystem.setArmState(
-                ArmSubsystem.ArmState.SPECIMEN_OUTTAKE
-            ))
+    public SequentialCommandGroup specimenOuttake() {
+        return new SequentialCommandGroup( // PEOS INTAKE
+           new InstantCommand(clawSubsystem::grab),
+           new WaitCommand(150),
+           new InstantCommand(() -> elevatorSubsystem.setLevel(
+               ElevatorSubsystem.Level.SPEC_MIDPOINT
+           )),
+           new InstantCommand(() -> armSubsystem.setArmState(
+               ArmSubsystem.ArmState.SPEC_OUTTAKE_AIM_NEW
+           )),
+           new WaitCommand(100),
+           new InstantCommand(() -> armSubsystem.setWristState(
+               ArmSubsystem.WristState.SPEC_OUTTAKE_AIM_NEW
+           ))
         );
     }
 
     public SequentialCommandGroup scoreSpeciment() {
         return new SequentialCommandGroup(
-            new InstantCommand(() -> elevatorSubsystem.setLevel(
-                ElevatorSubsystem.Level.HIGH_CHAMBER_RELEASE
+            new InstantCommand(() -> armSubsystem.setArmState(
+                ArmSubsystem.ArmState.SPEC_OUTTAKE_NEW
             )),
-            new WaitUntilCommand(() -> elevatorSubsystem.atTarget())
+            new InstantCommand(() -> armSubsystem.setWristState(
+                ArmSubsystem.WristState.SPEC_OUTTAKE_NEW
+            )),
+            new WaitCommand(150),
+            new InstantCommand(clawSubsystem::release)
         );
     }
 

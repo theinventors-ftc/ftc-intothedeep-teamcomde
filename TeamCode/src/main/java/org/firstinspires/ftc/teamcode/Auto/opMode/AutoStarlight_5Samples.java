@@ -175,7 +175,6 @@ public class AutoStarlight_5Samples extends CommandOpMode {
     public void setAlliance(RobotEx.Alliance alliance) {
         this.alliance = alliance;
     }
-
     /**
      * La Program
      */

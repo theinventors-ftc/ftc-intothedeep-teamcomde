@@ -20,10 +20,12 @@ public class LocalizationTest extends CommandOpMode {
     private RobotMap robotMap;
 
     private IntakeSubsystem in;
+    private DistanceSensorsSubsystem dist;
 
     @Override
     public void initialize() {
         robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.TELEOP);
+        dist = new DistanceSensorsSubsystem(robotMap, telemetry);
         drive = new SampleMecanumDrive(robotMap);
         drive.setPoseEstimate(new Pose2d(0,0,0));
         in = new IntakeSubsystem(robotMap);
@@ -39,6 +41,8 @@ public class LocalizationTest extends CommandOpMode {
         telemetry.addData("RR - X", rrPose.getX());
         telemetry.addData("RR - Y", rrPose.getY());
         telemetry.addData("RR - Theta", Math.toDegrees(rrPose.getHeading()));
+        telemetry.addData("X", dist.getDistances()[0]);
+        telemetry.addData("Y", dist.getDistances()[2]);
         telemetry.update();
     }
 }
