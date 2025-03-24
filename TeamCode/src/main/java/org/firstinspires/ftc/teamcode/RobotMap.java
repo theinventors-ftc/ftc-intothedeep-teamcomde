@@ -94,25 +94,25 @@ public class RobotMap implements RobotMapInterface {
         if(opMode == OpMode.TELEOP) {
             driverOp = new GamepadExEx(gamepad1);
             toolOp = new GamepadExEx(gamepad2);
-        }
-        // ------------------------------------- Drivetrain ------------------------------------- //
-        frontLeft = new MotorExEx(hardwareMap, "front_left", Motor.GoBILDA.RPM_435);
-        frontRight = new MotorExEx(hardwareMap, "front_right", Motor.GoBILDA.RPM_435);
-        rearLeft = new MotorExEx(hardwareMap, "rear_left", Motor.GoBILDA.RPM_435);
-        rearRight = new MotorExEx(hardwareMap, "rear_right", Motor.GoBILDA.RPM_435);
-        frontLeft.setRunMode(Motor.RunMode.RawPower);
-        frontRight.setRunMode(Motor.RunMode.RawPower);
-        rearLeft.setRunMode(Motor.RunMode.RawPower);
-        rearRight.setRunMode(Motor.RunMode.RawPower);
+            // ------------------------------------- Drivetrain ------------------------------------- //
+            frontLeft = new MotorExEx(hardwareMap, "front_left", Motor.GoBILDA.RPM_435);
+            frontRight = new MotorExEx(hardwareMap, "front_right", Motor.GoBILDA.RPM_435);
+            rearLeft = new MotorExEx(hardwareMap, "rear_left", Motor.GoBILDA.RPM_435);
+            rearRight = new MotorExEx(hardwareMap, "rear_right", Motor.GoBILDA.RPM_435);
+            frontLeft.setRunMode(Motor.RunMode.RawPower);
+            frontRight.setRunMode(Motor.RunMode.RawPower);
+            rearLeft.setRunMode(Motor.RunMode.RawPower);
+            rearRight.setRunMode(Motor.RunMode.RawPower);
 
-        imu = hardwareMap.get(IMU.class, "external_imu");
-        IMU.Parameters imuParameters = new IMU.Parameters(
-            new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD,
-                RevHubOrientationOnRobot.UsbFacingDirection.DOWN
-            )
-        );
-        imu.initialize(imuParameters);
+            imu = hardwareMap.get(IMU.class, "external_imu");
+            IMU.Parameters imuParameters = new IMU.Parameters(
+                new RevHubOrientationOnRobot(
+                    RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD,
+                    RevHubOrientationOnRobot.UsbFacingDirection.DOWN
+                )
+            );
+            imu.initialize(imuParameters);
+        }
 
         // ---------------------------------------- Util ---------------------------------------- //
         for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {

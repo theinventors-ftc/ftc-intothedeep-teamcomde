@@ -10,10 +10,10 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.command.button.Trigger;
+import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.Auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.ForwardControllerSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.HeadingControllerSubsystem;
@@ -77,7 +77,7 @@ public class OpCommon {
         );
     }
 
-    public void init_controllers(SampleMecanumDrive drive) {
+    public void init_controllers(Follower drive) {
         this.dashboard = FtcDashboard.getInstance();
         forwardControllerSubsystem = new ForwardControllerSubsystem(
             () -> distanceSensorsSubsystem.getDistances()[0],
@@ -88,7 +88,7 @@ public class OpCommon {
             dashboard.getTelemetry()
         );
         gyroFollow = new HeadingControllerSubsystem(
-            () -> Math.toDegrees(drive.getPoseEstimate().getHeading()),
+            () -> Math.toDegrees(drive.getPose().getHeading()),
             () -> 0,
             dashboard.getTelemetry()
         );
@@ -261,7 +261,7 @@ public class OpCommon {
 
     public SequentialCommandGroup release_sample() {
         return new SequentialCommandGroup(
-            new WaitCommand(250),
+            new WaitCommand(150),
             new InstantCommand(clawSubsystem::release),
             new WaitCommand(500),
             new InstantCommand(() -> armSubsystem.setWristState(

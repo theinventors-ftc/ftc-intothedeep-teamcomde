@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 public class IntakeCommand extends CommandBase {
     private final IntakeSubsystem intake;
     private final ExtendoSubsystem extendo;
+    private boolean failSafeEnabled = false;
 
     public enum COLOR {
         BLUE,
@@ -67,6 +68,21 @@ public class IntakeCommand extends CommandBase {
         intake.run();
     }
 
+    public void checkFailSafe() {
+        if (!(intake.isSample() && intake.getSampleColor() != IntakeSubsystem.COLOR.NONE)
+            && timer.done()) {
+            failSafeEnabled = true;
+        }
+    }
+
+    public boolean isFailSafeEnabled() {
+        return failSafeEnabled;
+    }
+
+    public void resetFailSafe() {
+        failSafeEnabled = false;
+    }
+
     @Override
     public void end(boolean interrupted) {
         if(interrupted) {
@@ -79,6 +95,7 @@ public class IntakeCommand extends CommandBase {
     @Override
     public boolean isFinished() {
         if (intake.getColorSensor().getDistance() == 0.0) {
+            checkFailSafe();
             return (intake.isSample()
 //                &&
 //                check_color(intake.getSampleColor())
