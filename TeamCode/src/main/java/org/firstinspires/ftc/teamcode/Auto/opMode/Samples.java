@@ -12,6 +12,7 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
 import com.pedropathing.pathgen.BezierLine;
@@ -33,7 +34,6 @@ import org.inventors.ftc.robotbase.RobotEx;
 @Autonomous(name = "Auto5Samples", group = "Special")
 public class Samples extends OpMode {
     private Follower follower;
-    private volatile Pose currP;
     private OpCommon opCommon;
     private RobotMap robotMap;
     private SequentialCommandGroup temp;
@@ -61,81 +61,80 @@ public class Samples extends OpMode {
 
     private Path
         preload,
+        park;
+
+    private PathChain
         sample_2,
         sample_3,
         s3basket,
         submersible,
         subasket,
-        park;
+        failSafePark;
 
-    private PathChain failSafePark;
-
-    public void preload() {
+    public void buildPaths() {
         preload = new Path(new BezierLine(
             new Point(start),
             new Point(sampleRight)
         ));
         preload.setLinearHeadingInterpolation(start.getHeading(), sampleRight.getHeading());
-    }
 
-    public void sample_2() {
-        sample_2 = new Path(new BezierLine(
-            new Point(currP),
+        sample_2 = follower.pathBuilder()
+            .addPath(new BezierLine(
+            new Point(sampleRight),
             new Point(sampleMid)
-        ));
-        sample_2.setLinearHeadingInterpolation(currP.getHeading(), sampleMid.getHeading());
-    }
+            ))
+            .setLinearHeadingInterpolation(sampleRight.getHeading(), sampleMid.getHeading())
+            .build();
 
-    public void sample_3() {
-        sample_3 = new Path(new BezierLine(
-            new Point(currP),
+        sample_3 = follower.pathBuilder()
+            .addPath(new BezierLine(
+            new Point(sampleMid),
             new Point(sampleLeft)
-        ));
-        sample_3.setLinearHeadingInterpolation(currP.getHeading(), sampleLeft.getHeading());
-    }
+            ))
+            .setLinearHeadingInterpolation(sampleMid.getHeading(), sampleLeft.getHeading())
+            .build();
 
-    public void s3basket() {
-        s3basket = new Path(new BezierLine(
-            new Point(currP),
+        s3basket = follower.pathBuilder()
+            .addPath(new BezierLine(
+            new Point(sampleLeft),
             new Point(sampleRight)
-        ));
-        s3basket.setLinearHeadingInterpolation(currP.getHeading(), sampleRight.getHeading());
-    }
+            ))
+            .setLinearHeadingInterpolation(sampleLeft.getHeading(), sampleRight.getHeading())
+            .build();
 
-    public void submersible() {
-        submersible = new Path(new BezierCurve(
-            new Point(currP),
+        submersible = follower.pathBuilder()
+            .addPath(new BezierCurve(
+            new Point(sampleRight),
             new Point(new Pose(-2 * Tile, 0, false)),
             new Point(sub_side)
-        ));
-        submersible.setLinearHeadingInterpolation(currP.getHeading(), sub_side.getHeading());
-    }
+            ))
+            .setLinearHeadingInterpolation(sampleRight.getHeading(), sub_side.getHeading())
+            .build();
 
-    public void subasket() {
-        subasket = new Path(new BezierCurve(
-            new Point(currP),
+        subasket = follower.pathBuilder()
+            .addPath(new BezierCurve(
+            new Point(sub_side),
             new Point(new Pose(-2 * Tile, 0, false)),
             new Point(sampleMid)
-        ));
-        subasket.setLinearHeadingInterpolation(currP.getHeading(), sampleMid.getHeading());
-    }
+            ))
+            .setLinearHeadingInterpolation(sub_side.getHeading(), sampleMid.getHeading())
+            .build();
 
-    public void park() {
         park = new Path(new BezierCurve(
-            new Point(currP),
+            new Point(sampleMid),
             new Point(new Pose(-2.5 * Tile, 10, false)),
             new Point(parking)
         ));
-        park.setLinearHeadingInterpolation(currP.getHeading(), parking.getHeading());
-    }
+        park.setLinearHeadingInterpolation(sampleMid.getHeading(), parking.getHeading());
 
-    public void failSafePark() {
+        //----Fail Safe Programs----//
+
         failSafePark = follower.pathBuilder()
             .addPath(new BezierLine(
-                new Point(currP),
+                new Point(sub_side),
                 new Point(new Pose(-2 * Tile, parking.getY(), false))
             ))
-            .setLinearHeadingInterpolation(currP.getHeading(), parking.getHeading())
+            .setLinearHeadingInterpolation(sub_side.getHeading(), parking.getHeading())
             .addPath(new BezierLine(
                 new Point(new Pose(-2 * Tile, parking.getY(), false)),
                 new Point(parking)
@@ -157,7 +156,6 @@ public class Samples extends OpMode {
                     new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(400)), // Prep Extendo
                     opCommon.basket_scoring()
                 );
-                preload();
 
                 temp.schedule();
                 follower.followPath(preload);
@@ -191,7 +189,6 @@ public class Samples extends OpMode {
                     );
                     temp.schedule();
 
-                    sample_2();
                     follower.followPath(sample_2);
                     setPathState(2);
                 }
@@ -221,7 +218,6 @@ public class Samples extends OpMode {
                     );
                     temp.schedule();
 
-                    sample_3();
                     follower.followPath(sample_3);
                     setPathState(3);
                 }
@@ -242,7 +238,6 @@ public class Samples extends OpMode {
                     sampleRight.setX(sampleRight.getX() - 2);
                     sampleRight.setY(sampleRight.getY() + 2);
 
-                    s3basket();
                     follower.followPath(s3basket);
                     setPathState(4);
                 }
@@ -258,7 +253,7 @@ public class Samples extends OpMode {
                     );
                     temp.schedule();
 
-                    submersible();
+                    FollowerConstants.xMovement = 75;
                     follower.followPath(submersible);
                     setPathState(5);
                 }
@@ -293,7 +288,7 @@ public class Samples extends OpMode {
                     sampleMid.setY(-1.85 * Tile);
                     sampleMid.setX(-2.65 * Tile);
 
-                    subasket();
+                    FollowerConstants.xMovement = 67.25945500141216;
                     follower.followPath(subasket);
                     setPathState(6);
                 }
@@ -319,7 +314,7 @@ public class Samples extends OpMode {
                     );
                     temp.schedule();
 
-                    park();
+                    FollowerConstants.xMovement = 75;
                     follower.followPath(park);
                     setPathState(8);
                 }
@@ -352,7 +347,6 @@ public class Samples extends OpMode {
                     temp =  opCommon.parking();
                     temp.schedule();
 
-                    failSafePark();
                     follower.followPath(failSafePark);
                     setPathState(8);
                 }
@@ -360,9 +354,6 @@ public class Samples extends OpMode {
 
             case 8:
                 if(!follower.isBusy()) {
-                    /* Level 1 Ascent */
-
-                    /* Set the state to a Case we won't use or define, so it just stops running an new paths */
                     setPathState(-1);
                 }
                 break;
@@ -372,12 +363,13 @@ public class Samples extends OpMode {
     @Override
     public void init() {
         CommandScheduler.getInstance().reset();
-        Constants.setConstants(FConstants.class, LConstants.class);
-        follower = new Follower(hardwareMap);
+        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         follower.setStartingPose(start);
         robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.AUTO);
         opCommon = new OpCommon(robotMap, alliance);
         timer = new Timer();
+
+        buildPaths();
     }
 
     @Override
@@ -389,17 +381,11 @@ public class Samples extends OpMode {
     public void loop() {
         follower.update();
         autonomousPathUpdate();
-        currP = follower.getPose();
         CommandScheduler.getInstance().run();
 
-        if (pathState == 5 && timer.getElapsedTime() >= 6000) {
-            setPathState(7);
-            telemetry.addData("FailSafe: ", 1);
-        }
-
-        telemetry.addData("Path State", pathState);
-        telemetry.addData("Position", follower.getPose().toString());
-        telemetry.update();
-        follower.drawOnDashBoard();
+//        if (pathState == 5 && timer.getElapsedTime() >= 6000) {
+//            setPathState(7);
+//            telemetry.addData("FailSafe: ", 1);
+//        }
     }
 }

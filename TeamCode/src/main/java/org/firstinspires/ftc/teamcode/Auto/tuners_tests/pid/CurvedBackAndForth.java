@@ -14,6 +14,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Auto.constants.FConstants;
 import org.firstinspires.ftc.teamcode.Auto.constants.LConstants;
+import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.RobotMap;
 
 
 /**
@@ -39,6 +41,8 @@ public class CurvedBackAndForth extends OpMode {
     private boolean forward = true;
 
     private Follower follower;
+    private RobotMap robotMap;
+    private IntakeSubsystem in;
 
     private Path forwards;
     private Path backwards;
@@ -49,8 +53,9 @@ public class CurvedBackAndForth extends OpMode {
      */
     @Override
     public void init() {
-        Constants.setConstants(FConstants.class, LConstants.class);
-        follower = new Follower(hardwareMap);
+        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
+        robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.AUTO);
+        in = new IntakeSubsystem(robotMap);
 
         forwards = new Path(new BezierCurve(new Point(0,0, Point.CARTESIAN), new Point(Math.abs(DISTANCE),
                                                                               0, Point.CARTESIAN), new Point(Math.abs(DISTANCE),DISTANCE, Point.CARTESIAN)));

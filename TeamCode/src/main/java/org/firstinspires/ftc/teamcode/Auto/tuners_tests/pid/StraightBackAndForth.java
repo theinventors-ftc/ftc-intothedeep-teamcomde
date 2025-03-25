@@ -14,6 +14,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Auto.constants.FConstants;
 import org.firstinspires.ftc.teamcode.Auto.constants.LConstants;
+import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.RobotMap;
 
 
 /**
@@ -34,11 +36,13 @@ import org.firstinspires.ftc.teamcode.Auto.constants.LConstants;
 public class StraightBackAndForth extends OpMode {
     private Telemetry telemetryA;
 
-    public static double DISTANCE = 40;
+    public static double DISTANCE = 48;
 
     private boolean forward = true;
 
     private Follower follower;
+    private RobotMap robotMap;
+    private IntakeSubsystem in;
 
     private Path forwards;
     private Path backwards;
@@ -49,13 +53,16 @@ public class StraightBackAndForth extends OpMode {
      */
     @Override
     public void init() {
-        Constants.setConstants(FConstants.class, LConstants.class);
-        follower = new Follower(hardwareMap);
+        follower = new Follower(hardwareMap,FConstants.class, LConstants.class);
+        robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.AUTO);
+        in = new IntakeSubsystem(robotMap);
 
         forwards = new Path(new BezierLine(new Point(0,0, Point.CARTESIAN), new Point(DISTANCE,0, Point.CARTESIAN)));
         forwards.setConstantHeadingInterpolation(0);
+        forwards.setPathEndTimeoutConstraint(2000);
         backwards = new Path(new BezierLine(new Point(DISTANCE,0, Point.CARTESIAN), new Point(0,0, Point.CARTESIAN)));
         backwards.setConstantHeadingInterpolation(0);
+        backwards.setPathEndTimeoutConstraint(2000);
 
         follower.followPath(forwards);
 
