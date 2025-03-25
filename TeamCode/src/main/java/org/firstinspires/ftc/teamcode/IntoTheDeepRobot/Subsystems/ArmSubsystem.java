@@ -49,7 +49,7 @@ public class ArmSubsystem extends SubsystemBase {
     private WristState wristState;
 
     private final HashMap<ArmState, Double> arm_positions = new HashMap<ArmState, Double>() {{
-        put(ArmState.INTAKE, 0.16); // 0.075
+        put(ArmState.INTAKE, 0.1675); // 0.075
         put(ArmState.PARK, 0.18);
         put(ArmState.PERP, 0.75);
         put(ArmState.SPECIMENT_INTAKE, 0.775);
@@ -62,7 +62,7 @@ public class ArmSubsystem extends SubsystemBase {
         put(ArmState.SPECIMEN_OUTTAKE, 0.33);
         put(ArmState.LVL1_ASCENT, 0.5);
         put(ArmState.SPEC_INTAKE_NEW, 0.92);
-        put(ArmState.SPEC_OUTTAKE_AIM_NEW, 0.32);
+        put(ArmState.SPEC_OUTTAKE_AIM_NEW, 0.35);
         put(ArmState.SPEC_OUTTAKE_NEW, 0.42);
     }};
 
@@ -73,14 +73,14 @@ public class ArmSubsystem extends SubsystemBase {
         put(WristState.SPECIMENT_INTAKE, 0.46);
         put(WristState.INTAKE_B_ABOVE, 0.70);
         put(WristState.INTAKE_B, 0.67);
-        put(WristState.BASKET_OUTTAKE, 0.78);
+        put(WristState.BASKET_OUTTAKE, 0.89);
         put(WristState.SPECIMENT_OUTTAKE_HIGH, 0.17);
         put(WristState.SPECIMENT_OUTTAKE_LOW, 0.0);
         put(WristState.HUMAN_PLAYER, 0.69);
         put(WristState.SPECIMEN_OUTTAKE, 0.28);
         put(WristState.LVL1_ASCENT, 0.78);
         put(WristState.SPEC_INTAKE_NEW, 0.28);
-        put(WristState.SPEC_OUTTAKE_AIM_NEW, 0.34);
+        put(WristState.SPEC_OUTTAKE_AIM_NEW, 0.35);
         put(WristState.SPEC_OUTTAKE_NEW, 0.38);
     }};
 
@@ -102,7 +102,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     public void setWristState(WristState state) {
         wristState = state;
-        wrist.setPosition((double)wrist_positions.get(state));
+        wrist.setPosition((double)wrist_positions.get(state)+0.05);
     }
 
     // ------------------------------------- State Getters -------------------------------------- //

@@ -3,49 +3,40 @@ package org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RobotMap;
 
 import java.util.HashMap;
 
 public class ClawSubsystem extends SubsystemBase {
-    private final ServoImplEx clawServo, clawRotServo;
+    private final ServoImplEx clawServo;
 
     // --------------------------------------- Claw States -------------------------------------- //
     public enum ClawState {
         OPEN,
         JUST_OPENED,
-        CLOSED
+        FIRMLY_GRIPPED,
+        LOOSLY_GRIPPED,
     }
-    public enum ClawRotState {
-        NORMAL,
-        FLIPPED,
-    }
+
     private ClawState state;
-    private ClawRotState rotState;
 
     private final HashMap<ClawState, Double> claw_positions = new HashMap<ClawState, Double>() {{
-        put(ClawState.CLOSED, 0.82);
-        put(ClawState.JUST_OPENED, 0.7);
-        put(ClawState.OPEN, 0.55);
-    }};
-
-    private final HashMap<ClawRotState, Double> claw_rot_positions = new HashMap<ClawRotState, Double>() {{
-        put(ClawRotState.NORMAL, 0.048);
-        put(ClawRotState.FLIPPED, 0.7);
+        put(ClawState.OPEN, 0.4);
+        put(ClawState.JUST_OPENED, 0.22);
+        put(ClawState.FIRMLY_GRIPPED, 0.05);
+        put(ClawState.LOOSLY_GRIPPED, 0.115);
     }};
 
     public ClawSubsystem(RobotMap robotMap) {
         clawServo = robotMap.getClawServo();
-        clawRotServo = robotMap.getClawRotServo();
-
-        goNormal();
-        grab();
+        firmlyGripped();
     }
 
     // ---------------------------------------- Actuators --------------------------------------- //
-    public void grab() {
-        this.state = ClawState.CLOSED;
-        clawServo.setPosition((double)claw_positions.get(ClawState.CLOSED));
+    public void release() {
+        this.state = ClawState.OPEN;
+        clawServo.setPosition((double)claw_positions.get(ClawState.OPEN));
     }
 
     public void justOpen() {
@@ -53,27 +44,18 @@ public class ClawSubsystem extends SubsystemBase {
         clawServo.setPosition((double)claw_positions.get(ClawState.JUST_OPENED));
     }
 
-    public void release() {
-        this.state = ClawState.OPEN;
-        clawServo.setPosition((double)claw_positions.get(ClawState.OPEN));
+    public void firmlyGripped() {
+        this.state = ClawState.FIRMLY_GRIPPED;
+        clawServo.setPosition((double)claw_positions.get(ClawState.FIRMLY_GRIPPED));
     }
 
-    public void goNormal() {
-        this.rotState = ClawRotState.NORMAL;
-        clawRotServo.setPosition((double)claw_rot_positions.get(ClawRotState.NORMAL));
-    }
-
-    public void goFlipped() {
-        this.rotState = ClawRotState.FLIPPED;
-        clawRotServo.setPosition((double)claw_rot_positions.get(ClawRotState.FLIPPED));
+    public void looslyGripped() {
+        this.state = ClawState.LOOSLY_GRIPPED;
+        clawServo.setPosition((double)claw_positions.get(ClawState.LOOSLY_GRIPPED));
     }
 
     // -------------------------------------- State Getters ------------------------------------- //
     public ClawState getState() {
         return state;
-    }
-
-    public ClawRotState getRotState() {
-        return rotState;
     }
 }
