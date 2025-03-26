@@ -14,15 +14,7 @@ public class ArmSubsystem extends SubsystemBase {
     public enum ArmState {
         INTAKE,
         PARK,
-        PERP,
-        SPECIMENT_INTAKE,
-        INTAKE_B_ABOVE,
-        INTAKE_B,
         BASKET_OUTTAKE,
-        SPECIMENT_OUTTAKE_HIGH,
-        SPECIMENT_OUTTAKE_LOW,
-        HUMAN_PLAYER,
-        SPECIMEN_OUTTAKE,
         LVL1_ASCENT,
         SPEC_INTAKE_NEW,
         SPEC_OUTTAKE_AIM_NEW,
@@ -31,15 +23,7 @@ public class ArmSubsystem extends SubsystemBase {
     public enum WristState {
         INTAKE,
         PARK,
-        PERP,
-        SPECIMENT_INTAKE,
-        INTAKE_B_ABOVE,
-        INTAKE_B,
         BASKET_OUTTAKE,
-        SPECIMENT_OUTTAKE_HIGH, // old
-        SPECIMENT_OUTTAKE_LOW, // old
-        HUMAN_PLAYER,
-        SPECIMEN_OUTTAKE,
         LVL1_ASCENT,
         SPEC_INTAKE_NEW,
         SPEC_OUTTAKE_AIM_NEW,
@@ -49,39 +33,23 @@ public class ArmSubsystem extends SubsystemBase {
     private WristState wristState;
 
     private final HashMap<ArmState, Double> arm_positions = new HashMap<ArmState, Double>() {{
-        put(ArmState.INTAKE, 0.1675); // 0.075
-        put(ArmState.PARK, 0.18);
-        put(ArmState.PERP, 0.75);
-        put(ArmState.SPECIMENT_INTAKE, 0.775);
-        put(ArmState.INTAKE_B_ABOVE, 0.88);
-        put(ArmState.INTAKE_B, 0.91);
+        put(ArmState.INTAKE, 0.093);
+        put(ArmState.PARK, 0.23);
         put(ArmState.BASKET_OUTTAKE, 0.46);
-        put(ArmState.SPECIMENT_OUTTAKE_HIGH, 0.71);
-        put(ArmState.SPECIMENT_OUTTAKE_LOW, 0.86);
-        put(ArmState.HUMAN_PLAYER, 0.7);
-        put(ArmState.SPECIMEN_OUTTAKE, 0.33);
         put(ArmState.LVL1_ASCENT, 0.5);
-        put(ArmState.SPEC_INTAKE_NEW, 0.92);
-        put(ArmState.SPEC_OUTTAKE_AIM_NEW, 0.35);
-        put(ArmState.SPEC_OUTTAKE_NEW, 0.42);
+        put(ArmState.SPEC_INTAKE_NEW, 0.13);
+        put(ArmState.SPEC_OUTTAKE_AIM_NEW, 0.56);
+        put(ArmState.SPEC_OUTTAKE_NEW, 0.4);
     }};
 
     private final HashMap<WristState, Double> wrist_positions = new HashMap<WristState, Double>() {{
-        put(WristState.INTAKE, 0.1);
-        put(WristState.PARK, 0.0);
-        put(WristState.PERP, 0.48);
-        put(WristState.SPECIMENT_INTAKE, 0.46);
-        put(WristState.INTAKE_B_ABOVE, 0.70);
-        put(WristState.INTAKE_B, 0.67);
-        put(WristState.BASKET_OUTTAKE, 0.89);
-        put(WristState.SPECIMENT_OUTTAKE_HIGH, 0.17);
-        put(WristState.SPECIMENT_OUTTAKE_LOW, 0.0);
-        put(WristState.HUMAN_PLAYER, 0.69);
-        put(WristState.SPECIMEN_OUTTAKE, 0.28);
+        put(WristState.INTAKE, 0.195);
+        put(WristState.PARK, 0.1);
+        put(WristState.BASKET_OUTTAKE, 0.95);
         put(WristState.LVL1_ASCENT, 0.78);
-        put(WristState.SPEC_INTAKE_NEW, 0.28);
-        put(WristState.SPEC_OUTTAKE_AIM_NEW, 0.35);
-        put(WristState.SPEC_OUTTAKE_NEW, 0.38);
+        put(WristState.SPEC_INTAKE_NEW, 0.6);
+        put(WristState.SPEC_OUTTAKE_AIM_NEW, 0.5);
+        put(WristState.SPEC_OUTTAKE_NEW, 0.44);
     }};
 
     public ArmSubsystem(RobotMap robotMap) {

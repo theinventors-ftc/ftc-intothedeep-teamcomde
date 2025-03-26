@@ -321,7 +321,7 @@ public class OpCommon {
     public SequentialCommandGroup specimenAim() {
         return new SequentialCommandGroup( // PEOS INTAKE AIM
            new InstantCommand(() -> elevatorSubsystem.setLevel(
-               ElevatorSubsystem.Level.SPEC_MIDPOINT)
+               ElevatorSubsystem.Level.SPEC_INTAKE)
            ),
            new InstantCommand(() -> armSubsystem.setWristState(
                ArmSubsystem.WristState.SPEC_INTAKE_NEW
@@ -361,7 +361,7 @@ public class OpCommon {
            new InstantCommand(clawSubsystem::firmlyGripped),
            new WaitCommand(150),
            new InstantCommand(() -> elevatorSubsystem.setLevel(
-               ElevatorSubsystem.Level.SPEC_MIDPOINT
+               ElevatorSubsystem.Level.SPEC_INTAKE
            )),
            new InstantCommand(() -> armSubsystem.setArmState(
                ArmSubsystem.ArmState.SPEC_OUTTAKE_AIM_NEW
