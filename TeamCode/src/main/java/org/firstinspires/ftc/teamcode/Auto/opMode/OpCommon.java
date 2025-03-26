@@ -233,6 +233,16 @@ public class OpCommon {
         );
     }
 
+    public SequentialCommandGroup sample_intake_specimen(int pos) {
+        return new SequentialCommandGroup(
+            new InstantCommand(
+                () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
+            ),
+            new InstantCommand(() -> extendoSubsystem.setTargetPosition(pos), extendoSubsystem),
+            new InstantCommand(intakeSubsystem::lower)
+        );
+    }
+
     public SequentialCommandGroup discard_sample() {
         return new SequentialCommandGroup(
             new InstantCommand(intakeSubsystem::raise),
