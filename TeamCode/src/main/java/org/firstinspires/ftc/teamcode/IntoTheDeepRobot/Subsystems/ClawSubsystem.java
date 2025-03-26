@@ -22,7 +22,7 @@ public class ClawSubsystem extends SubsystemBase {
     private ClawState state;
 
     private final HashMap<ClawState, Double> claw_positions = new HashMap<ClawState, Double>() {{
-        put(ClawState.OPEN, 0.4);
+        put(ClawState.OPEN, 0.45);
         put(ClawState.JUST_OPENED, 0.22);
         put(ClawState.FIRMLY_GRIPPED, 0.05);
         put(ClawState.LOOSLY_GRIPPED, 0.115);

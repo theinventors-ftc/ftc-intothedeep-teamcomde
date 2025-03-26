@@ -56,7 +56,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         HANGING,
         HANGING_RELEASE,
         HIGH_CHAMBER_RELEASE,
-        SPEC_MIDPOINT,
+        SPEC_INTAKE,
         SPEC_MIDPOINT2,
         MANUAL
     }
@@ -76,7 +76,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         put(Level.HIGH_CHAMBER_RELEASE, 0);
         put(Level.HANGING_AIM, 917);
         put(Level.HANGING, -150);
-        put(Level.SPEC_MIDPOINT, 385);
+        put(Level.SPEC_INTAKE, 0);
         put(Level.SPEC_MIDPOINT2, 540);
         put(Level.HANGING_RELEASE, 0); // TODO Go intake in auto hang
     }};
