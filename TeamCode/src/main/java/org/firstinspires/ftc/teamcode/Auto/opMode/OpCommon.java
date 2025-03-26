@@ -124,7 +124,6 @@ public class OpCommon {
                 new InstantCommand(() -> armSubsystem.setWristState(
                         ArmSubsystem.WristState.INTAKE
                 )),
-                new InstantCommand(clawSubsystem::goNormal, clawSubsystem),
                 new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
                 new WaitCommand(120),
                 new InstantCommand(() -> armSubsystem.setArmState(
@@ -172,7 +171,7 @@ public class OpCommon {
                                 new InstantCommand(intakeSubsystem::raise, intakeSubsystem),
                                 new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
                                 new WaitUntilCommand(() -> elevatorSubsystem.atTarget()),
-                                new InstantCommand(clawSubsystem::grab),
+                                new InstantCommand(clawSubsystem::looslyGripped),
                                 new WaitCommand(60)
                         ),
                         discard_sample(),
@@ -193,7 +192,6 @@ public class OpCommon {
                     new InstantCommand(() -> armSubsystem.setWristState(
                         ArmSubsystem.WristState.INTAKE
                     )),
-                    new InstantCommand(clawSubsystem::goNormal, clawSubsystem),
                     new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
                     new WaitCommand(120),
                     new InstantCommand(() -> armSubsystem.setArmState(
@@ -224,7 +222,7 @@ public class OpCommon {
                     new InstantCommand(intakeSubsystem::raise, intakeSubsystem),
                     new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
                     new WaitUntilCommand(() -> elevatorSubsystem.atTarget()),
-                    new InstantCommand(clawSubsystem::firmlyGripped),
+                    new InstantCommand(clawSubsystem::looslyGripped),
                     new WaitCommand(60)
                 ),
                 discard_sample(),
@@ -271,9 +269,9 @@ public class OpCommon {
 
     public SequentialCommandGroup release_sample() {
         return new SequentialCommandGroup(
-            new WaitCommand(150),
+            new WaitCommand(200),
             new InstantCommand(clawSubsystem::release),
-            new WaitCommand(500),
+            new WaitCommand(250),
             new InstantCommand(() -> armSubsystem.setWristState(
                 ArmSubsystem.WristState.PARK
             )),
@@ -328,7 +326,6 @@ public class OpCommon {
                 ElevatorSubsystem.Level.PARK)
             ),
             new WaitCommand(250),
-            new InstantCommand(clawSubsystem::goFlipped, clawSubsystem),
             new InstantCommand(() -> armSubsystem.setWristState(
                 ArmSubsystem.WristState.SPECIMENT_INTAKE
             )),

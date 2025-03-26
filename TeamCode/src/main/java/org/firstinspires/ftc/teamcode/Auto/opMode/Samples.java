@@ -44,7 +44,8 @@ public class Samples extends OpMode {
     private int
         pathState;
 
-    private boolean curr = true;
+    private boolean
+        curr = true;
 
     private Pose
         start = new Pose(-2 * Tile + robotX/2, -3 * Tile + robotY/2, Math.toRadians(90), false),
@@ -53,7 +54,7 @@ public class Samples extends OpMode {
 
         sampleMid = new Pose(-2.6 * Tile, -1.93 * Tile, Math.toRadians(80), false),
 
-        sampleLeft = new Pose(-2.35 * Tile, -1.46 * Tile, Math.toRadians(147), false),
+        sampleLeft = new Pose(-2.45 * Tile, -1.6 * Tile, Math.toRadians(140), false),
 
         sub_side = new Pose(-1.3 * Tile, -0.5 * Tile, Math.toRadians(0), false),
 
@@ -97,9 +98,9 @@ public class Samples extends OpMode {
         s3basket = follower.pathBuilder()
             .addPath(new BezierLine(
             new Point(sampleLeft),
-            new Point(sampleRight)
+            new Point(sampleMid)
             ))
-            .setLinearHeadingInterpolation(sampleLeft.getHeading(), sampleRight.getHeading())
+            .setLinearHeadingInterpolation(sampleLeft.getHeading(), sampleMid.getHeading())
             .build();
 
         submersible = follower.pathBuilder()
@@ -163,20 +164,12 @@ public class Samples extends OpMode {
                 break;
 
             case 1:
-                if (!follower.isBusy() && !CommandScheduler.getInstance().isScheduled(temp) && curr) {
+                if (follower.atPose(sampleRight, 1, 1) && !CommandScheduler.getInstance().isScheduled(temp) && curr) {
                     curr = false;
                     temp = new SequentialCommandGroup(
                         opCommon.release_sample(),
                         opCommon.extendo(0.6),
-                        opCommon.sample_intake(),
-                        new InstantCommand(() -> opCommon.elevatorSubsystem.set_target_height(150)),
-                        new WaitCommand(200),
-                        new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
-                        new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(50))
-                        , // Prep Extendo
-                        opCommon.basket_scoring(),
-                        new WaitCommand(50),
-                        opCommon.release_sample()
+                        opCommon.sample_intake()
                     );
                     temp.schedule();
                 }
@@ -184,6 +177,14 @@ public class Samples extends OpMode {
                 if (!CommandScheduler.getInstance().isScheduled(temp) && !curr) {
                     curr = true;
                     temp = new SequentialCommandGroup(
+                        new InstantCommand(() -> opCommon.elevatorSubsystem.set_target_height(150)),
+                        new WaitCommand(200),
+                        new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
+                        new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(50))
+                        , // Prep Extendo
+                        opCommon.basket_scoring(),
+                        new WaitCommand(50),
+                        opCommon.release_sample(),
                         opCommon.extendo(0.35),
                         opCommon.sample_intake()
                     );
@@ -195,7 +196,7 @@ public class Samples extends OpMode {
                 break;
 
             case 2:
-                if (!follower.isBusy() && !CommandScheduler.getInstance().isScheduled(temp) && curr) {
+                if (follower.atPose(sampleMid, 1, 1) && !CommandScheduler.getInstance().isScheduled(temp) && curr) {
                     curr = false;
                     temp = new SequentialCommandGroup(
                         new InstantCommand(() -> opCommon.elevatorSubsystem.set_target_height(150)),
@@ -224,13 +225,13 @@ public class Samples extends OpMode {
                 break;
 
             case 3:
-                if (!follower.isBusy() && !CommandScheduler.getInstance().isScheduled(temp)) {
+                if (follower.atPose(sampleLeft, 1, 1) && !CommandScheduler.getInstance().isScheduled(temp)) {
                     temp = new SequentialCommandGroup(
                         new InstantCommand(() -> opCommon.elevatorSubsystem.set_target_height(150)),
                         new WaitCommand(200),
                         new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
-                        new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(600)), // Prep Extendo
-                        new WaitCommand(1500),
+                        new InstantCommand(() -> opCommon.extendoSubsystem.returnToZero()), // Prep Extendo
+                        new WaitCommand(400),
                         opCommon.basket_scoring()
                     );
                     temp.schedule();
@@ -244,7 +245,7 @@ public class Samples extends OpMode {
                 break;
 
             case 4:
-                if (!follower.isBusy() && !CommandScheduler.getInstance().isScheduled(temp)) {
+                if (follower.atPose(sampleMid, 1, 1) && !CommandScheduler.getInstance().isScheduled(temp)) {
                     temp = new SequentialCommandGroup(
                         opCommon.release_sample(),
                         new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
@@ -253,16 +254,19 @@ public class Samples extends OpMode {
                     );
                     temp.schedule();
 
-                    FollowerConstants.xMovement = 75;
-                    follower.followPath(submersible);
+                    FollowerConstants.xMovement = 80;
+
+                    follower.followPath(submersible, true);
                     setPathState(5);
                 }
                 break;
 
             case 5:
-                if (!follower.isBusy() && !CommandScheduler.getInstance().isScheduled(temp) && curr) {
+                if (follower.atPose(sub_side, 1, 1) && !CommandScheduler.getInstance().isScheduled(temp) && curr) {
                     curr = false;
                     temp = new SequentialCommandGroup(
+                        new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
+                        new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(600)), // Prep Extendo
                         opCommon.deep_intake(),
                         opCommon.submersible_intake(),
                         new InstantCommand(() -> opCommon.intakeSubsystem.reverse()),
@@ -288,14 +292,13 @@ public class Samples extends OpMode {
                     sampleMid.setY(-1.85 * Tile);
                     sampleMid.setX(-2.65 * Tile);
 
-                    FollowerConstants.xMovement = 67.25945500141216;
                     follower.followPath(subasket);
                     setPathState(6);
                 }
                 break;
 
             case 6:
-                if (!follower.isBusy() && !CommandScheduler.getInstance().isScheduled(temp) && curr) {
+                if (follower.atPose(sampleMid, 1, 1) && !CommandScheduler.getInstance().isScheduled(temp) && curr) {
                     curr = false;
                     temp = new SequentialCommandGroup(
                         opCommon.release_sample(),
@@ -315,6 +318,7 @@ public class Samples extends OpMode {
                     temp.schedule();
 
                     FollowerConstants.xMovement = 75;
+
                     follower.followPath(park);
                     setPathState(8);
                 }
@@ -353,7 +357,7 @@ public class Samples extends OpMode {
                 break;
 
             case 8:
-                if(!follower.isBusy()) {
+                if(follower.atPose(parking, 1, 1)) {
                     setPathState(-1);
                 }
                 break;
@@ -383,9 +387,9 @@ public class Samples extends OpMode {
         autonomousPathUpdate();
         CommandScheduler.getInstance().run();
 
-//        if (pathState == 5 && timer.getElapsedTime() >= 6000) {
-//            setPathState(7);
-//            telemetry.addData("FailSafe: ", 1);
-//        }
+        if (pathState == 5 && timer.getElapsedTime() >= 6000) {
+            setPathState(7);
+            telemetry.addData("FailSafe: ", 1);
+        }
     }
 }
