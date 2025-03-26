@@ -224,7 +224,7 @@ public class OpCommon {
                     new InstantCommand(intakeSubsystem::raise, intakeSubsystem),
                     new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
                     new WaitUntilCommand(() -> elevatorSubsystem.atTarget()),
-                    new InstantCommand(clawSubsystem::grab),
+                    new InstantCommand(clawSubsystem::firmlyGripped),
                     new WaitCommand(60)
                 ),
                 discard_sample(),
@@ -367,23 +367,20 @@ public class OpCommon {
 //        );
 //    }
 
-
-    public SequentialCommandGroup specimenIntake() {
-        return new SequentialCommandGroup(
-            new InstantCommand(clawSubsystem::grab),
-            new WaitCommand(200),
-            new InstantCommand(() -> elevatorSubsystem.setLevel(
-                ElevatorSubsystem.Level.HIGH_CHAMBER
-            )),
-            new WaitCommand(150),
-            new InstantCommand(() -> armSubsystem.setWristState(
-                ArmSubsystem.WristState.SPECIMEN_OUTTAKE
-            )),
-            new WaitCommand(100),
-            new InstantCommand(clawSubsystem::goNormal),
-            new InstantCommand(() -> armSubsystem.setArmState(
-                ArmSubsystem.ArmState.SPECIMEN_OUTTAKE
-            ))
+    public SequentialCommandGroup specimenOuttake() {
+        return new SequentialCommandGroup( // PEOS INTAKE
+           new InstantCommand(clawSubsystem::firmlyGripped),
+           new WaitCommand(150),
+           new InstantCommand(() -> elevatorSubsystem.setLevel(
+               ElevatorSubsystem.Level.SPEC_MIDPOINT
+           )),
+           new InstantCommand(() -> armSubsystem.setArmState(
+               ArmSubsystem.ArmState.SPEC_OUTTAKE_AIM_NEW
+           )),
+           new WaitCommand(100),
+           new InstantCommand(() -> armSubsystem.setWristState(
+               ArmSubsystem.WristState.SPEC_OUTTAKE_AIM_NEW
+           ))
         );
     }
 
