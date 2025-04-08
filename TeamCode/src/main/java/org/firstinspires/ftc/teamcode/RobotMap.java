@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Bitmap;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -19,7 +18,6 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.function.Consumer;
 import org.firstinspires.ftc.robotcore.external.function.Continuation;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.CameraControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.FocusControl;
@@ -33,8 +31,6 @@ import org.inventors.ftc.robotbase.hardware.ColorSensor;
 import org.inventors.ftc.robotbase.hardware.GamepadExEx;
 import org.inventors.ftc.robotbase.hardware.MotorExEx;
 import org.jetbrains.annotations.NotNull;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
@@ -65,7 +61,7 @@ public class RobotMap implements RobotMapInterface {
     private ServoImplEx armRightServo, armLeftServo, armWristServo;
 
     // ----------------------------------------- Intake ----------------------------------------- //
-    private ServoImplEx intakeRaiseServoL, intakeRaiseServoR;
+    private ServoImplEx wiper, intakeRaiseServoR;
     private CRServoImplEx leftIntakeServo, rightIntakeServo;
     private ColorSensor colorSensor;
     private DigitalChannel sampleLimitSwitch, raiseLimitSwitch;
@@ -123,9 +119,9 @@ public class RobotMap implements RobotMapInterface {
         battery = new Battery(hardwareMap);
 
         // Camera
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(0);
-        telemetry.setMsTransmissionInterval(11);
+//        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+//        limelight.pipelineSwitch(0);
+//        telemetry.setMsTransmissionInterval(11);
 //        int cameraMonitorViewId = hardwareMap.appContext.getResources()
 //                .getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 //        rearCamera =  OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class,
@@ -168,7 +164,7 @@ public class RobotMap implements RobotMapInterface {
         armWristServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
         // --------------------------------------- Intake --------------------------------------- //
-        intakeRaiseServoL = hardwareMap.get(ServoImplEx.class, "intake_raise_left");
+        wiper = hardwareMap.get(ServoImplEx.class, "wiper");
         intakeRaiseServoR = hardwareMap.get(ServoImplEx.class, "intake_raise_right");
 
         leftIntakeServo = hardwareMap.get(CRServoImplEx.class, "intake_left_wheel");
@@ -447,8 +443,8 @@ public class RobotMap implements RobotMapInterface {
     }
 
     // ----------------------------------------- Intake ----------------------------------------- //
-    public ServoImplEx getIntakeRaiseServoL() {
-        return intakeRaiseServoL;
+    public ServoImplEx getWiper () {
+        return wiper;
     }
 
     public ServoImplEx getIntakeRaiseServoR() {

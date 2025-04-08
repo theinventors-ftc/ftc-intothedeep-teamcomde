@@ -14,7 +14,6 @@ import com.pedropathing.localization.Pose;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Commands.IntakeCommand;
-import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.SpecimenAlignmentSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Pipelines.SpecimenDetectionPipeline;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ArmSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ClawSubsystem;
@@ -25,7 +24,7 @@ import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ExtendoSubsyst
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.HangingSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.HeadingControllerSubsystem;
-import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.StrafeControllerSubsystem;
+
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.RobotEx;
 import org.inventors.ftc.robotbase.drive.DriveConstants;
@@ -46,7 +45,6 @@ public class IntoTheDeepRobot extends RobotEx {
     // ---------------------------------- Initialize Controllers -------------------------------- //
 //    protected ForwardControllerSubsystem forwardController;
 //    protected StrafeControllerSubsystem strafeControllerSubsystem;
-    protected SpecimenAlignmentSubsystem specimenAlignmentSubsystem;
     protected HeadingControllerSubsystem gyroFollow;
 
     private boolean hasInit = false;
@@ -56,12 +54,6 @@ public class IntoTheDeepRobot extends RobotEx {
                             Pose2d startingPose) {
         super(robotMap, RobotConstants, opModeType, alliance, init_camera, startingPose);
         this.robotMap = robotMap;
-
-        limelight3A = robotMap.getRearLimelight();
-        specimenAlignmentSubsystem = new SpecimenAlignmentSubsystem(
-                limelight3A,
-                dashboard.getTelemetry()
-        );
 
         new Trigger(() -> (Math.abs(drivetrainForward()) > 0.1 ||
                 Math.abs(drivetrainStrafe()) > 0.1 ||
@@ -483,6 +475,24 @@ public class IntoTheDeepRobot extends RobotEx {
                         ),
                         new InstantCommand(gyroFollow::disable)
                 );
+
+        driverOp.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
+            .whenPressed(
+                new ConditionalCommand(
+                    new InstantCommand(intakeSubsystem::semi_open),
+                    new InstantCommand(intakeSubsystem::contract),
+                    () -> intakeSubsystem.getWiperState() != IntakeSubsystem.WiperState.SEMI_OPEN
+                )
+            );
+
+        driverOp.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+            .whenPressed(
+                new ConditionalCommand(
+                    new InstantCommand(intakeSubsystem::full_open),
+                    new InstantCommand(intakeSubsystem::contract),
+                    () -> intakeSubsystem.getWiperState() != IntakeSubsystem.WiperState.FULL_OPEN
+                )
+            );
 
 //        driverOp.getGamepadButton(GamepadKeys.Button.B)
 //                .whenPressed(

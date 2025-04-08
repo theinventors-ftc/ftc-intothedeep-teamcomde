@@ -94,10 +94,6 @@ public class OpCommon {
         );
     }
 
-    public double calculate_turn() {
-        return Range.clip(-gyroFollow.calculateTurn(), -1, 1);
-    }
-
     public SequentialCommandGroup reset_elevator() {
         return new SequentialCommandGroup(
             new InstantCommand(() -> armSubsystem.setWristState(
@@ -193,7 +189,7 @@ public class OpCommon {
                         ArmSubsystem.WristState.INTAKE
                     )),
                     new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
-                    new WaitCommand(120),
+                    new WaitCommand(70),
                     new InstantCommand(() -> armSubsystem.setArmState(
                         ArmSubsystem.ArmState.INTAKE
                     ))
@@ -214,30 +210,25 @@ public class OpCommon {
                         () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
                     ),
                     new InstantCommand(() -> extendoSubsystem.set_MAX_POWER(1)),
-                    new InstantCommand(() -> extendoSubsystem.setTargetPosition(90), extendoSubsystem),
+                    new InstantCommand(extendoSubsystem::returnToZero, extendoSubsystem),
+                    new InstantCommand(intakeSubsystem::raise, intakeSubsystem),
                     // Push Sample (Align to Parrot)
                     new InstantCommand(intakeSubsystem::run),
                     new WaitCommand(120),
                     new InstantCommand(intakeSubsystem::stop),
-                    new InstantCommand(intakeSubsystem::raise, intakeSubsystem),
                     new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
                     new WaitUntilCommand(() -> elevatorSubsystem.atTarget()),
+                    new WaitCommand(30),
                     new InstantCommand(clawSubsystem::looslyGripped),
-                    new WaitCommand(60)
+                    new WaitCommand(60),
+                    // Disengage Sample from the Intake/Parrot
+                    new InstantCommand(
+                        () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.PARK2)
+                    )
                 ),
                 discard_sample(),
                 () -> intakeSubsystem.check_color(alliance, true)
             )
-        );
-    }
-
-    public SequentialCommandGroup sample_intake_specimen(int pos) {
-        return new SequentialCommandGroup(
-            new InstantCommand(
-                () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
-            ),
-            new InstantCommand(() -> extendoSubsystem.setTargetPosition(pos), extendoSubsystem),
-            new InstantCommand(intakeSubsystem::lower)
         );
     }
 
@@ -255,21 +246,21 @@ public class OpCommon {
             new InstantCommand(
                 () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.HIGH_BASKET)
             ),
+            new InstantCommand(clawSubsystem::firmlyGripped, clawSubsystem),
             new WaitCommand(100),
             new InstantCommand(() -> armSubsystem.setArmState(
                 ArmSubsystem.ArmState.BASKET_OUTTAKE
             )),
+            new WaitCommand(50),
             new WaitUntilCommand(() -> elevatorSubsystem.atTarget()),
             new InstantCommand(() -> armSubsystem.setWristState(
-                    ArmSubsystem.WristState.BASKET_OUTTAKE
-            )),
-            new WaitCommand(50)
+                ArmSubsystem.WristState.BASKET_OUTTAKE
+            ))
         );
     }
 
     public SequentialCommandGroup release_sample() {
         return new SequentialCommandGroup(
-            new WaitCommand(200),
             new InstantCommand(clawSubsystem::release),
             new WaitCommand(250),
             new InstantCommand(() -> armSubsystem.setWristState(
@@ -301,133 +292,91 @@ public class OpCommon {
         );
     }
 
-    public SequentialCommandGroup activateDistanceCalibration(double[] pidaTargets) {
-        return new SequentialCommandGroup(
-            new InstantCommand(gyroFollow::enable),
-            new InstantCommand(strafeControllerSubsystem::enable),
-            new InstantCommand(forwardControllerSubsystem::enable),
-            new InstantCommand(() -> gyroFollow.setGyroTarget(pidaTargets[2])),
-            new InstantCommand(() -> strafeControllerSubsystem.setDistTarget(pidaTargets[1])),
-            new InstantCommand(() -> forwardControllerSubsystem.setGyroTarget(pidaTargets[0]))
-        );
-    }
-
-    public SequentialCommandGroup deactivateDistanceCalibration() {
-        return new SequentialCommandGroup(
-            new InstantCommand(gyroFollow::disable),
-            new InstantCommand(strafeControllerSubsystem::disable),
-            new InstantCommand(forwardControllerSubsystem::disable)
-        );
-    }
-
     public SequentialCommandGroup specimenAim() {
-        return new SequentialCommandGroup(
+        return new SequentialCommandGroup( // PEOS INTAKE AIM
             new InstantCommand(() -> elevatorSubsystem.setLevel(
-                ElevatorSubsystem.Level.PARK)
+               ElevatorSubsystem.Level.SPEC_INTAKE)
             ),
-            new WaitCommand(250),
-            new InstantCommand(() -> armSubsystem.setWristState(
-                ArmSubsystem.WristState.SPECIMENT_INTAKE
-            )),
-            new WaitCommand(60),
             new InstantCommand(() -> armSubsystem.setArmState(
-                ArmSubsystem.ArmState.SPECIMENT_INTAKE
+               ArmSubsystem.ArmState.PARK
             )),
-            new WaitCommand(160),
-            new InstantCommand(() -> elevatorSubsystem.setLevel(
-                ElevatorSubsystem.Level.INTAKE
+            new InstantCommand(() -> armSubsystem.setWristState(
+               ArmSubsystem.WristState.PARK
             )),
-            new InstantCommand(clawSubsystem::release)
-        );
-    }
-
-//    public SequentialCommandGroup specimenAimObservSpecial() {
-//        return new SequentialCommandGroup(
-//            new InstantCommand(() -> elevatorSubsystem.setLevel(
-//                ElevatorSubsystem.Level.PARK)
-//            ),
-//            new WaitCommand(250),
-//            new InstantCommand(clawSubsystem::goFlipped, clawSubsystem),
-//            new InstantCommand(() -> armSubsystem.setWristState(
-//                ArmSubsystem.WristState.SPECIMENT_INTAKE
-//            )),
-//            new WaitCommand(120),
-//            new InstantCommand(() -> armSubsystem.setArmState(
-//                ArmSubsystem.ArmState.SPECIMENT_INTAKE
-//            )),
-//            new WaitCommand(200),
-//            new InstantCommand(() -> elevatorSubsystem.setLevel(
-//                ElevatorSubsystem.Level.INTAKE
-//            )),
-//            new WaitCommand(500),
-//            new InstantCommand(clawSubsystem::release)
-//        );
-//    }
-
-    public SequentialCommandGroup specimenOuttake() {
-        return new SequentialCommandGroup( // PEOS INTAKE
-           new InstantCommand(clawSubsystem::firmlyGripped),
-           new WaitCommand(150),
-           new InstantCommand(() -> elevatorSubsystem.setLevel(
-               ElevatorSubsystem.Level.SPEC_MIDPOINT
-           )),
-           new InstantCommand(() -> armSubsystem.setArmState(
-               ArmSubsystem.ArmState.SPEC_OUTTAKE_AIM_NEW
-           )),
-           new WaitCommand(100),
-           new InstantCommand(() -> armSubsystem.setWristState(
-               ArmSubsystem.WristState.SPEC_OUTTAKE_AIM_NEW
-           ))
+            new WaitCommand(200),
+            new InstantCommand(() -> armSubsystem.setWristState(
+               ArmSubsystem.WristState.SPEC_INTAKE_NEW
+            )),
+            new WaitCommand(100),
+            new InstantCommand(() -> armSubsystem.setArmState(
+               ArmSubsystem.ArmState.SPEC_INTAKE_NEW
+            )),
+            new InstantCommand(clawSubsystem::release),
+            new InstantCommand(extendoSubsystem::returnToZero)
         );
     }
 
     public SequentialCommandGroup scoreSpeciment() {
         return new SequentialCommandGroup(
+            new InstantCommand(clawSubsystem::firmlyGripped),
+            new WaitCommand(200),
             new InstantCommand(() -> elevatorSubsystem.setLevel(
-                ElevatorSubsystem.Level.HIGH_CHAMBER_RELEASE
+                ElevatorSubsystem.Level.SPEC_INTAKE
             )),
-            new WaitUntilCommand(() -> elevatorSubsystem.atTarget())
+            new InstantCommand(() -> armSubsystem.setWristState(
+                ArmSubsystem.WristState.SPEC_OUTTAKE_AIM_NEW
+            )),
+            new InstantCommand(() -> armSubsystem.setArmState(
+                ArmSubsystem.ArmState.SPEC_OUTTAKE_AIM_NEW
+            ))
         );
     }
 
     public SequentialCommandGroup releaseSpecimen() {
         return new SequentialCommandGroup(
-            new InstantCommand(clawSubsystem::release),
-            new WaitCommand(100)
+            new InstantCommand(() -> armSubsystem.setArmState(
+                ArmSubsystem.ArmState.SPEC_OUTTAKE_NEW
+            )),
+            new InstantCommand(() -> armSubsystem.setWristState(
+                ArmSubsystem.WristState.SPEC_OUTTAKE_NEW
+            )),
+            new WaitCommand(300),
+            new InstantCommand(clawSubsystem::release)
         );
     }
 
-    public double drivetrainStrafe() {
-        return -strafeControllerSubsystem.calculatePower();
+    public SequentialCommandGroup extendoSpecimenPush() {
+        return new SequentialCommandGroup(
+            new IntakeCommand(
+                intakeSubsystem,
+                  (alliance == RobotEx.Alliance.RED ?
+                      IntakeCommand.COLOR.RED_YELLOW : IntakeCommand.COLOR.BLUE_YELLOW),
+                  extendoSubsystem,
+                  0.7,
+                  1000
+            ),
+            new InstantCommand(()-> extendoSubsystem.set_MAX_POWER(1)),
+            new InstantCommand(()-> extendoSubsystem.setTargetPosition(900)),
+            new InstantCommand(intakeSubsystem::reverse),
+            new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
+            new InstantCommand(()-> extendoSubsystem.set_MAX_POWER(1)),
+            new InstantCommand(()-> extendoSubsystem.returnToZero()),
+            new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
+            new InstantCommand(intakeSubsystem::stop)
+        );
     }
 
-    public double drivetrainForward() {
-        return forwardControllerSubsystem.calculatePower();
-    }
-
-    public double drivetrainTurn() {
-        return -gyroFollow.calculateTurn();
-    }
-
-    public boolean isInThreshold(double current, double target, double threshold) {
-        return current <= target + threshold && current >= target - threshold;
-    }
-
-    public void robotCentricMovement(double x, double y, double t) {
-
-        // Denominator is the largest motor power (absolute value) or 1
-        // This ensures all the powers maintain the same ratio,
-        // but only if at least one is out of the range [-1, 1]
-        double denominator = Math.max(abs(y) + abs(x) + abs(t), 1);
-        double frontLeftPower = (y + x + t) / denominator;
-        double backLeftPower = (y - x + t) / denominator;
-        double frontRightPower = (y - x - t) / denominator;
-        double backRightPower = (y + x - t) / denominator;
-
-        robotMap.getFrontLeftMotor().set(frontLeftPower);
-        robotMap.getRearLeftMotor().set(backLeftPower);
-        robotMap.getFrontRightMotor().set(frontRightPower);
-        robotMap.getRearRightMotor().set(backRightPower);
+    public SequentialCommandGroup armReset() {
+        return new SequentialCommandGroup(
+            new InstantCommand(clawSubsystem::firmlyGripped, clawSubsystem),
+            new InstantCommand(() -> armSubsystem.setWristState(
+                ArmSubsystem.WristState.PARK
+            )),
+            new WaitCommand(120),
+            new InstantCommand(() -> armSubsystem.setArmState(
+                ArmSubsystem.ArmState.PARK
+            ))
+        );
     }
 
     public SequentialCommandGroup parking() {

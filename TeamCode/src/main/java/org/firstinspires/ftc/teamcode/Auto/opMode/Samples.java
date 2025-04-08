@@ -4,7 +4,6 @@ import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.Tile
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robotX;
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robotY;
 
-import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
@@ -19,7 +18,6 @@ import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.Path;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
-import com.pedropathing.util.Constants;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -29,7 +27,6 @@ import org.firstinspires.ftc.teamcode.Auto.constants.LConstants;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ArmSubsystem;
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.RobotEx;
-
 
 @Autonomous(name = "Auto5Samples", group = "Special")
 public class Samples extends OpMode {
@@ -41,8 +38,25 @@ public class Samples extends OpMode {
 
     private RobotEx.Alliance alliance = RobotEx.Alliance.RED;
 
+    private enum PathState {
+        PRELOAD,
+        RIGHT_SAMPLE,
+        MID_SAMPLE,
+        LEFT_SAMPLE,
+        LEFT_SAMPLE_BAKSET,
+        SUBMERSIBLE,
+        SUBMERSIBLE_BASKET,
+        SECOND_SUBMERSIBLE,
+        SECOND_SUBMERSIBLE_BASKET,
+        PARKING,
+        STOP
+    }
+
+    private PathState pathState;
+
     private int
-        pathState;
+        xThreshold = 4,
+        yThreshold = 4;
 
     private boolean
         curr = true;
@@ -50,15 +64,25 @@ public class Samples extends OpMode {
     private Pose
         start = new Pose(-2 * Tile + robotX/2, -3 * Tile + robotY/2, Math.toRadians(90), false),
 
-        sampleRight = new Pose(-57, -2 * Tile - 2, Math.toRadians(67), false),
+        sampleRight = new Pose(-59, -2 * Tile - 4, Math.toRadians(65), false),
 
-        sampleMid = new Pose(-2.6 * Tile, -1.93 * Tile, Math.toRadians(80), false),
+        sampleMid = new Pose(-2.6 * Tile - 2, -1.93 * Tile, Math.toRadians(80), false),
 
-        sampleLeft = new Pose(-2.45 * Tile, -1.6 * Tile, Math.toRadians(140), false),
+        basket_3Sasmple = new Pose(-2.6 * Tile - 2, -1.93 * Tile + 3, Math.toRadians(80), false),
 
-        sub_side = new Pose(-1.3 * Tile, -0.5 * Tile, Math.toRadians(0), false),
+        sub_basket = new Pose(-2.55 * Tile, -2.1 * Tile, Math.toRadians(80), false),
 
-        parking = new Pose(-1.2 * Tile, -5, Math.toRadians(180), false);
+        sec_sub_basket = new Pose(-2.55 * Tile, -2.1 * Tile, Math.toRadians(80), false),
+
+        sampleLeft = new Pose(-2.45 * Tile, -1.48 * Tile, Math.toRadians(149), false),
+
+        sub_side = new Pose(-1.25 * Tile, -0.5 * Tile, Math.toRadians(0), false),
+
+        sec_sub_side = new Pose(-1.25 * Tile, -0.5 * Tile, Math.toRadians(0), false),
+
+        parking = new Pose(-1.2 * Tile, -5, Math.toRadians(180), false),
+
+        failSafe_parking = new Pose(-1.2 * Tile + 5, -5, Math.toRadians(180), false);
 
     private Path
         preload,
@@ -70,101 +94,114 @@ public class Samples extends OpMode {
         s3basket,
         submersible,
         subasket,
+        sec_submersible,
+        sec_subasket,
         failSafePark;
 
     public void buildPaths() {
-        preload = new Path(new BezierLine(
-            new Point(start),
-            new Point(sampleRight)
-        ));
+        FollowerConstants.zeroPowerAccelerationMultiplier = 3.5;
+
+        preload = new Path(new BezierLine(new Point(start), new Point(sampleRight)));
         preload.setLinearHeadingInterpolation(start.getHeading(), sampleRight.getHeading());
 
         sample_2 = follower.pathBuilder()
             .addPath(new BezierLine(
-            new Point(sampleRight),
-            new Point(sampleMid)
-            ))
+            new Point(sampleRight), new Point(sampleMid)))
             .setLinearHeadingInterpolation(sampleRight.getHeading(), sampleMid.getHeading())
             .build();
 
         sample_3 = follower.pathBuilder()
             .addPath(new BezierLine(
-            new Point(sampleMid),
-            new Point(sampleLeft)
-            ))
+                new Point(sampleMid), new Point(sampleLeft)))
             .setLinearHeadingInterpolation(sampleMid.getHeading(), sampleLeft.getHeading())
             .build();
 
         s3basket = follower.pathBuilder()
             .addPath(new BezierLine(
-            new Point(sampleLeft),
-            new Point(sampleMid)
-            ))
-            .setLinearHeadingInterpolation(sampleLeft.getHeading(), sampleMid.getHeading())
+                new Point(sampleLeft), new Point(basket_3Sasmple)))
+            .setLinearHeadingInterpolation(sampleLeft.getHeading(), basket_3Sasmple.getHeading())
             .build();
 
         submersible = follower.pathBuilder()
             .addPath(new BezierCurve(
-            new Point(sampleRight),
-            new Point(new Pose(-2 * Tile, 0, false)),
-            new Point(sub_side)
-            ))
-            .setLinearHeadingInterpolation(sampleRight.getHeading(), sub_side.getHeading())
+                new Point(basket_3Sasmple),
+                new Point(new Pose(-2.2 * Tile, -0.7 * Tile, false)),
+                new Point(sub_side)))
+            .setLinearHeadingInterpolation(basket_3Sasmple.getHeading(), sub_side.getHeading())
             .build();
 
         subasket = follower.pathBuilder()
             .addPath(new BezierCurve(
-            new Point(sub_side),
-            new Point(new Pose(-2 * Tile, 0, false)),
-            new Point(sampleMid)
-            ))
-            .setLinearHeadingInterpolation(sub_side.getHeading(), sampleMid.getHeading())
+                new Point(sub_side),
+                new Point(new Pose(-2 * Tile, 0, false)),
+                new Point(sub_basket)))
+            .setLinearHeadingInterpolation(sub_side.getHeading(), sub_basket.getHeading())
+            .build();
+
+        sec_submersible = follower.pathBuilder()
+            .addPath(new BezierCurve(
+                new Point(sub_basket),
+                new Point(new Pose(-2.2 * Tile, -0.7 * Tile, false)),
+                new Point(sec_sub_side)))
+            .setLinearHeadingInterpolation(sub_basket.getHeading(), sec_sub_side.getHeading())
+            .build();
+
+        sec_subasket = follower.pathBuilder()
+            .addPath(new BezierCurve(
+                new Point(sec_sub_side),
+                new Point(new Pose(-2 * Tile, 0, false)),
+                new Point(sec_sub_basket)))
+            .setLinearHeadingInterpolation(sec_sub_side.getHeading(), sec_sub_basket.getHeading())
             .build();
 
         park = new Path(new BezierCurve(
-            new Point(sampleMid),
-            new Point(new Pose(-2.5 * Tile, 10, false)),
-            new Point(parking)
-        ));
-        park.setLinearHeadingInterpolation(sampleMid.getHeading(), parking.getHeading());
+            new Point(basket_3Sasmple),
+            new Point(new Pose(-2.5 * Tile, 0, false)),
+            new Point(parking)));
+        park.setLinearHeadingInterpolation(basket_3Sasmple.getHeading(), parking.getHeading());
 
         //----Fail Safe Programs----//
 
         failSafePark = follower.pathBuilder()
             .addPath(new BezierLine(
                 new Point(sub_side),
-                new Point(new Pose(-2 * Tile, parking.getY(), false))
+                new Point(new Pose(-2 * Tile, failSafe_parking.getY(), false))
             ))
-            .setLinearHeadingInterpolation(sub_side.getHeading(), parking.getHeading())
+            .setLinearHeadingInterpolation(sub_side.getHeading(), failSafe_parking.getHeading())
             .addPath(new BezierLine(
-                new Point(new Pose(-2 * Tile, parking.getY(), false)),
-                new Point(parking)
+                new Point(new Pose(-2 * Tile, failSafe_parking.getY(), false)),
+                new Point(failSafe_parking)
             ))
-            .setConstantHeadingInterpolation(parking.getHeading())
+            .setConstantHeadingInterpolation(failSafe_parking.getHeading())
             .build();
     }
 
-    public void setPathState(int pState) {
+    public void setPathState(PathState pState) {
         pathState = pState;
         timer.resetTimer();
     }
 
     public void autonomousPathUpdate() {
         switch (pathState) {
-            case 0:
+            case PRELOAD:
                 temp = new SequentialCommandGroup(
                     new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
                     new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(400)), // Prep Extendo
-                    opCommon.basket_scoring()
+                    new ParallelCommandGroup(
+                        opCommon.basket_scoring(),
+                        new InstantCommand(() -> opCommon.armSubsystem.setWristState(
+                            ArmSubsystem.WristState.BASKET_OUTTAKE
+                        ))
+                    )
                 );
-
                 temp.schedule();
-                follower.followPath(preload);
-                setPathState(1);
+
+                follower.followPath(preload, true);
+                setPathState(PathState.RIGHT_SAMPLE);
                 break;
 
-            case 1:
-                if (follower.atPose(sampleRight, 1, 1) && !CommandScheduler.getInstance().isScheduled(temp) && curr) {
+            case RIGHT_SAMPLE:
+                if (follower.atPose(sampleRight, xThreshold, yThreshold) && !CommandScheduler.getInstance().isScheduled(temp) && curr) {
                     curr = false;
                     temp = new SequentialCommandGroup(
                         opCommon.release_sample(),
@@ -177,34 +214,31 @@ public class Samples extends OpMode {
                 if (!CommandScheduler.getInstance().isScheduled(temp) && !curr) {
                     curr = true;
                     temp = new SequentialCommandGroup(
-                        new InstantCommand(() -> opCommon.elevatorSubsystem.set_target_height(150)),
-                        new WaitCommand(200),
                         new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
                         new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(50))
                         , // Prep Extendo
                         opCommon.basket_scoring(),
-                        new WaitCommand(50),
+                        new WaitCommand(200),
                         opCommon.release_sample(),
                         opCommon.extendo(0.35),
                         opCommon.sample_intake()
                     );
                     temp.schedule();
 
-                    follower.followPath(sample_2);
-                    setPathState(2);
+                    follower.followPath(sample_2, true);
+                    setPathState(PathState.MID_SAMPLE);
                 }
                 break;
 
-            case 2:
-                if (follower.atPose(sampleMid, 1, 1) && !CommandScheduler.getInstance().isScheduled(temp) && curr) {
+            case MID_SAMPLE:
+                if (follower.atPose(sampleMid, xThreshold, yThreshold) && !CommandScheduler.getInstance().isScheduled(temp) && curr) {
                     curr = false;
                     temp = new SequentialCommandGroup(
-                        new InstantCommand(() -> opCommon.elevatorSubsystem.set_target_height(150)),
-                        new WaitCommand(200),
                         new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
-                        new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(250)), // Prep Extendo
+                        new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(250)),
+                        // Prep Extendo
                         opCommon.basket_scoring(),
-                        new WaitCommand(50),
+                        new WaitCommand(200),
                         opCommon.release_sample()
                     );
                     temp.schedule();
@@ -219,59 +253,59 @@ public class Samples extends OpMode {
                     );
                     temp.schedule();
 
-                    follower.followPath(sample_3);
-                    setPathState(3);
+                    follower.followPath(sample_3, true);
+                    setPathState(PathState.LEFT_SAMPLE);
                 }
                 break;
 
-            case 3:
-                if (follower.atPose(sampleLeft, 1, 1) && !CommandScheduler.getInstance().isScheduled(temp)) {
+            case LEFT_SAMPLE:
+                if (!CommandScheduler.getInstance().isScheduled(temp)) {
                     temp = new SequentialCommandGroup(
-                        new InstantCommand(() -> opCommon.elevatorSubsystem.set_target_height(150)),
-                        new WaitCommand(200),
                         new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
                         new InstantCommand(() -> opCommon.extendoSubsystem.returnToZero()), // Prep Extendo
-                        new WaitCommand(400),
-                        opCommon.basket_scoring()
+                        new ParallelCommandGroup(
+                            opCommon.basket_scoring(),
+                            new InstantCommand(() -> opCommon.armSubsystem.setWristState(
+                                ArmSubsystem.WristState.BASKET_OUTTAKE
+                            ))
+                        )
                     );
                     temp.schedule();
 
-                    sampleRight.setX(sampleRight.getX() - 2);
-                    sampleRight.setY(sampleRight.getY() + 2);
-
-                    follower.followPath(s3basket);
-                    setPathState(4);
+                    follower.followPath(s3basket, true);
+                    setPathState(PathState.LEFT_SAMPLE_BAKSET);
                 }
                 break;
 
-            case 4:
-                if (follower.atPose(sampleMid, 1, 1) && !CommandScheduler.getInstance().isScheduled(temp)) {
+            case LEFT_SAMPLE_BAKSET:
+                if (follower.atPose(sampleMid, xThreshold, yThreshold) && !CommandScheduler.getInstance().isScheduled(temp)) {
                     temp = new SequentialCommandGroup(
                         opCommon.release_sample(),
                         new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
-                        new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(500)), // Prep Extendo
+                        new InstantCommand(() -> opCommon.extendoSubsystem.returnToZero()),
+                        // Prep Extendo
                         opCommon.reset_elevator()
                     );
                     temp.schedule();
 
-                    FollowerConstants.xMovement = 80;
-
                     follower.followPath(submersible, true);
-                    setPathState(5);
+                    setPathState(PathState.SUBMERSIBLE);
                 }
                 break;
 
-            case 5:
-                if (follower.atPose(sub_side, 1, 1) && !CommandScheduler.getInstance().isScheduled(temp) && curr) {
+            case SUBMERSIBLE:
+                if (follower.atPose(sub_side, xThreshold, yThreshold) && !CommandScheduler.getInstance().isScheduled(temp) && curr) {
                     curr = false;
                     temp = new SequentialCommandGroup(
                         new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
-                        new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(600)), // Prep Extendo
-                        opCommon.deep_intake(),
-                        opCommon.submersible_intake(),
-                        new InstantCommand(() -> opCommon.intakeSubsystem.reverse()),
-                        new WaitCommand(150),
-                        new InstantCommand(() -> opCommon.intakeSubsystem.stop())
+                        new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(250))
+                        , // Prep Extendo
+                        new InstantCommand(opCommon.intakeSubsystem::full_open),
+                        new WaitCommand(400),
+                        new InstantCommand(opCommon.intakeSubsystem::contract),
+                        opCommon.extendo(0.35),
+                        opCommon.sample_intake(),
+                        new InstantCommand(opCommon.intakeSubsystem::contract)
                     );
                     temp.schedule();
                 }
@@ -281,6 +315,9 @@ public class Samples extends OpMode {
                     temp = new SequentialCommandGroup(
                         new ParallelCommandGroup(
                             opCommon.basket_scoring(),
+                            new InstantCommand(() -> opCommon.armSubsystem.setWristState(
+                                ArmSubsystem.WristState.BASKET_OUTTAKE
+                            )),
                             new SequentialCommandGroup(
                                 new WaitCommand(500),
                                 new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
@@ -289,20 +326,67 @@ public class Samples extends OpMode {
                     );
                     temp.schedule();
 
-                    sampleMid.setY(-1.85 * Tile);
-                    sampleMid.setX(-2.65 * Tile);
-
-                    follower.followPath(subasket);
-                    setPathState(6);
+                    follower.followPath(subasket, true);
+                    setPathState(PathState.SUBMERSIBLE_BASKET);
                 }
                 break;
 
-            case 6:
-                if (follower.atPose(sampleMid, 1, 1) && !CommandScheduler.getInstance().isScheduled(temp) && curr) {
-                    curr = false;
+            case SUBMERSIBLE_BASKET:
+                if (follower.atPose(sub_basket, xThreshold, yThreshold) && !CommandScheduler.getInstance().isScheduled(temp)) {
                     temp = new SequentialCommandGroup(
                         opCommon.release_sample(),
-                        new WaitCommand(200)
+                        new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
+                        new InstantCommand(() -> opCommon.extendoSubsystem.returnToZero()),
+                        // Prep Extendo
+                        opCommon.reset_elevator()
+                    );
+                    temp.schedule();
+
+                    follower.followPath(sec_submersible, true);
+                    setPathState(PathState.SECOND_SUBMERSIBLE);
+                }
+                break;
+
+            case SECOND_SUBMERSIBLE:
+                if (follower.atPose(sec_sub_side, xThreshold, yThreshold) && !CommandScheduler.getInstance().isScheduled(temp) && curr) {
+                    curr = false;
+                    temp = new SequentialCommandGroup(
+                        new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
+                        new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(250))
+                        , // Prep Extendo
+                        opCommon.extendo(0.35),
+                        opCommon.sample_intake(),
+                        new InstantCommand(opCommon.intakeSubsystem::contract)
+                    );
+                    temp.schedule();
+                }
+
+                if (!CommandScheduler.getInstance().isScheduled(temp) && !curr) {
+                    curr = true;
+                    temp = new SequentialCommandGroup(
+                        new ParallelCommandGroup(
+                            opCommon.basket_scoring(),
+                            new InstantCommand(() -> opCommon.armSubsystem.setWristState(
+                                ArmSubsystem.WristState.BASKET_OUTTAKE
+                            )),
+                            new SequentialCommandGroup(
+                                new WaitCommand(500),
+                                new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
+                                new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(500)) // Prep Extendo
+                            ))
+                    );
+                    temp.schedule();
+
+                    follower.followPath(subasket, true);
+                    setPathState(PathState.SECOND_SUBMERSIBLE_BASKET);
+                }
+                break;
+
+            case SECOND_SUBMERSIBLE_BASKET:
+                if (follower.atPose(sec_sub_basket, xThreshold, yThreshold) && !CommandScheduler.getInstance().isScheduled(temp) && curr) {
+                    curr = false;
+                    temp = new SequentialCommandGroup(
+                        opCommon.release_sample()
                     );
                     temp.schedule();
                 }
@@ -317,48 +401,14 @@ public class Samples extends OpMode {
                     );
                     temp.schedule();
 
-                    FollowerConstants.xMovement = 75;
-
-                    follower.followPath(park);
-                    setPathState(8);
+                    follower.followPath(park, true);
+                    setPathState(PathState.PARKING);
                 }
                 break;
 
-            case 7:
-                if (curr) {
-                    curr = false;
-                    temp = new SequentialCommandGroup(
-                        new InstantCommand(opCommon.intakeSubsystem::raise),
-                        new InstantCommand(opCommon.intakeSubsystem::stop),
-                        new InstantCommand(opCommon.intakeSubsystem::reverse),
-                        new InstantCommand(() -> opCommon.armSubsystem.setArmState(
-                            ArmSubsystem.ArmState.PARK
-                        )),
-                        new InstantCommand(() -> opCommon.armSubsystem.setWristState(
-                            ArmSubsystem.WristState.PARK
-                        )),
-                        new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
-                        new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(-50)),
-                        new InstantCommand(() -> opCommon.elevatorSubsystem.set_target_height(-50)),
-                        new WaitUntilCommand(() -> opCommon.elevatorSubsystem.atTarget()),
-                        new WaitUntilCommand(() -> opCommon.extendoSubsystem.atTarget()),
-                        new InstantCommand(opCommon.intakeSubsystem::stop)
-                    );
-                    temp.schedule();
-                }
-
-                if (!curr) {
-                    temp =  opCommon.parking();
-                    temp.schedule();
-
-                    follower.followPath(failSafePark);
-                    setPathState(8);
-                }
-                break;
-
-            case 8:
-                if(follower.atPose(parking, 1, 1)) {
-                    setPathState(-1);
+            case PARKING:
+                if(follower.atPose(parking, xThreshold, yThreshold)) {
+                    setPathState(PathState.STOP);
                 }
                 break;
         }
@@ -378,7 +428,7 @@ public class Samples extends OpMode {
 
     @Override
     public void start() {
-        setPathState(0);
+        setPathState(PathState.PRELOAD);
     }
 
     @Override
@@ -387,9 +437,10 @@ public class Samples extends OpMode {
         autonomousPathUpdate();
         CommandScheduler.getInstance().run();
 
-        if (pathState == 5 && timer.getElapsedTime() >= 6000) {
-            setPathState(7);
+        if (pathState == PathState.SUBMERSIBLE && timer.getElapsedTime() >= 6000) {
+            setPathState(PathState.SECOND_SUBMERSIBLE);
             telemetry.addData("FailSafe: ", 1);
+            curr = true;
         }
     }
 }

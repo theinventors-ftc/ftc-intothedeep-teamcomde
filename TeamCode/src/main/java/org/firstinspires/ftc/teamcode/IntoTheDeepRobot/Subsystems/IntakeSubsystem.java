@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.RobotEx;
 import org.inventors.ftc.robotbase.hardware.ColorSensor;
@@ -14,7 +13,7 @@ import org.inventors.ftc.robotbase.hardware.ColorSensor;
 import java.util.HashMap;
 
 public class IntakeSubsystem extends SubsystemBase {
-    private ServoImplEx raiseServoL, raiseServoR;
+    private ServoImplEx wiper, raiseServoR;
     private CRServoImplEx rightIntake, leftIntake;
     private ColorSensor colorSensor;
     private DigitalChannel limitSwitch, raiseLimitSwitch;
@@ -34,16 +33,25 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private RaiseState raiseState;
 
-    private final HashMap<RaiseState, Double> raise_positionsL = new HashMap<RaiseState, Double>() {{
-        put(RaiseState.RAISED, 0.04);
-        put(RaiseState.LOWERED, 0.24);
-        put(RaiseState.HANGING, 0.0);
+    // Wiper States
+    public enum WiperState {
+        FULL_OPEN,
+        SEMI_OPEN,
+        CONTRACTED
+    }
+
+    private WiperState wiperState;
+
+    private final HashMap<WiperState, Double> wiper_positions = new HashMap<WiperState, Double>() {{
+        put(WiperState.FULL_OPEN, 0.0);
+        put(WiperState.SEMI_OPEN, 0.1);
+        put(WiperState.CONTRACTED, 0.45);
     }};
 
     private final HashMap<RaiseState, Double> raise_positionsR = new HashMap<RaiseState, Double>() {{
-        put(RaiseState.RAISED, 0.07);
-        put(RaiseState.LOWERED, 0.24);
-        put(RaiseState.HANGING, 0.0);
+        put(RaiseState.RAISED, 0.5);
+        put(RaiseState.LOWERED, 0.31);
+        put(RaiseState.HANGING, 0.5);
     }};
 
     // Intake States
@@ -69,7 +77,9 @@ public class IntakeSubsystem extends SubsystemBase {
     public IntakeSubsystem(RobotMap robotMap) {
         this.telemetry = robotMap.getTelemetry();
 
-        raiseServoL = robotMap.getIntakeRaiseServoL();
+        wiper = robotMap.getWiper();
+        contract();
+
         raiseServoR = robotMap.getIntakeRaiseServoR();
         raise();
 
@@ -88,20 +98,34 @@ public class IntakeSubsystem extends SubsystemBase {
     // Raise
     public void raise() {
         raiseState = RaiseState.RAISED;
-        raiseServoL.setPosition((double)raise_positionsL.get(RaiseState.RAISED));
         raiseServoR.setPosition((double)raise_positionsR.get(RaiseState.RAISED));
     }
 
     public void lower() {
         raiseState = RaiseState.LOWERED;
-        raiseServoL.setPosition((double)raise_positionsL.get(RaiseState.LOWERED));
         raiseServoR.setPosition((double)raise_positionsR.get(RaiseState.LOWERED));
     }
 
     public void hang() {
         raiseState = RaiseState.HANGING;
-        raiseServoL.setPosition((double)raise_positionsL.get(RaiseState.HANGING));
         raiseServoR.setPosition((double)raise_positionsR.get(RaiseState.HANGING));
+    }
+
+    // Wiper
+
+    public void full_open() {
+        wiperState = WiperState.FULL_OPEN;
+        wiper.setPosition((double)wiper_positions.get(WiperState.FULL_OPEN));
+    }
+
+    public void semi_open() {
+        wiperState = WiperState.SEMI_OPEN;
+        wiper.setPosition((double)wiper_positions.get(WiperState.SEMI_OPEN));
+    }
+
+    public void contract() {
+        wiperState = WiperState.CONTRACTED;
+        wiper.setPosition((double)wiper_positions.get(WiperState.CONTRACTED));
     }
 
     // Intake
@@ -143,6 +167,9 @@ public class IntakeSubsystem extends SubsystemBase {
     }
     public IntakeState getIntakeState() {
         return intakeState;
+    }
+    public WiperState getWiperState() {
+        return wiperState;
     }
 
     public COLOR getSampleColor() {
