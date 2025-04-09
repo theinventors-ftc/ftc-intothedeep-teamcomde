@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.RobotEx;
 import org.inventors.ftc.robotbase.hardware.ColorSensor;
@@ -13,7 +14,7 @@ import org.inventors.ftc.robotbase.hardware.ColorSensor;
 import java.util.HashMap;
 
 public class IntakeSubsystem extends SubsystemBase {
-    private ServoImplEx wiper, raiseServoR;
+    private ServoImplEx wiper, raiseServo;
     private CRServoImplEx rightIntake, leftIntake;
     private ColorSensor colorSensor;
     private DigitalChannel limitSwitch, raiseLimitSwitch;
@@ -98,21 +99,20 @@ public class IntakeSubsystem extends SubsystemBase {
     // Raise
     public void raise() {
         raiseState = RaiseState.RAISED;
-        raiseServoR.setPosition((double)raise_positionsR.get(RaiseState.RAISED));
+        raiseServo.setPosition((double)raise_positionsR.get(RaiseState.RAISED));
     }
 
     public void lower() {
         raiseState = RaiseState.LOWERED;
-        raiseServoR.setPosition((double)raise_positionsR.get(RaiseState.LOWERED));
+        raiseServo.setPosition((double)raise_positionsR.get(RaiseState.LOWERED));
     }
 
     public void hang() {
         raiseState = RaiseState.HANGING;
-        raiseServoR.setPosition((double)raise_positionsR.get(RaiseState.HANGING));
+        raiseServo.setPosition((double)raise_positionsR.get(RaiseState.HANGING));
     }
 
     // Wiper
-
     public void full_open() {
         wiperState = WiperState.FULL_OPEN;
         wiper.setPosition((double)wiper_positions.get(WiperState.FULL_OPEN));

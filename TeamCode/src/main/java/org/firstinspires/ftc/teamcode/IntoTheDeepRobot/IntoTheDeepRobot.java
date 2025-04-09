@@ -24,7 +24,7 @@ import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ExtendoSubsyst
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.HangingSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.HeadingControllerSubsystem;
-
+import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.StrafeControllerSubsystem;
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.RobotEx;
 import org.inventors.ftc.robotbase.drive.DriveConstants;
@@ -527,7 +527,6 @@ public class IntoTheDeepRobot extends RobotEx {
     @Override
     public double drivetrainStrafe() {
 //        if (strafeControllerSubsystem.isEnabled()) return strafeControllerSubsystem.calculatePower();
-//        return specimenAlignmentSubsystem.calculatePower();
 
         return super.drivetrainStrafe();
     }

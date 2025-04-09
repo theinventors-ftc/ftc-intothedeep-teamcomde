@@ -26,12 +26,12 @@ public class ExtendoSubsystem extends SubsystemBase {
     private DoubleSupplier power;
 
     private SimpleMotorFeedforward ff = new SimpleMotorFeedforward(
-            0.0,
+            0.05,
             1.0,
             0.0
     );
     private PIDFControllerEx pid = new PIDFControllerEx(
-            0.007,
+            0.0072,
             0.0, // 0.06
             0.06,
             0.0,
@@ -99,6 +99,8 @@ public class ExtendoSubsystem extends SubsystemBase {
         telemetry.addData("Extendo Target", targetPosition);
         telemetry.addData("Extendo Power: ", power.getAsDouble());
         telemetry.update();
+
+        if(getExtension() < 100) block_manual = false;
 
         if(Math.abs(power.getAsDouble()) > 0.05 && !block_manual){ // Manual
             set(Range.clip(

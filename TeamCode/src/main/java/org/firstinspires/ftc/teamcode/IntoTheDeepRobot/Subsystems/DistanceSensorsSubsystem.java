@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RobotMap;
@@ -47,7 +48,7 @@ public class DistanceSensorsSubsystem extends SubsystemBase {
     public void periodic() {
         for (int i = 0; i < 3; i++) {
             distances[i] = (sensors[i].getVoltage()/3.3) * 500;
-            distances_fix[i] = mapping(
+            distances_fix[i] = Range.scale(
                     distances[i],
                     tuning[i][0],
                     tuning[i][1],
@@ -60,10 +61,6 @@ public class DistanceSensorsSubsystem extends SubsystemBase {
 //        telemetry.addData("Rear Distance", distances[0]);
 //        telemetry.addData("Left Distance", distances[1]);
 //        telemetry.addData("Right Distance", distances[2]);
-    }
-
-    public double mapping(double x, double in_min, double in_max, double out_min, double out_max) {
-        return (x-in_min) * (out_max-out_min) / (in_max - in_min) + out_min;
     }
 
     public double[] getDistances() {
