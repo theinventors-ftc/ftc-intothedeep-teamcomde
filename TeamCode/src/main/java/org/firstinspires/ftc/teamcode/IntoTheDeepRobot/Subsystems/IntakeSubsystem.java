@@ -14,7 +14,7 @@ import org.inventors.ftc.robotbase.hardware.ColorSensor;
 import java.util.HashMap;
 
 public class IntakeSubsystem extends SubsystemBase {
-    private ServoImplEx raiseServoL, raiseServoR;
+    private ServoImplEx raiseServoR; //, raiseServoL;
     private CRServoImplEx rightIntake, leftIntake;
     private ColorSensor colorSensor;
     private DigitalChannel limitSwitch, raiseLimitSwitch;
@@ -34,18 +34,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private RaiseState raiseState;
 
-    private final HashMap<RaiseState, Double> raise_positionsL = new HashMap<RaiseState, Double>() {{
-        put(RaiseState.RAISED, 0.04);
-        put(RaiseState.LOWERED, 0.24);
-        put(RaiseState.HANGING, 0.0);
+    private final HashMap<RaiseState, Double> raise_positions = new HashMap<RaiseState, Double>() {{
+        put(RaiseState.RAISED, 0.5);
+        put(RaiseState.LOWERED, 0.31);
+        put(RaiseState.HANGING, 0.5);
     }};
-
-    private final HashMap<RaiseState, Double> raise_positionsR = new HashMap<RaiseState, Double>() {{
-        put(RaiseState.RAISED, 0.07);
-        put(RaiseState.LOWERED, 0.24);
-        put(RaiseState.HANGING, 0.0);
-    }};
-
     // Intake States
     public enum IntakeState {
         INTAKE,
@@ -69,7 +62,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public IntakeSubsystem(RobotMap robotMap) {
         this.telemetry = robotMap.getTelemetry();
 
-        raiseServoL = robotMap.getIntakeRaiseServoL();
+//        raiseServoL = robotMap.getIntakeRaiseServoL();
         raiseServoR = robotMap.getIntakeRaiseServoR();
         raise();
 
@@ -88,20 +81,20 @@ public class IntakeSubsystem extends SubsystemBase {
     // Raise
     public void raise() {
         raiseState = RaiseState.RAISED;
-        raiseServoL.setPosition((double)raise_positionsL.get(RaiseState.RAISED));
-        raiseServoR.setPosition((double)raise_positionsR.get(RaiseState.RAISED));
+//        raiseServoL.setPosition((double)raise_positionsL.get(RaiseState.RAISED));
+        raiseServoR.setPosition((double)raise_positions.get(RaiseState.RAISED));
     }
 
     public void lower() {
         raiseState = RaiseState.LOWERED;
-        raiseServoL.setPosition((double)raise_positionsL.get(RaiseState.LOWERED));
-        raiseServoR.setPosition((double)raise_positionsR.get(RaiseState.LOWERED));
+//        raiseServoL.setPosition((double)raise_positionsL.get(RaiseState.LOWERED));
+        raiseServoR.setPosition((double)raise_positions.get(RaiseState.LOWERED));
     }
 
     public void hang() {
         raiseState = RaiseState.HANGING;
-        raiseServoL.setPosition((double)raise_positionsL.get(RaiseState.HANGING));
-        raiseServoR.setPosition((double)raise_positionsR.get(RaiseState.HANGING));
+//        raiseServoL.setPosition((double)raise_positionsL.get(RaiseState.HANGING));
+        raiseServoR.setPosition((double)raise_positions.get(RaiseState.HANGING));
     }
 
     // Intake

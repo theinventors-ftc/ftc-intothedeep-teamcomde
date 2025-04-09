@@ -55,10 +55,6 @@ public class SpecimenAlignmentSubsystem extends SubsystemBase {
         return limelight.getLatestResult().getPythonOutput()[0];
     }
 
-    public double mapping(double x, double in_min, double in_max, double out_min, double out_max) {
-        return (x-in_min) * (out_max-out_min) / (in_max - in_min) + out_min;
-    }
-
     public double calculatePower() {
 //        double clip_map =
         return Range.clip(controller.calculate(), -clip, clip);

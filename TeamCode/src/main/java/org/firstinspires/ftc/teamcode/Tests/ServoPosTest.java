@@ -19,7 +19,7 @@ public class ServoPosTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        servo = hardwareMap.get(ServoImplEx.class, "claw");
+        servo = hardwareMap.get(ServoImplEx.class, "intake_raise_right");
 
         waitForStart();
 

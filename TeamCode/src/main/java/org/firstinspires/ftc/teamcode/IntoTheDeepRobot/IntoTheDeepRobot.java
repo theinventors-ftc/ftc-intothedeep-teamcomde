@@ -56,11 +56,11 @@ public class IntoTheDeepRobot extends RobotEx {
         super(robotMap, RobotConstants, opModeType, alliance, init_camera, startingPose);
         this.robotMap = robotMap;
 
-        limelight3A = robotMap.getRearLimelight();
-        specimenAlignmentSubsystem = new SpecimenAlignmentSubsystem(
-                limelight3A,
-                dashboard.getTelemetry()
-        );
+//        limelight3A = robotMap.getRearLimelight();
+//        specimenAlignmentSubsystem = new SpecimenAlignmentSubsystem(
+//                limelight3A,
+//                dashboard.getTelemetry()
+//        );
 
         new Trigger(() -> (Math.abs(drivetrainForward()) > 0.1 ||
                 Math.abs(drivetrainStrafe()) > 0.1 ||

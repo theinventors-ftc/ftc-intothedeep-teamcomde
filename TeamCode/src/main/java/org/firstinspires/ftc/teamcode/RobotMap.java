@@ -123,9 +123,9 @@ public class RobotMap implements RobotMapInterface {
         battery = new Battery(hardwareMap);
 
         // Camera
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(0);
-        telemetry.setMsTransmissionInterval(11);
+//        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+//        limelight.pipelineSwitch(0);
+//        telemetry.setMsTransmissionInterval(11);
 //        int cameraMonitorViewId = hardwareMap.appContext.getResources()
 //                .getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 //        rearCamera =  OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class,
