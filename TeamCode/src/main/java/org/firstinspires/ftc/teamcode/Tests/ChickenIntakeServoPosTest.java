@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.Tests;
 
-import android.net.TransportInfo;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
@@ -10,20 +8,15 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.IntakeV2Subsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.SampleDetectionSubsystem;
 import org.inventors.ftc.robotbase.hardware.GamepadExEx;
 
+@Disabled
 @Config
 @TeleOp(name = "ChickenIntakeServoPosTest", group = "Tests")
 public class ChickenIntakeServoPosTest extends CommandOpMode {

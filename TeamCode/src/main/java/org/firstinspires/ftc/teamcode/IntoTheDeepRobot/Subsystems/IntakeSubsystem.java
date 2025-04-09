@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.RobotEx;
 import org.inventors.ftc.robotbase.hardware.ColorSensor;
@@ -49,7 +48,7 @@ public class IntakeSubsystem extends SubsystemBase {
         put(WiperState.CONTRACTED, 0.45);
     }};
 
-    private final HashMap<RaiseState, Double> raise_positionsR = new HashMap<RaiseState, Double>() {{
+    private final HashMap<RaiseState, Double> raise_positions = new HashMap<RaiseState, Double>() {{
         put(RaiseState.RAISED, 0.5);
         put(RaiseState.LOWERED, 0.31);
         put(RaiseState.HANGING, 0.5);
@@ -79,9 +78,9 @@ public class IntakeSubsystem extends SubsystemBase {
         this.telemetry = robotMap.getTelemetry();
 
         wiper = robotMap.getWiper();
-        contract();
+        wiper_contract();
 
-        raiseServoR = robotMap.getIntakeRaiseServoR();
+        raiseServo = robotMap.getIntakeRaiseServo();
         raise();
 
         leftIntake = robotMap.getLeftIntakeServo();
@@ -99,31 +98,31 @@ public class IntakeSubsystem extends SubsystemBase {
     // Raise
     public void raise() {
         raiseState = RaiseState.RAISED;
-        raiseServo.setPosition((double)raise_positionsR.get(RaiseState.RAISED));
+        raiseServo.setPosition((double)raise_positions.get(RaiseState.RAISED));
     }
 
     public void lower() {
         raiseState = RaiseState.LOWERED;
-        raiseServo.setPosition((double)raise_positionsR.get(RaiseState.LOWERED));
+        raiseServo.setPosition((double)raise_positions.get(RaiseState.LOWERED));
     }
 
     public void hang() {
         raiseState = RaiseState.HANGING;
-        raiseServo.setPosition((double)raise_positionsR.get(RaiseState.HANGING));
+        raiseServo.setPosition((double)raise_positions.get(RaiseState.HANGING));
     }
 
     // Wiper
-    public void full_open() {
+    public void wiper_full_open() {
         wiperState = WiperState.FULL_OPEN;
         wiper.setPosition((double)wiper_positions.get(WiperState.FULL_OPEN));
     }
 
-    public void semi_open() {
+    public void wiper_semi_open() {
         wiperState = WiperState.SEMI_OPEN;
         wiper.setPosition((double)wiper_positions.get(WiperState.SEMI_OPEN));
     }
 
-    public void contract() {
+    public void wiper_contract() {
         wiperState = WiperState.CONTRACTED;
         wiper.setPosition((double)wiper_positions.get(WiperState.CONTRACTED));
     }
@@ -198,8 +197,6 @@ public class IntakeSubsystem extends SubsystemBase {
     public boolean isSample() {
         telemetry.addData("Intake has Sample?: ", limitSwitch.getState());
         return limitSwitch.getState();
-//        telemetry.addData("Intake has Sample?: ", limitSwitch.getState());
-//        return colorSensor.getDistance(DistanceUnit.MM) < 30;
     }
 
     public ColorSensor getColorSensor() {

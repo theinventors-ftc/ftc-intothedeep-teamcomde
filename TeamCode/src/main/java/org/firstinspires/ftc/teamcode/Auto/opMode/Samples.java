@@ -9,7 +9,6 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
-import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.localization.Pose;
@@ -300,12 +299,12 @@ public class Samples extends OpMode {
                         new InstantCommand(() -> opCommon.extendoSubsystem.set_MAX_POWER(1)),
                         new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(250))
                         , // Prep Extendo
-                        new InstantCommand(opCommon.intakeSubsystem::full_open),
+                        new InstantCommand(opCommon.intakeSubsystem::wiper_full_open),
                         new WaitCommand(400),
-                        new InstantCommand(opCommon.intakeSubsystem::contract),
+                        new InstantCommand(opCommon.intakeSubsystem::wiper_contract),
                         opCommon.extendo(0.35),
                         opCommon.sample_intake(),
-                        new InstantCommand(opCommon.intakeSubsystem::contract)
+                        new InstantCommand(opCommon.intakeSubsystem::wiper_contract)
                     );
                     temp.schedule();
                 }
@@ -356,7 +355,7 @@ public class Samples extends OpMode {
                         , // Prep Extendo
                         opCommon.extendo(0.35),
                         opCommon.sample_intake(),
-                        new InstantCommand(opCommon.intakeSubsystem::contract)
+                        new InstantCommand(opCommon.intakeSubsystem::wiper_contract)
                     );
                     temp.schedule();
                 }

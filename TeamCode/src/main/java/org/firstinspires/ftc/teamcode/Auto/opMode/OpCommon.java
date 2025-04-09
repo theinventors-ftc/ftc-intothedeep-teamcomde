@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.Auto.opMode;
 
-import static java.lang.Math.abs;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -9,10 +7,7 @@ import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
-import com.arcrobotics.ftclib.command.button.Trigger;
 import com.pedropathing.follower.Follower;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.ForwardControllerSubsystem;

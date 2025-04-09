@@ -61,7 +61,7 @@ public class RobotMap implements RobotMapInterface {
     private ServoImplEx armRightServo, armLeftServo, armWristServo;
 
     // ----------------------------------------- Intake ----------------------------------------- //
-    private ServoImplEx wiper, intakeRaiseServoR;
+    private ServoImplEx wiper, intakeRaiseServo;
     private CRServoImplEx leftIntakeServo, rightIntakeServo;
     private ColorSensor colorSensor;
     private DigitalChannel sampleLimitSwitch, raiseLimitSwitch;
@@ -165,7 +165,7 @@ public class RobotMap implements RobotMapInterface {
 
         // --------------------------------------- Intake --------------------------------------- //
         wiper = hardwareMap.get(ServoImplEx.class, "wiper");
-        intakeRaiseServoR = hardwareMap.get(ServoImplEx.class, "intake_raise_right");
+        intakeRaiseServo = hardwareMap.get(ServoImplEx.class, "intake_raise_right");
 
         leftIntakeServo = hardwareMap.get(CRServoImplEx.class, "intake_left_wheel");
         rightIntakeServo = hardwareMap.get(CRServoImplEx.class, "intake_right_wheel");
@@ -443,12 +443,12 @@ public class RobotMap implements RobotMapInterface {
     }
 
     // ----------------------------------------- Intake ----------------------------------------- //
-    public ServoImplEx getWiper () {
+    public ServoImplEx getWiper() {
         return wiper;
     }
 
-    public ServoImplEx getIntakeRaiseServoR() {
-        return intakeRaiseServoR;
+    public ServoImplEx getIntakeRaiseServo() {
+        return intakeRaiseServo;
     }
 
     public CRServoImplEx getLeftIntakeServo() {

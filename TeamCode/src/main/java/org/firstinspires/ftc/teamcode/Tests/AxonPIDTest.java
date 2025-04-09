@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Tests;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.util.Timing;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -13,6 +14,7 @@ import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.util.PIDFControllerEx;
 
 import java.util.concurrent.TimeUnit;
 
+@Disabled
 @Config
 @TeleOp(name = "Axon PID Test", group = "Tests")
 public class AxonPIDTest extends LinearOpMode {

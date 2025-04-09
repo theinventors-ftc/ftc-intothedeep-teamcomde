@@ -3,11 +3,11 @@ package org.firstinspires.ftc.teamcode.Tests;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 
-//@Disabled
+@Disabled
 @TeleOp(name = "Limelight Test", group = "Tests")
 public class LimelightTest extends LinearOpMode {
     private Limelight3A limelight;

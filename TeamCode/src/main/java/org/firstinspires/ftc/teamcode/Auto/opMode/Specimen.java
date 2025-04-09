@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.Tile
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robotX;
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robotY;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
@@ -20,6 +21,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Auto.constants.FConstants;
 import org.firstinspires.ftc.teamcode.Auto.constants.LConstants;
+import org.firstinspires.ftc.teamcode.PoseStorage;
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.RobotEx;
 
@@ -481,5 +483,14 @@ public class Specimen extends OpMode {
 
         telemetry.addData("Pathstate", pathState);
         telemetry.addData("Is Robot Stuck", follower.isRobotStuck());
+    }
+
+    @Override
+    public void stop() {
+        PoseStorage.currentPose = new Pose2d(
+                follower.getPose().getAsFTCStandardCoordinates().getX(),
+                follower.getPose().getAsFTCStandardCoordinates().getY(),
+                follower.getPose().getAsFTCStandardCoordinates().getHeading()
+        );
     }
 }
