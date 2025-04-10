@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.Tile
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robotX;
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robotY;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
@@ -24,6 +25,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.Auto.constants.FConstants;
 import org.firstinspires.ftc.teamcode.Auto.constants.LConstants;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ArmSubsystem;
+import org.firstinspires.ftc.teamcode.PoseStorage;
 import org.firstinspires.ftc.teamcode.RobotMap;
 import org.inventors.ftc.robotbase.RobotEx;
 
@@ -416,9 +418,9 @@ public class Samples extends OpMode {
     @Override
     public void init() {
         CommandScheduler.getInstance().reset();
-        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
-        follower.setStartingPose(start);
         robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.AUTO);
+        follower = new Follower(robotMap, FConstants.class, LConstants.class);
+        follower.setStartingPose(start);
         opCommon = new OpCommon(robotMap, alliance);
         timer = new Timer();
 
@@ -441,5 +443,14 @@ public class Samples extends OpMode {
             telemetry.addData("FailSafe: ", 1);
             curr = true;
         }
+    }
+
+    @Override
+    public void stop() {
+        PoseStorage.currentPose = new Pose2d(
+            follower.getPose().getAsFTCStandardCoordinates().getX(),
+            follower.getPose().getAsFTCStandardCoordinates().getY(),
+            follower.getPose().getAsFTCStandardCoordinates().getHeading()
+        );
     }
 }

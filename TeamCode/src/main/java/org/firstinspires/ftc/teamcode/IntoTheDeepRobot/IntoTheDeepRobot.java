@@ -9,8 +9,11 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.pedropathing.follower.Follower;
 
+import org.firstinspires.ftc.teamcode.Auto.opMode.OpCommon;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Commands.IntakeCommand;
+import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Commands.PedroCommand;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.HeadingControllerSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ArmSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ClawSubsystem;
@@ -21,11 +24,13 @@ import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ExtendoSubsyst
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.HangingSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.RobotMap;
+
 import org.inventors.ftc.robotbase.RobotEx;
 import org.inventors.ftc.robotbase.drive.DriveConstants;
 
 public class IntoTheDeepRobot extends RobotEx {
     protected RobotMap robotMap;
+    protected Follower follower;
     //----------------------------------- Initialize Subsystems ----------------------------------//
     protected ClawSubsystem clawSubsystem;
     protected ArmSubsystem armSubsystem;
@@ -53,6 +58,74 @@ public class IntoTheDeepRobot extends RobotEx {
                 Math.abs(drivetrainStrafe()) > 0.1 ||
                 Math.abs(drivetrainTurn()) > 0.1) && !hasInit)
                 .whenActive(new InstantCommand(this::initMechanismsTeleOp));
+    }
+
+    public IntoTheDeepRobot(Follower follower, RobotMap robotMap,
+                            DriveConstants RobotConstants,
+                            OpModeType opModeType, Alliance alliance, boolean init_camera,
+                            Pose2d startingPose) {
+        super(robotMap, RobotConstants, opModeType, alliance, init_camera, startingPose);
+        this.robotMap = robotMap;
+        this.follower = follower;
+
+        new Trigger(() -> (Math.abs(drivetrainForward()) > 0.1 ||
+            Math.abs(drivetrainStrafe()) > 0.1 ||
+            Math.abs(drivetrainTurn()) > 0.1) && !hasInit)
+            .whenActive(new InstantCommand(this::initMechanismsTeleOp));
+    }
+
+    public SequentialCommandGroup specimenAim() {
+        drive_isInAuto(true);
+        return new SequentialCommandGroup( // PEOS INTAKE AIM
+                                           new InstantCommand(() -> elevatorSubsystem.setLevel(
+                                               ElevatorSubsystem.Level.SPEC_INTAKE)
+                                           ),
+                                           new InstantCommand(() -> armSubsystem.setArmState(
+                                               ArmSubsystem.ArmState.PARK
+                                           )),
+                                           new InstantCommand(() -> armSubsystem.setWristState(
+                                               ArmSubsystem.WristState.PARK
+                                           )),
+                                           new WaitCommand(200),
+                                           new InstantCommand(() -> armSubsystem.setWristState(
+                                               ArmSubsystem.WristState.SPEC_INTAKE_NEW
+                                           )),
+                                           new WaitCommand(100),
+                                           new InstantCommand(() -> armSubsystem.setArmState(
+                                               ArmSubsystem.ArmState.SPEC_INTAKE_NEW
+                                           )),
+                                           new InstantCommand(clawSubsystem::release),
+                                           new InstantCommand(extendoSubsystem::returnToZero)
+        );
+    }
+
+    public SequentialCommandGroup scoreSpeciment() {
+        return new SequentialCommandGroup(
+            new InstantCommand(clawSubsystem::firmlyGripped),
+            new WaitCommand(200),
+            new InstantCommand(() -> elevatorSubsystem.setLevel(
+                ElevatorSubsystem.Level.SPEC_INTAKE
+            )),
+            new InstantCommand(() -> armSubsystem.setWristState(
+                ArmSubsystem.WristState.SPEC_OUTTAKE_AIM_NEW
+            )),
+            new InstantCommand(() -> armSubsystem.setArmState(
+                ArmSubsystem.ArmState.SPEC_OUTTAKE_AIM_NEW
+            ))
+        );
+    }
+
+    public SequentialCommandGroup releaseSpecimen() {
+        return new SequentialCommandGroup(
+            new InstantCommand(() -> armSubsystem.setArmState(
+                ArmSubsystem.ArmState.SPEC_OUTTAKE_NEW
+            )),
+            new InstantCommand(() -> armSubsystem.setWristState(
+                ArmSubsystem.WristState.SPEC_OUTTAKE_NEW
+            )),
+            new WaitCommand(300),
+            new InstantCommand(clawSubsystem::release)
+        );
     }
 
     public SequentialCommandGroup intake_sample_for_specimen() {
@@ -201,8 +274,6 @@ public class IntoTheDeepRobot extends RobotEx {
         hangingSubsystem = new HangingSubsystem(this.robotMap);
         couplersSubsystem = new CouplersSubsystem(this.robotMap);
         distanceSensorsSubsystem = new DistanceSensorsSubsystem(this.robotMap, telemetry);
-
-
 
 //        forwardController = new ForwardControllerSubsystem(
 //                () -> distanceSensorsSubsystem.getDistances()[0],
@@ -476,6 +547,12 @@ public class IntoTheDeepRobot extends RobotEx {
                     new InstantCommand(intakeSubsystem::wiper_contract)
                 )
             );
+
+//
+//        driverOp.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
+//            .whenHeld(
+//                new PedroCommand(follower, releaseSpecimen(), scoreSpeciment(), specimenAim())
+//            );
     }
 
     @Override

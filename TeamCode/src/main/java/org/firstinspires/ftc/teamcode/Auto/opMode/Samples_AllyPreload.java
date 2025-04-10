@@ -333,9 +333,9 @@ public class Samples_AllyPreload extends OpMode {
     @Override
     public void init() {
         CommandScheduler.getInstance().reset();
-        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
-        follower.setStartingPose(start);
         robotMap = new RobotMap(hardwareMap, telemetry, gamepad1, gamepad2, RobotMap.OpMode.AUTO);
+        follower = new Follower(robotMap, FConstants.class, LConstants.class);
+        follower.setStartingPose(start);
         opCommon = new OpCommon(robotMap, alliance);
         timer = new Timer();
 

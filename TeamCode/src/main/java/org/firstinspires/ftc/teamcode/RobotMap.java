@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import android.graphics.Bitmap;
 
 import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.pedropathing.follower.RobotMapUtil;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -14,6 +15,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.function.Consumer;
@@ -36,7 +38,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 import org.openftc.easyopencv.PipelineRecordingParameters;
 
-public class RobotMap implements RobotMapInterface {
+public class RobotMap implements RobotMapInterface, RobotMapUtil {
     public enum OpMode {
         AUTO,
         TELEOP
@@ -83,32 +85,35 @@ public class RobotMap implements RobotMapInterface {
 
     private Limelight3A limelight;
 
-    public RobotMap(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2,
-                    OpMode opMode) {
+    private VoltageSensor voltageSensor;
+
+    public RobotMap (HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2,
+                     OpMode opMode) {
         this.opMode = opMode;
         this.hardwareMap = hardwareMap;
         if(opMode == OpMode.TELEOP) {
             driverOp = new GamepadExEx(gamepad1);
             toolOp = new GamepadExEx(gamepad2);
-            // ------------------------------------- Drivetrain ------------------------------------- //
-            frontLeft = new MotorExEx(hardwareMap, "front_left", Motor.GoBILDA.RPM_435);
-            frontRight = new MotorExEx(hardwareMap, "front_right", Motor.GoBILDA.RPM_435);
-            rearLeft = new MotorExEx(hardwareMap, "rear_left", Motor.GoBILDA.RPM_435);
-            rearRight = new MotorExEx(hardwareMap, "rear_right", Motor.GoBILDA.RPM_435);
-            frontLeft.setRunMode(Motor.RunMode.RawPower);
-            frontRight.setRunMode(Motor.RunMode.RawPower);
-            rearLeft.setRunMode(Motor.RunMode.RawPower);
-            rearRight.setRunMode(Motor.RunMode.RawPower);
-
-            imu = hardwareMap.get(IMU.class, "external_imu");
-            IMU.Parameters imuParameters = new IMU.Parameters(
-                new RevHubOrientationOnRobot(
-                    RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD,
-                    RevHubOrientationOnRobot.UsbFacingDirection.DOWN
-                )
-            );
-            imu.initialize(imuParameters);
         }
+
+        // ------------------------------------- Drivetrain ------------------------------------- //
+        frontLeft = new MotorExEx(hardwareMap, "front_left", Motor.GoBILDA.RPM_435);
+        frontRight = new MotorExEx(hardwareMap, "front_right", Motor.GoBILDA.RPM_435);
+        rearLeft = new MotorExEx(hardwareMap, "rear_left", Motor.GoBILDA.RPM_435);
+        rearRight = new MotorExEx(hardwareMap, "rear_right", Motor.GoBILDA.RPM_435);
+        frontLeft.setRunMode(Motor.RunMode.RawPower);
+        frontRight.setRunMode(Motor.RunMode.RawPower);
+        rearLeft.setRunMode(Motor.RunMode.RawPower);
+        rearRight.setRunMode(Motor.RunMode.RawPower);
+
+        imu = hardwareMap.get(IMU.class, "external_imu");
+        IMU.Parameters imuParameters = new IMU.Parameters(
+            new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD,
+                RevHubOrientationOnRobot.UsbFacingDirection.DOWN
+            )
+        );
+        imu.initialize(imuParameters);
 
         // ---------------------------------------- Util ---------------------------------------- //
         for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
@@ -117,6 +122,7 @@ public class RobotMap implements RobotMapInterface {
 
         this.telemetry = telemetry;
         battery = new Battery(hardwareMap);
+        voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
         // Camera
 //        limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -419,6 +425,10 @@ public class RobotMap implements RobotMapInterface {
         return battery;
     }
 
+    public VoltageSensor getVoltageSensor() {
+        return voltageSensor;
+    }
+
     //// --------------------------------------- Mechanisms ----------------------------------- ////
     // ------------------------------------------- Claw ----------------------------------------- //
     public ServoImplEx getClawServo() {
@@ -443,11 +453,11 @@ public class RobotMap implements RobotMapInterface {
     }
 
     // ----------------------------------------- Intake ----------------------------------------- //
-    public ServoImplEx getWiper() {
+    public ServoImplEx getWiper () {
         return wiper;
     }
 
-    public ServoImplEx getIntakeRaiseServo() {
+    public ServoImplEx getIntakeRaiseServo () {
         return intakeRaiseServo;
     }
 
