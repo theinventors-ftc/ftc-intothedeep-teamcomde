@@ -1,10 +1,14 @@
-package org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Commands;
+package org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems;
 
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.Tile;
 import static org.firstinspires.ftc.teamcode.Auto.features.BuilderFunctions.robotY;
 
-import com.arcrobotics.ftclib.command.CommandBase;
+import android.se.omapi.Session;
+
+import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
@@ -13,13 +17,13 @@ import com.pedropathing.pathgen.Point;
 
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.IntoTheDeepRobot;
 
-public class PedroCommand extends CommandBase {
+public class PedroSubsystem extends SubsystemBase {
 
     private Follower follower;
-    private SequentialCommandGroup releaseSpecimen;
+    private boolean isAutoRunning = false;
     private SequentialCommandGroup scoreSpeciment;
+    private SequentialCommandGroup releaseSpecimen;
     private SequentialCommandGroup specimenAim;
-    private volatile boolean backToTeleOp = false;
 
     private double
         xThreshold = 4,
@@ -119,41 +123,39 @@ public class PedroCommand extends CommandBase {
         }
     }
 
-    public PedroCommand(Follower follower,
-                        SequentialCommandGroup releaseSpecimen,
-                        SequentialCommandGroup scoreSpeciment,
-                        SequentialCommandGroup specimenAim) {
+    public PedroSubsystem (Follower follower, SequentialCommandGroup scoreSpeciment,
+                                                SequentialCommandGroup releaseSpecimen,
+                                                SequentialCommandGroup specimenAim)
+    {
         this.follower = follower;
-        this.releaseSpecimen = releaseSpecimen;
         this.scoreSpeciment = scoreSpeciment;
+        this.releaseSpecimen = releaseSpecimen;
         this.specimenAim = specimenAim;
     }
 
-    public void setBackToTeleOp(boolean set) {
-        backToTeleOp = set;
+    public void setIsAutoRunning(boolean set) {
+        isAutoRunning = set;
     }
 
-    @Override
+    public boolean getIsAutoRunning() {
+        return isAutoRunning;
+    }
+
     public void initialize() {
+        setIsAutoRunning(true);
         buildFirstCycle();
         setPathState(PathState.STARTING);
     }
 
-    @Override
-    public void execute() {
-        follower.update();
-        autonomousPathUpdate();
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        if(interrupted) {
-            follower.breakFollowing();
+    public void periodic() {
+        if (getIsAutoRunning()) {
+            follower.update();
+            autonomousPathUpdate();
         }
     }
 
-    @Override
-    public boolean isFinished() {
-        return backToTeleOp;
+    public void stop() {
+        follower.breakFollowing();
+        setIsAutoRunning(false);
     }
 }

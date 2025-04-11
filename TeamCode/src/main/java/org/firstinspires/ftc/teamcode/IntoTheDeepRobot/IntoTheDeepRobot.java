@@ -11,9 +11,8 @@ import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.pedropathing.follower.Follower;
 
-import org.firstinspires.ftc.teamcode.Auto.opMode.OpCommon;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Commands.IntakeCommand;
-import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Commands.PedroCommand;
+import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.PedroSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Controllers.HeadingControllerSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ArmSubsystem;
 import org.firstinspires.ftc.teamcode.IntoTheDeepRobot.Subsystems.ClawSubsystem;
@@ -40,6 +39,7 @@ public class IntoTheDeepRobot extends RobotEx {
     protected HangingSubsystem hangingSubsystem;
     protected CouplersSubsystem couplersSubsystem;
     protected DistanceSensorsSubsystem distanceSensorsSubsystem;
+    protected PedroSubsystem pedroSubsystem;
 
     // ---------------------------------- Initialize Controllers -------------------------------- //
 //    protected ForwardControllerSubsystem forwardController;
@@ -75,27 +75,26 @@ public class IntoTheDeepRobot extends RobotEx {
     }
 
     public SequentialCommandGroup specimenAim() {
-        drive_isInAuto(true);
         return new SequentialCommandGroup( // PEOS INTAKE AIM
-                                           new InstantCommand(() -> elevatorSubsystem.setLevel(
-                                               ElevatorSubsystem.Level.SPEC_INTAKE)
-                                           ),
-                                           new InstantCommand(() -> armSubsystem.setArmState(
-                                               ArmSubsystem.ArmState.PARK
-                                           )),
-                                           new InstantCommand(() -> armSubsystem.setWristState(
-                                               ArmSubsystem.WristState.PARK
-                                           )),
-                                           new WaitCommand(200),
-                                           new InstantCommand(() -> armSubsystem.setWristState(
-                                               ArmSubsystem.WristState.SPEC_INTAKE_NEW
-                                           )),
-                                           new WaitCommand(100),
-                                           new InstantCommand(() -> armSubsystem.setArmState(
-                                               ArmSubsystem.ArmState.SPEC_INTAKE_NEW
-                                           )),
-                                           new InstantCommand(clawSubsystem::release),
-                                           new InstantCommand(extendoSubsystem::returnToZero)
+            new InstantCommand(() -> elevatorSubsystem.setLevel(
+               ElevatorSubsystem.Level.SPEC_INTAKE)
+            ),
+            new InstantCommand(() -> armSubsystem.setArmState(
+               ArmSubsystem.ArmState.PARK
+            )),
+            new InstantCommand(() -> armSubsystem.setWristState(
+               ArmSubsystem.WristState.PARK
+            )),
+            new WaitCommand(200),
+            new InstantCommand(() -> armSubsystem.setWristState(
+               ArmSubsystem.WristState.SPEC_INTAKE_NEW
+            )),
+            new WaitCommand(100),
+            new InstantCommand(() -> armSubsystem.setArmState(
+               ArmSubsystem.ArmState.SPEC_INTAKE_NEW
+            )),
+            new InstantCommand(clawSubsystem::release),
+            new InstantCommand(extendoSubsystem::returnToZero)
         );
     }
 
@@ -254,6 +253,7 @@ public class IntoTheDeepRobot extends RobotEx {
     @Override
     public void initMechanismsTeleOp() {
         hasInit = true;
+        drive_isInAuto(false);
 
         clawSubsystem = new ClawSubsystem(this.robotMap);
         armSubsystem = new ArmSubsystem(this.robotMap);
@@ -291,6 +291,11 @@ public class IntoTheDeepRobot extends RobotEx {
                 dashboard.getTelemetry()
         );
 
+        pedroSubsystem = new PedroSubsystem(follower,
+                                            scoreSpeciment(),
+                                            releaseSpecimen(),
+                                            specimenAim());
+
         //------------------------------------ Manual Actions ---------------------------------- //
 //         Claw Grab/Release(Just Open) Toggle
         toolOp.getGamepadButton(GamepadKeys.Button.X).whenPressed(new ConditionalCommand(
@@ -305,7 +310,6 @@ public class IntoTheDeepRobot extends RobotEx {
 //        ));
 
         toolOp.getGamepadButton(GamepadKeys.Button.Y).toggleWhenPressed(intake_sample_for_specimen());
-
 
         // Intake Raise/Lower Toggle
         toolOp.getGamepadButton(GamepadKeys.Button.A).whenPressed(new ConditionalCommand(
@@ -410,8 +414,26 @@ public class IntoTheDeepRobot extends RobotEx {
                 )
         );
 
+        new Trigger(() -> driverOp.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.0)
+            .whenActive(
+                new SequentialCommandGroup(
+                    new InstantCommand(() -> extendoSubsystem.set_MAX_POWER(1)),
+                    new InstantCommand(() -> extendoSubsystem.setTargetPosition((int)(1700 * driverOp.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)))
+                )
+            )
+        );
+
+        driverOp.getGamepadButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)
+            .whenPressed(
+                new SequentialCommandGroup(
+                    new InstantCommand(intakeSubsystem::lower),
+                    intake_sample()
+                )
+            );
+
         // High Basket
-        toolOp.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).whenPressed(
+        driverOp.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+            .whenPressed(
                 new SequentialCommandGroup(
                         new InstantCommand(clawSubsystem::firmlyGripped),
                         new ConditionalCommand(
@@ -431,7 +453,28 @@ public class IntoTheDeepRobot extends RobotEx {
                                 ArmSubsystem.ArmState.BASKET_OUTTAKE
                         ))
                 )
-        );
+            )
+            .whenReleased(
+                new SequentialCommandGroup(
+                    new InstantCommand(clawSubsystem::release),
+                    new WaitCommand(150),
+                    new InstantCommand(clawSubsystem::justOpen, clawSubsystem),
+                    new InstantCommand(
+                        () -> elevatorSubsystem.setLevel(ElevatorSubsystem.Level.INTAKE)
+                    ),
+                    new ConditionalCommand(
+                        new InstantCommand(() -> extendoSubsystem.setTargetPosition(250), extendoSubsystem),
+                        new InstantCommand(),
+                        () -> extendoSubsystem.getExtension() < 250
+                    ),
+                    new InstantCommand(() -> armSubsystem.setWristState(
+                        ArmSubsystem.WristState.INTAKE
+                    )),
+                    new InstantCommand(() -> armSubsystem.setArmState(
+                        ArmSubsystem.ArmState.INTAKE
+                    ))
+                )
+            );
 
         //// Basket Outtake Automation
         new Trigger(() -> toolOp.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.4)
@@ -515,31 +558,12 @@ public class IntoTheDeepRobot extends RobotEx {
                 () -> elevatorSubsystem.getLevel() != ElevatorSubsystem.Level.HANGING_AIM
         ));
 
-        toolOp.getGamepadButton(GamepadKeys.Button.BACK).whenPressed(new SequentialCommandGroup(
+        driverOp.getGamepadButton(GamepadKeys.Button.BACK).whenPressed(new SequentialCommandGroup(
                 new InstantCommand(elevatorSubsystem::reset_encoder, elevatorSubsystem),
                 new InstantCommand(extendoSubsystem::reset_encoder, extendoSubsystem)
         ));
 
-        // ------------------------------------ Drive Commands ---------------------------------- //
-        driverOp.getGamepadButton(GamepadKeys.Button.A)
-                .toggleWhenPressed(
-                        new SequentialCommandGroup(
-                                new InstantCommand(gyroFollow::enable),
-                                new InstantCommand(() -> gyroFollow.setGyroTarget(0))
-                        ),
-                        new InstantCommand(gyroFollow::disable)
-                );
-//
-//        driverOp.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-//            .whenPressed(
-//                new ConditionalCommand(
-//                    new InstantCommand(intakeSubsystem::semi_open),
-//                    new InstantCommand(intakeSubsystem::contract),
-//                    () -> intakeSubsystem.getWiperState() != IntakeSubsystem.WiperState.SEMI_OPEN
-//                )
-//            );
-
-        driverOp.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+        driverOp.getGamepadButton(GamepadKeys.Button.X)
             .whenPressed(
                 new SequentialCommandGroup(
                     new InstantCommand(intakeSubsystem::wiper_full_open),
@@ -548,11 +572,21 @@ public class IntoTheDeepRobot extends RobotEx {
                 )
             );
 
-//
-//        driverOp.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-//            .whenHeld(
-//                new PedroCommand(follower, releaseSpecimen(), scoreSpeciment(), specimenAim())
-//            );
+        driverOp.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
+            .toggleWhenPressed(
+                new SequentialCommandGroup(
+                    new InstantCommand(pedroSubsystem::initialize),
+                    new InstantCommand(() -> drive.setInAutoMode(pedroSubsystem.getIsAutoRunning()))
+                )
+            );
+
+        driverOp.getGamepadButton(GamepadKeys.Button.A)
+            .toggleWhenPressed(
+                new SequentialCommandGroup(
+                    new InstantCommand(pedroSubsystem::stop),
+                    new InstantCommand(() -> drive.setInAutoMode(pedroSubsystem.getIsAutoRunning()))
+                )
+            );
     }
 
     @Override
