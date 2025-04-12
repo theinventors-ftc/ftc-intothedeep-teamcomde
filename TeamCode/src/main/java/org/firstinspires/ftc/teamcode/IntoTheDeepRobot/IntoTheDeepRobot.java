@@ -409,11 +409,11 @@ public class IntoTheDeepRobot extends RobotEx {
                         new InstantCommand(clawSubsystem::firmlyGripped, clawSubsystem),
                         new InstantCommand(extendoSubsystem::returnToZero, extendoSubsystem),
                         new InstantCommand(() -> armSubsystem.setWristState(
-                                ArmSubsystem.WristState.PARK
+                                ArmSubsystem.WristState.INTAKE
                         )),
                         new WaitCommand(120),
                         new InstantCommand(() -> armSubsystem.setArmState(
-                                ArmSubsystem.ArmState.PARK
+                                ArmSubsystem.ArmState.INTAKE
                         ))
                 ),
                 new SequentialCommandGroup( // Ascending Cmd
