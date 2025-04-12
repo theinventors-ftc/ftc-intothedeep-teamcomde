@@ -49,7 +49,7 @@ public class ArmSubsystem extends SubsystemBase {
         put(WristState.LVL1_ASCENT, 0.78);
         put(WristState.SPEC_INTAKE_NEW, 0.6);
         put(WristState.SPEC_OUTTAKE_AIM_NEW, 0.485);
-        put(WristState.SPEC_OUTTAKE_NEW, 0.44);
+        put(WristState.SPEC_OUTTAKE_NEW, 0.43);
     }};
 
     public ArmSubsystem(RobotMap robotMap) {

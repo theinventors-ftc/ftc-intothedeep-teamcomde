@@ -8,6 +8,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
@@ -93,7 +94,7 @@ public class Specimen extends OpMode {
             Math.toRadians(280), false),
 
         allianceSampleLeft = new Pose(
-            2 * Tile - 1, -Tile + (robotY/2), Math.toRadians(270), false),
+            2 * Tile - 3, -Tile + (robotY/2), Math.toRadians(270), false),
 
         allianceSampleMid = new Pose(
             2.5 * Tile - 4, -Tile + (robotY/2), Math.toRadians(270), false),
@@ -102,11 +103,17 @@ public class Specimen extends OpMode {
             3 * Tile - (robotX/2) - 2, -Tile + (robotY/2), Math.toRadians(270), false),
 
         parking = new Pose(
-            2 * Tile, -2.4 * Tile, Math.toRadians(315), false);
+            2 * Tile, -2.4 * Tile, Math.toRadians(315), false),
+
+        samplePoseMid = new Pose(allianceSampleMid.getX(), -2.5 * Tile + 22.4, false),
+
+        samplePoseLeft = new Pose(allianceSampleLeft.getX(), -2.5 * Tile + 22.4, false);
+
 
     private Path
         toPreload,
-        toParking;
+        toParking,
+        sample;
 
     private PathChain
         samples,
@@ -125,35 +132,37 @@ public class Specimen extends OpMode {
 
         //*//
 
+        sample = new Path(new BezierCurve(
+            new Point(new Pose(allianceSampleLeft.getX(), -2.5 * Tile + 22.4, false)),
+            new Point(allianceSampleLeft),
+            new Point(new Pose(2.25 * Tile, -4, false)),
+            new Point(allianceSampleMid)
+        ));
+
         samples = follower.pathBuilder()
             .addPath(new BezierCurve(
                 new Point(preload),
-                new Point(new Pose(2.3 * Tile, -2.3 * Tile, false)),
-                new Point(new Pose(1.3 * Tile, 8, false)),
+                new Point(new Pose(2.35 * Tile, -2.3 * Tile, false)),
+                new Point(new Pose(1.3 * Tile, 1, false)),
                 new Point(allianceSampleLeft)
             ))
             .setConstantHeadingInterpolation(Math.toRadians(270))
             .addPath(new BezierLine(
                 new Point(allianceSampleLeft),
-                new Point(new Pose(allianceSampleLeft.getX(), -2.5 * Tile + 22.4, false))
+                new Point(samplePoseLeft)
             ))
             .setConstantHeadingInterpolation(Math.toRadians(270))
-            .addPath(new BezierCurve(
-                new Point(new Pose(allianceSampleLeft.getX(), -2.5 * Tile + 22.4, false)),
-                new Point(allianceSampleLeft),
-                new Point(new Pose(2.25 * Tile, 3, false)),
-                new Point(allianceSampleMid)
-            ))
+            .addPath(sample)
             .setConstantHeadingInterpolation(Math.toRadians(270))
             .addPath(new BezierLine(
                 new Point(allianceSampleMid),
-                new Point(new Pose(allianceSampleMid.getX(), -2.5 * Tile + 22.4, false))
+                new Point(samplePoseMid)
             ))
             .setConstantHeadingInterpolation(Math.toRadians(270))
             .addPath(new BezierCurve(
                 new Point(new Pose(allianceSampleMid.getX(), -2.5 * Tile + 22.4, false)),
                 new Point(allianceSampleMid),
-                new Point(new Pose(2.55 * Tile, 3, false)),
+                new Point(new Pose(2.55 * Tile, -4, false)),
                 new Point(allianceSampleRight)
             ))
             .setConstantHeadingInterpolation(Math.toRadians(270))
@@ -163,6 +172,7 @@ public class Specimen extends OpMode {
             ))
             .setConstantHeadingInterpolation(Math.toRadians(270))
             .build();
+
 
         //*//
 
@@ -275,12 +285,11 @@ public class Specimen extends OpMode {
                     temp.schedule();
                 }
 
-                if (!curr) {
+                if (!CommandScheduler.getInstance().isScheduled(temp) && !curr) {
                     curr = true;
                     temp = new SequentialCommandGroup(
                         opCommon.specimenAim(),
-                        new InstantCommand(opCommon.clawSubsystem::looslyGripped),
-                        new InstantCommand(opCommon.intakeSubsystem::lower)
+                        new InstantCommand(opCommon.clawSubsystem::looslyGripped)
                     );
                     temp.schedule();
 
@@ -290,13 +299,18 @@ public class Specimen extends OpMode {
                 break;
 
             case LEFT_SAMPLE:
+
                 if (follower.atPose(new Pose(1.5 * Tile, -Tile), 10, 10)) {
                     follower.setMaxPower(0.8);
+                    temp = new SequentialCommandGroup(
+                        new InstantCommand(() -> opCommon.extendoSubsystem.setTargetPosition(150)),
+                        new InstantCommand(opCommon.intakeSubsystem::lower)
+                    );
+                    temp.schedule();
                 }
 
                 if (follower.getCurrentTValue() >= 0.8 &&
                     follower.atPose(allianceSampleLeft, 6, 6, hThreshold) && !CommandScheduler.getInstance().isScheduled(temp)) {
-
                     follower.setMaxPower(1);
 
                     temp = opCommon.extendoSpecimenPush();
@@ -311,12 +325,13 @@ public class Specimen extends OpMode {
                     follower.setMaxPower(0.9);
                 }
 
-                if (follower.atPose(allianceSampleMid, xThreshold, yThreshold, hThreshold) && !CommandScheduler.getInstance().isScheduled(temp)) {
+                if (follower.getCurrentPath() == sample && follower.getCurrentTValue() >= 0.9 && !CommandScheduler.getInstance().isScheduled(temp)) {
                     follower.setMaxPower(1);
-                    curr = true;
+
                     temp = new SequentialCommandGroup(
                         opCommon.extendoSpecimenPush(),
-                        new InstantCommand(opCommon.intakeSubsystem::raise)
+                        new InstantCommand(opCommon.intakeSubsystem::raise),
+                        new InstantCommand(opCommon.extendoSubsystem::returnToZero)
                     );
                     temp.schedule();
 

@@ -352,11 +352,11 @@ public class OpCommon {
             ),
             new InstantCommand(()-> extendoSubsystem.set_MAX_POWER(1)),
             new InstantCommand(()-> extendoSubsystem.setTargetPosition(900)),
+            new WaitCommand(100),
             new InstantCommand(intakeSubsystem::reverse),
-            new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
+            new WaitUntilCommand(extendoSubsystem::atTarget),
             new InstantCommand(()-> extendoSubsystem.set_MAX_POWER(1)),
-            new InstantCommand(()-> extendoSubsystem.returnToZero()),
-            new WaitUntilCommand(() -> extendoSubsystem.atTarget()),
+            new InstantCommand(()-> extendoSubsystem.setTargetPosition(150)),
             new InstantCommand(intakeSubsystem::stop)
         );
     }
